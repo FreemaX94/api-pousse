@@ -14,6 +14,7 @@ const login = async (req, res, next) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     if (!user) throw createError(404, 'Utilisateur non trouvé');
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw createError(401, 'Mot de passe incorrect');
 
@@ -23,7 +24,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Lax',
-      maxAge: 3600000, // 1h
+      maxAge: 3600000,
     });
 
     res.status(200).json({
@@ -38,9 +39,16 @@ const login = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hash, isActive: true });
+    const { username, password, email, role } = req.body;
+
+    const user = new User({
+      username,
+      email,
+      password, // laissé en clair pour que le modèle le hash
+      role: role || 'user',
+      isActive: true
+    });
+
     await user.save();
     res.status(201).json({ success: true, message: 'Utilisateur créé' });
   } catch (err) {
