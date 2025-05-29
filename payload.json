@@ -1,0 +1,14 @@
+{
+    "client": "Test",
+    "destination": "123 Rue de la Paix",
+    "contenu": "",
+    "contact": "",
+    "telephone": "",
+    "date": "2025-05-02T12:00:00.000Z",
+    "prix": 0,
+    "pole": "Création",
+    "statut": "Préparé",
+    "items": ["1"],
+    "syncSource": "googleSheet"
+  }
+  

@@ -1,0 +1,75 @@
+/* src/index.css */
+
+/* 1) L’@import doit être en tout premier (avant Tailwind) */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Déclaration de la police BodoniBauerBQ pour le titre/logo */
+@font-face {
+  font-family: 'BodoniBauerBQ';
+  src: url('/fonts/Bodoni Bauer BQ Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+:root {
+  --bg: #FFFFFF;
+  --text: #111;
+  --primary: #007BFF;
+  --border: #DDD;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--bg);
+    height: 100%;
+  }
+
+  body {
+    @apply text-[var(--text)] font-sans leading-relaxed;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'BodoniBauerBQ', serif;
+    color: var(--text);
+  }
+
+  button {
+    font-family: inherit;
+  }
+}
+
+/* Boutons et tables (inchangés) */
+.btn {
+  @apply inline-flex items-center border px-3 py-1 rounded text-sm font-medium;
+}
+.btn-primary {
+  @apply bg-[var(--primary)] text-white border-[var(--primary)];
+}
+.btn-outline-primary {
+  @apply border-[var(--primary)] text-[var(--primary)] bg-white;
+}
+.table {
+  @apply w-full border-collapse;
+}
+.table th,
+.table td {
+  @apply px-3 py-2 border-b border-[var(--border)] text-sm;
+}
+.table th {
+  @apply text-left font-semibold bg-white;
+}
+
+/* Mode sombre */
+.dark {
+  --bg: #121212;
+  --text: #e2e8f0;
+  --primary: #4ade80; /* vert doux */
+  --border: #333;
+}
