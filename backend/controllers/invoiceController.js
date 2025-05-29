@@ -9,7 +9,8 @@ exports.validateCreateInvoice = celebrate({
     pole: Joi.string().required(),
     details: Joi.string().allow('').optional(),
     amount: Joi.number().required(),
-    dueDate: Joi.date().required()
+    dueDate: Joi.date().required(),
+    date: Joi.date().required() // <-- Toujours requis pour ton dashboard
   })
 });
 
@@ -22,6 +23,9 @@ exports.validateGetInvoices = celebrate({
 });
 
 exports.createInvoice = asyncHandler(async (req, res) => {
+  // 🐞 Log temporaire pour débogage
+  console.log('📦 Payload reçu :', req.body);
+
   const invoice = await invoiceService.createInvoice(req.body);
   res.status(201).json({ status: 'success', data: invoice });
 });
@@ -30,4 +34,3 @@ exports.getInvoices = asyncHandler(async (req, res) => {
   const list = await invoiceService.listInvoices(req.query);
   res.status(200).json({ status: 'success', ...list });
 });
-

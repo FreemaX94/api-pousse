@@ -16,7 +16,8 @@
       "request": "launch",
       "name": "Debug Frontend React (Vite)",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/frontend"
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "vite-frontend"
     }
   ]
 }
