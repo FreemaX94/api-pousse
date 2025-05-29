@@ -1,9 +1,12 @@
-
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 
 const app = express();
+
+// 🔍 Logger de requêtes HTTP
+app.use(morgan('dev'));
 
 app.use(cors({
   origin: [
@@ -17,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Routes simulées (à adapter selon ton projet réel)
+// 🧪 Routes factices pour tests simples
 app.use('/api/users', (req, res) => res.status(200).send([]));
 app.use('/api/sanitize-test', (req, res) => res.status(200).send([]));
 app.use('/api/statistiques', (req, res) => res.status(200).send([]));
@@ -32,7 +35,7 @@ app.use('/api/deliveries', (req, res) => res.status(200).send([]));
 app.use('/api/entretien', (req, res) => res.status(200).send([]));
 app.use('/api/vehicules', (req, res) => res.status(200).send([]));
 
-// Produits (exemple simulé)
+// 🧪 Produits simulés
 let fakeProducts = [];
 
 app.get('/api/products', (req, res) => {
@@ -50,12 +53,17 @@ app.get('/api/products/:id', (req, res) => {
   res.status(200).json(found);
 });
 
-// Routes réelles à charger dynamiquement
+// ✅ Brancher toutes les vraies routes dynamiques
 function setupRoutes() {
   const authRoutes = require('./routes/authRoutes');
-  const stockRoutes = require('./routes/stocks'); // ✅ Ajouté
+  const stockRoutes = require('./routes/stocks');
+  const invoiceRoutes = require('./routes/invoices'); // ✅ ajouté
+  const vehicleRoutes = require('./routes/vehicles'); // ✅ ajouté
+
   app.use('/api/auth', authRoutes);
-  app.use('/stocks', stockRoutes); // ✅ Ajouté
+  app.use('/stocks', stockRoutes);
+  app.use('/api/invoices', invoiceRoutes); // ✅ activé
+  app.use('/api/vehicles', vehicleRoutes); // ✅ activé
 }
 
 module.exports = { app, setupRoutes };

@@ -1,15 +1,8 @@
 {
-  "git.ignoreLimitWarning": true,
-  "cSpell.language": "fr",
-  "cSpell.dictionaries": ["fr"],
-  "cSpell.enabled": true,
-  "cSpell.ignorePaths": [
-    "**/node_modules/**",
-    "**/dist/**",
-    "**/build/**",
-    "**/.git/**"
-  ],
-  "cSpell.words": [
+  "version": "0.2",
+  "language": "fr",
+  "dictionaries": ["fr", "softwareTerms", "node"],
+  "words": [
     "acompte",
     "facture",
     "livraison",
@@ -35,5 +28,11 @@
     "AdminPanel",
     "StockViewer",
     "NavBar"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**"
   ]
 }

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const VehicleSchema = new Schema({
@@ -7,4 +7,4 @@ const VehicleSchema = new Schema({
   capacity: { type: Number, required: true, min: 0 }
 }, { timestamps: true });
 
-export default mongoose.model('Vehicle', VehicleSchema);
+module.exports = mongoose.model('Vehicle', VehicleSchema);

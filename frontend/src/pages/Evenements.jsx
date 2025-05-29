@@ -24,16 +24,21 @@ export default function Evenements() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    const from = new Date().toISOString();
-    fetch(`/api/events?from=${encodeURIComponent(from)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(setEvents)
-      .catch((err) => console.error("Error fetching events:", err));
-  }, []);
+useEffect(() => {
+  const from = new Date().toISOString();
+  fetch(`/api/events?from=${encodeURIComponent(from)}`, {
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(setEvents)
+    .catch((err) => console.error("Error fetching events:", err));
+}, []);
+
 
   return (
     <div className={darkMode ? "dark" : ""}>

@@ -1,11 +1,16 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const InvoiceSchema = new Schema({
-  orderId: { type: Schema.Types.ObjectId, ref: 'SalesOrder', required: true, index: true },
+  client: { type: String, required: true, trim: true },
+  employee: { type: String, required: true, trim: true },
+  pole: { type: String, required: true, trim: true },
+  details: { type: String, trim: true },
   amount: { type: Number, required: true, min: 0 },
   dueDate: { type: Date, required: true },
   status: { type: String, enum: ['paid', 'unpaid', 'overdue'], default: 'unpaid' }
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
-export default mongoose.model('Invoice', InvoiceSchema);
+module.exports = mongoose.model('Invoice', InvoiceSchema);

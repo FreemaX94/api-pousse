@@ -1,34 +1,33 @@
-const * as service = require('../services/invoiceService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
+const asyncHandler = require('express-async-handler');
+const invoiceService = require('../services/invoiceService');
 
 exports.validateCreateInvoice = celebrate({
   [Segments.BODY]: Joi.object({
-    orderId: Joi.string().hex().length(24).required(),
-    amount: Joi.number().positive().required(),
+    client: Joi.string().required(),
+    employee: Joi.string().required(),
+    pole: Joi.string().required(),
+    details: Joi.string().allow('').optional(),
+    amount: Joi.number().required(),
     dueDate: Joi.date().required()
   })
 });
-exports.createInvoice = async (req, res, next) =>{
-    try{
-        const inv=await service.createInvoice(req.body);
-        res.status(201).json({status:'success',data:inv});
-    }catch(err){
-        next(err);
-    }
-};
 
 exports.validateGetInvoices = celebrate({
   [Segments.QUERY]: Joi.object({
-    status: Joi.string().valid('paid','unpaid','overdue').optional(),
-    page: Joi.number().min(1).optional(),
-    limit: Joi.number().max(200).optional()
+    status: Joi.string().valid('paid', 'unpaid').optional(),
+    page: Joi.number().integer().min(1).optional(),
+    limit: Joi.number().integer().min(1).optional()
   })
 });
-exports.getInvoices = async (req, res, next) =>{
-    try{
-        const {data,meta}=await service.listInvoices(req.query);
-        res.json({status:'success',data,meta});
-    }catch(err){
-        next(err);
-    }
-};
+
+exports.createInvoice = asyncHandler(async (req, res) => {
+  const invoice = await invoiceService.createInvoice(req.body);
+  res.status(201).json({ status: 'success', data: invoice });
+});
+
+exports.getInvoices = asyncHandler(async (req, res) => {
+  const list = await invoiceService.listInvoices(req.query);
+  res.status(200).json({ status: 'success', ...list });
+});
+

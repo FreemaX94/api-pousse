@@ -1,120 +1,89 @@
-(async () => {
-// backend/services/invoiceService.js
 const createError = require('http-errors');
 const mongoose = require('mongoose');
 const Invoice = require('../models/Invoice.js');
 
-/**
- * Crée une nouvelle facture.
- * @param {{ orderId: string, amount: number, dueDate: Date|string }} payload
- * @returns {Promise<Object>}
- */
-exports.createInvoice({ orderId, amount, dueDate }) {
-  if (!mongoose.Types.ObjectId.isValid(orderId)) {
-    throw createError(400, 'orderId invalide')
-  }
-  if (amount == null) {
-    throw createError(400, 'amount est requis')
-  }
-  if (!dueDate) {
-    throw createError(400, 'dueDate est requis')
+exports.createInvoice = async ({ client, employee, pole, details, amount, dueDate }) => {
+  if (!client || !employee || !pole || amount == null || !dueDate) {
+    throw createError(400, 'Champs requis manquants');
   }
 
   const inv = await Invoice.create({
-    orderId,
+    client,
+    employee,
+    pole,
+    details,
     amount,
     dueDate: new Date(dueDate)
-  })
-  return inv.toObject()
-}
+  });
+  return inv.toObject();
+};
 
-/**
- * Compte les factures selon filtre.
- * @param {{ status?: string }} filter
- * @returns {Promise<number>}
- */
-exports.countInvoices({ status } = {}) {
-  const q = {}
-  if (status) q.status = status
-  return Invoice.countDocuments(q)
-}
+exports.countInvoices = async ({ status } = {}) => {
+  const q = {};
+  if (status) q.status = status;
+  return Invoice.countDocuments(q);
+};
 
-/**
- * Liste les factures avec pagination et filtre de statut.
- * @param {{ status?: string, page?: number, limit?: number }} options
- * @returns {Promise<{ data: Object[], meta: { total: number, page: number, limit: number } }>}
- */
-exports.listInvoices({ status, page = 1, limit = 50 } = {}) {
-  const q = {}
-  if (status) q.status = status
+exports.listInvoices = async ({ status, page = 1, limit = 50 } = {}) => {
+  const q = {};
+  if (status) q.status = status;
+  const skip = (Math.max(page, 1) - 1) * limit;
 
-  const skip = (Math.max(page, 1) - 1) * limit
-  const [ total, data ] = await Promise.all([
-    countInvoices({ status }),
+  const [total, data] = await Promise.all([
+    exports.countInvoices({ status }),
     Invoice.find(q)
       .sort({ dueDate: 1 })
       .skip(skip)
       .limit(limit)
       .lean()
-  ])
-  return { data, meta: { total, page, limit } }
-}
+  ]);
 
-/**
- * Récupère une facture par son ID.
- * @param {string} id
- * @returns {Promise<Object>}
- */
-exports.getInvoiceById(id) {
+  return { data, meta: { total, page, limit } };
+};
+
+exports.getInvoiceById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createError(400, 'ID de facture invalide')
+    throw createError(400, 'ID de facture invalide');
   }
-  const inv = await Invoice.findById(id).lean()
+  const inv = await Invoice.findById(id).lean();
   if (!inv) {
-    throw createError(404, 'Facture non trouvée')
+    throw createError(404, 'Facture non trouvée');
   }
-  return inv
-}
+  return inv;
+};
 
-/**
- * Met à jour une facture existante.
- * @param {string} id
- * @param {{ amount?: number, dueDate?: Date|string, status?: string }} update
- * @returns {Promise<Object>}
- */
-exports.updateInvoice(id, update) {
+exports.updateInvoice = async (id, update) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createError(400, 'ID de facture invalide')
+    throw createError(400, 'ID de facture invalide');
   }
-  const payload = {}
-  if (update.amount != null) payload.amount = update.amount
-  if (update.dueDate) payload.dueDate = new Date(update.dueDate)
-  if (update.status) payload.status = update.status
+  const payload = {};
+  if (update.client) payload.client = update.client;
+  if (update.employee) payload.employee = update.employee;
+  if (update.pole) payload.pole = update.pole;
+  if (update.details !== undefined) payload.details = update.details;
+  if (update.amount != null) payload.amount = update.amount;
+  if (update.dueDate) payload.dueDate = new Date(update.dueDate);
+  if (update.status) payload.status = update.status;
 
   const updated = await Invoice.findByIdAndUpdate(
     id,
     payload,
     { new: true, runValidators: true }
-  ).lean()
-  if (!updated) {
-    throw createError(404, 'Facture non trouvée')
-  }
-  return updated
-}
+  ).lean();
 
-/**
- * Supprime une facture.
- * @param {string} id
- * @returns {Promise<Object>}
- */
-exports.deleteInvoice(id) {
+  if (!updated) {
+    throw createError(404, 'Facture non trouvée');
+  }
+  return updated;
+};
+
+exports.deleteInvoice = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw createError(400, 'ID de facture invalide')
+    throw createError(400, 'ID de facture invalide');
   }
-  const deleted = await Invoice.findByIdAndDelete(id).lean()
+  const deleted = await Invoice.findByIdAndDelete(id).lean();
   if (!deleted) {
-    throw createError(404, 'Facture non trouvée')
+    throw createError(404, 'Facture non trouvée');
   }
-  return deleted
-}
-})();
+  return deleted;
+};

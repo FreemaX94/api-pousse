@@ -1,4 +1,4 @@
-const * as service = require('../services/contractService.js');
+const service = require('../services/contractService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
 
 exports.validatePostContract = celebrate({
@@ -13,7 +13,7 @@ exports.validatePostContract = celebrate({
 exports.postContract = async (req, res, next) => {
   try {
     const contract = await service.createContract(req.body);
-    res.status(201).json({ status: 'success', data: contract });
+    res.status(201).json({ status: 'success', data: _contract });
   } catch (err) {
     next(err);
   }
