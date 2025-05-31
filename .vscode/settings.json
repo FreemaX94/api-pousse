@@ -1,5 +1,7 @@
 {
   "git.ignoreLimitWarning": true,
+
+  // Correcteur orthographique FR
   "cSpell.language": "fr",
   "cSpell.dictionaries": ["fr"],
   "cSpell.enabled": true,
@@ -10,30 +12,36 @@
     "**/.git/**"
   ],
   "cSpell.words": [
-    "acompte",
-    "facture",
-    "livraison",
-    "Nieuwkoop",
-    "Pousse",
-    "contrat",
-    "entretien",
-    "concepteur",
-    "vehicule",
-    "frontend",
-    "backend",
-    "MongoDB",
-    "React",
-    "Tailwind",
-    "Edwin",
-    "Organilog",
-    "Evenements",
-    "Catalogue",
-    "Inventaire",
-    "Plannings",
-    "Stocks",
-    "depot",
-    "AdminPanel",
-    "StockViewer",
-    "NavBar"
-  ]
+    "acompte", "facture", "livraison", "Nieuwkoop", "Pousse",
+    "contrat", "entretien", "concepteur", "vehicule",
+    "frontend", "backend", "MongoDB", "React", "Tailwind",
+    "Edwin", "Organilog", "Evenements", "Catalogue", "Inventaire",
+    "Plannings", "Stocks", "depot", "AdminPanel", "StockViewer", "NavBar",
+    "Organizer", "workbench", "icon", "theme",
+    "trim", "Trailing", "smooth", "integrated", "linting"
+  ],
+
+  // ✅ Formatage automatique sur sauvegarde (via Prettier uniquement)
+  "editor.formatOnSave": true,
+
+  // ✅ ESLint actif (mais pas de fix forcé)
+  "eslint.codeActionsOnSave.mode": "all",
+  "eslint.validate": ["javascript", "javascriptreact"],
+
+  // ✅ Prettier
+  "prettier.requireConfig": true,
+
+  // ✅ Import Organizer
+  "importOrganizer.sortOnBeforeSave": true,
+
+  // Apparence
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.tabSize": 2,
+  "editor.minimap.enabled": false,
+  "files.trimTrailingWhitespace": true,
+  "workbench.startupEditor": "none",
+  "editor.smoothScrolling": true,
+
+  // Terminal personnalisé
+  "terminal.integrated.shell.windows": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe"
 }
