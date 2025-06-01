@@ -22,7 +22,7 @@ const login = async (req, res, next) => {
 
     res.cookie('sid', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // ✅ POUR DEV LOCAL (à remettre en true pour prod HTTPS)
       sameSite: 'Lax',
       maxAge: 3600000,
     });
@@ -44,7 +44,7 @@ const register = async (req, res, next) => {
     const user = new User({
       username,
       email,
-      password, // laissé en clair pour que le modèle le hash
+      password, // le modèle User hash le mot de passe
       role: role || 'user',
       isActive: true
     });

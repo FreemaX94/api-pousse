@@ -8,13 +8,19 @@ const app = express();
 // 🔍 Logger de requêtes HTTP
 app.use(morgan('dev'));
 
+const allowedOrigins = process.env.CORS_ORIGIN.split(',');
+
 app.use(cors({
-  origin: [
-    'http://localhost:3001',
-    'https://api-pousse-app-5y2wo.ondigitalocean.app'
-  ],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -25,7 +27,7 @@ export default defineConfig({
     port: 3000,
     open: true,
     cors: true,
-    proxy: {
+    proxy: isProd ? {} : {
       '/stocks': {
         target: 'http://localhost:3001',
         changeOrigin: true,

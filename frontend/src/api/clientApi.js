@@ -1,16 +1,11 @@
-// frontend/src/api/api.js
+// frontend/src/api/clientApi.js
 
 import axios from 'axios';
 
-// Récupère la base URL de l'API depuis les variables d'environnement
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+// Récupère l'URL depuis le .env ou fallback
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://144.126.228.24:3001/api';
 
-if (!baseURL) {
-  console.warn(
-    "⚠️ VITE_API_BASE_URL n'est pas définie. " +
-    "Ajoutez VITE_API_BASE_URL=http://localhost:3000/api dans votre .env"
-  );
-}
+console.log("✅ API utilisée :", baseURL);
 
 const api = axios.create({
   baseURL,
