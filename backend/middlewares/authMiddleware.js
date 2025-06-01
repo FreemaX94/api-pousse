@@ -1,35 +1,42 @@
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 const User = require('../models/userModel');
 const createError = require('../utils/createError');
 
-const authMiddleware = async (req, res, next) => {
+// Simulation de blacklist côté mémoire
+const blacklistedTokens = new Set();
+const isTokenBlacklisted = (token) => blacklistedTokens.has(token);
+
+const authMiddleware = (requiredRole = null) => async (req, res, next) => {
   try {
-    console.log('🛂 Authorization header reçu :', req.headers.authorization);
-
+    const isTest = process.env.NODE_ENV === 'test';
     const token = req.cookies?.sid || req.headers.authorization?.split(' ')[1];
-    console.log('🔓 Token extrait :', token);
-
     if (!token) throw createError(401, 'Token manquant');
+    if (!isTest) console.log('🛂 Token reçu :', token);
+
+    if (await isTokenBlacklisted(token)) {
+      return next(createError(401, 'Token révoqué'));
+    }
 
     const secret = process.env.JWT_SECRET || 'dev_secret_key';
     const decoded = jwt.verify(token, secret);
 
     const user = await User.findById(decoded.id);
-    console.log('👤 User trouvé:', user?.username, '| Actif:', user?.isActive);
+    if (!user) throw createError(401, 'Utilisateur introuvable');
+    if (!user.isActive) throw createError(403, 'Compte non activé');
 
-    if (!user) {
-      console.warn('❌ Utilisateur non trouvé pour ID:', decoded.id);
-      throw createError(401, 'Utilisateur introuvable');
+    if (requiredRole && user.role !== requiredRole) {
+      return next(createError(403, 'Accès réservé au rôle ' + requiredRole));
     }
 
-    if (!user.isActive) {
-      console.warn('⚠️ Compte inactif:', user.username);
-      throw createError(403, 'Compte non activé');
+    const incomingAgent = req.headers['user-agent'];
+    const incomingIP = req.ip;
+
+    if (user.lastUserAgent && user.lastUserAgent !== incomingAgent) {
+      console.warn('⚠️ User-Agent inattendu');
     }
 
     req.user = user;
-    next();
+    return next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       console.warn('⏰ Token expiré');

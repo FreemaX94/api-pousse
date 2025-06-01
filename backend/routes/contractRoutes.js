@@ -3,6 +3,7 @@ const { postContract, getContracts, getContract, validatePostContract, validateG
 const authMiddleware = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 router.post('/', authMiddleware, validatePostContract, postContract);
 router.get('/', authMiddleware, validateGetContracts, getContracts);

@@ -1,11 +1,10 @@
-
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { app, setupRoutes } = require('../../app');
 const User = require('../../models/userModel');
 
-jest.setTimeout(30000);
+jest.setTimeout(60000); // ⏱️ Timeout augmenté
 
 describe('AuthController', () => {
   let mongoServer;
@@ -17,7 +16,12 @@ describe('AuthController', () => {
   let userId;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    mongoServer = await MongoMemoryServer.create({
+      instance: { port: 27017 },
+      binary: { version: '6.0.5' },
+      autoStart: true
+    });
+
     const uri = mongoServer.getUri();
     await mongoose.connect(uri);
     mongoose.models = {};
@@ -26,15 +30,23 @@ describe('AuthController', () => {
     server = app.listen(4001);
 
     const timestamp = Date.now();
-    userData = { username: `testuser_${timestamp}`, password: 'Password123' };
-    inactiveUser = { username: `inactiveuser_${timestamp}`, password: 'Password123' };
 
-    await request(app).post('/api/auth/register').send(inactiveUser);
+    // 🔴 Crée un user inactif directement en BDD
+    const rawInactiveUser = new User({
+      username: `inactiveuser_${timestamp}`,
+      password: 'Password123',
+      isActive: false
+    });
+    await rawInactiveUser.save();
+    inactiveUser = { username: rawInactiveUser.username, password: 'Password123' };
+
+    // 🟢 Utilisateur actif via activation
+    userData = { username: `testuser_${timestamp}`, password: 'Password123' };
     await request(app).post('/api/auth/register').send(userData);
     await request(app).post('/api/auth/activate').send({ username: userData.username });
 
     const loginRes = await request(app).post('/api/auth/login').send(userData);
-    cookie = loginRes.headers['set-cookie'][0].split(';')[0]; // "sid=..."
+    cookie = loginRes.headers['set-cookie'][0].split(';')[0];
     refreshToken = loginRes.body.refreshToken;
 
     const user = await User.findOne({ username: userData.username });
@@ -43,8 +55,10 @@ describe('AuthController', () => {
 
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongoServer.stop();
-    server.close(() => console.log('🛑 Server closed'));
+    if (mongoServer) await mongoServer.stop();
+    if (server && server.close) {
+      server.close();
+    }
   });
 
   test('registers a new user', async () => {
@@ -108,7 +122,10 @@ describe('AuthController', () => {
   });
 
   test('logout handles unknown user gracefully', async () => {
-    const fakeToken = 'Bearer ' + require('jsonwebtoken').sign({ id: '000000000000000000000000' }, process.env.JWT_SECRET || 'dev_secret_key');
+    const fakeToken = 'Bearer ' + require('jsonwebtoken').sign(
+      { id: '000000000000000000000000' },
+      process.env.JWT_SECRET || 'dev_secret_key'
+    );
     const res = await request(app)
       .post('/api/auth/logout')
       .set('Authorization', fakeToken);

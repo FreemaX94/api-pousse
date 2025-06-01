@@ -1,7 +1,9 @@
+const authMiddleware = require('../middlewares/authMiddleware');
 const express = require('express');
 const adminMiddleware = require('../middlewares/adminMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware('admin'));
 
 router.post('/seed/contracts', adminMiddleware, async (req, res, next) => {
   try {

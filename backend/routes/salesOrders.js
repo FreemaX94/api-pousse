@@ -3,6 +3,7 @@ const { createOrder, getOrders, validateCreateOrder, validateGetOrders } = requi
 const authMiddleware = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 router.post('/', authMiddleware, validateCreateOrder, createOrder);
 router.get('/', authMiddleware, validateGetOrders, getOrders);

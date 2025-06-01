@@ -3,6 +3,7 @@ const { Sheet, exportSheet, validateImportSheet, validateExportSheet } = require
 const authMiddleware = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 router.post('/import', authMiddleware, validateImportSheet, importSheet);
 router.get('/export', authMiddleware, validateExportSheet, exportSheet);

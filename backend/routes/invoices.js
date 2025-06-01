@@ -3,6 +3,7 @@ const { createInvoice, getInvoices, validateCreateInvoice, validateGetInvoices }
 const authMiddleware = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware('admin'));
 
 router.post('/', authMiddleware, validateCreateInvoice, createInvoice);
 router.get('/', authMiddleware, validateGetInvoices, getInvoices);

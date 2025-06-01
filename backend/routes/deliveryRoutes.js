@@ -9,6 +9,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const adminMiddleware = require('../middlewares/adminMiddleware');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 router.post('/', authMiddleware, adminMiddleware, validateCreateDelivery, createDelivery);
 router.get('/', authMiddleware, validateGetDeliveries, getDeliveries);

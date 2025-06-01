@@ -4,6 +4,7 @@ const authMiddleware = require('../middlewares/authMiddleware.js');
 const adminMiddleware = require('../middlewares/adminMiddleware.js');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 router.get('/', validateGetProduits, getProduits);
 router.post('/', authMiddleware, adminMiddleware, validateCreateProduit, createProduit);

@@ -8,7 +8,8 @@ const app = express();
 // 🔍 Logger de requêtes HTTP
 app.use(morgan('dev'));
 
-const allowedOrigins = process.env.CORS_ORIGIN.split(',');
+// ✅ Corrigé pour éviter les crashs si la variable est absente
+const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',');
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -19,8 +20,6 @@ app.use(cors({
   },
   credentials: true
 }));
-
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -63,13 +62,13 @@ app.get('/api/products/:id', (req, res) => {
 function setupRoutes() {
   const authRoutes = require('./routes/authRoutes');
   const stockRoutes = require('./routes/stocks');
-  const invoiceRoutes = require('./routes/invoices'); // ✅ ajouté
-  const vehicleRoutes = require('./routes/vehicles'); // ✅ ajouté
+  const invoiceRoutes = require('./routes/invoices');
+  const vehicleRoutes = require('./routes/vehicles');
 
   app.use('/api/auth', authRoutes);
   app.use('/stocks', stockRoutes);
-  app.use('/api/invoices', invoiceRoutes); // ✅ activé
-  app.use('/api/vehicles', vehicleRoutes); // ✅ activé
+  app.use('/api/invoices', invoiceRoutes);
+  app.use('/api/vehicles', vehicleRoutes);
 }
 
 module.exports = { app, setupRoutes };

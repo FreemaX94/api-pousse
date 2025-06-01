@@ -1,5 +1,7 @@
+const authMiddleware = require('../middlewares/authMiddleware');
 const express = require('express');
 const router = express.Router();
+router.use(authMiddleware());
 const controller = require('../controllers/catalogueController');
 
 // 🔍 Récupérer tout le catalogue

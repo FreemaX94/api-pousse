@@ -1,8 +1,10 @@
+const authMiddleware = require('../middlewares/authMiddleware');
 const express = require('express');
 const { google } = require('googleapis');
 const path = require('path');
 
 const router = express.Router();
+router.use(authMiddleware());
 
 // Authentification Google Service Account
 const auth = new google.auth.GoogleAuth({

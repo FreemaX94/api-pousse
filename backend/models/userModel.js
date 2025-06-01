@@ -15,18 +15,27 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  email: {
+    type: String
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
   },
-  isActive: { // corrigé
+  isActive: {
     type: Boolean,
     default: false
   },
   refreshToken: {
     type: String,
     default: null
+  },
+  lastUserAgent: {
+    type: String
+  },
+  lastIP: {
+    type: String
   }
 }, { timestamps: true });
 
