@@ -2,13 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const { errors } = require('celebrate');
 
 const app = express();
 
 // 🔍 Logger de requêtes HTTP
 app.use(morgan('dev'));
 
-// ✅ Corrigé pour éviter les crashs si la variable est absente
+// ✅ Origines autorisées en lecture depuis la variable d’env
 const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',');
 
 app.use(cors({
@@ -25,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 🧪 Routes factices pour tests simples
+// 🧪 Routes factices de test (temporairement conservées)
 app.use('/api/users', (req, res) => res.status(200).send([]));
 app.use('/api/sanitize-test', (req, res) => res.status(200).send([]));
 app.use('/api/statistiques', (req, res) => res.status(200).send([]));
@@ -40,7 +41,7 @@ app.use('/api/deliveries', (req, res) => res.status(200).send([]));
 app.use('/api/entretien', (req, res) => res.status(200).send([]));
 app.use('/api/vehicules', (req, res) => res.status(200).send([]));
 
-// 🧪 Produits simulés
+// 🧪 Produits simulés (mock temporaire)
 let fakeProducts = [];
 
 app.get('/api/products', (req, res) => {
@@ -70,5 +71,14 @@ function setupRoutes() {
   app.use('/api/invoices', invoiceRoutes);
   app.use('/api/vehicles', vehicleRoutes);
 }
+
+// 🎯 Gestion des erreurs Celebrate (validation Joi)
+app.use(errors());
+
+// 🛑 Middleware global de gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error('Erreur serveur :', err.message || err);
+  res.status(500).json({ error: 'Erreur interne du serveur' });
+});
 
 module.exports = { app, setupRoutes };

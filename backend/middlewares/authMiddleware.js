@@ -2,9 +2,11 @@ const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const User = require('../models/userModel');
 
+// Middleware d'authentification avec rôle optionnel
 const authMiddleware = (requiredRole = null) => async (req, res, next) => {
   try {
     const token = req.cookies.accessToken;
+
     if (!token) {
       return next(createError(401, 'Token manquant'));
     }
@@ -37,4 +39,15 @@ const authMiddleware = (requiredRole = null) => async (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+// Middleware spécifique pour vérifier le rôle admin (utilisé en test unitaire)
+const requireAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return next(createError(403, 'Accès réservé aux administrateurs'));
+  }
+  next();
+};
+
+module.exports = {
+  authMiddleware,
+  requireAdmin // ✅ maintenant exporté
+};

@@ -1,11 +1,20 @@
 const express = require('express');
-const router = express.Router();
-const { register, activate, login, refresh, me, logout } = require('../controllers/authController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const {
+  register,
+  activate,
+  login,
+  refresh,
+  me,
+  logout,
+} = require('../controllers/authController');
+const { authMiddleware } = require('../middlewares/authMiddleware'); // ✅ destructuring
 
+const router = express.Router();
+
+// 🔓 Routes publiques
 router.post('/register', register);
-router.post('/login', login);
 router.post('/activate', activate);
+router.post('/login', login);
 router.post('/refresh', refresh);
 
 // 🔒 Routes protégées
