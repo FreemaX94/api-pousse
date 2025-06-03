@@ -1,7 +1,7 @@
 // frontend/src/pages/ForgotPassword.jsx
 
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 
@@ -17,10 +17,7 @@ export default function ForgotPassword() {
     if (!token) return toast.error('Confirmez que vous n’êtes pas un robot');
     setLoading(true);
     try {
-      await axios.post(
-        'http://localhost:3001/api/auth/forgot-password',
-        { email, recaptcha: token }
-      );
+      await api.post('/auth/forgot-password', { email, recaptcha: token });
       toast.success('Email de réinitialisation envoyé');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Erreur');

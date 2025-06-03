@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 import zxcvbn from 'zxcvbn';
 
@@ -18,7 +18,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/api/auth/reset-password', { token, password });
+      await api.post('/auth/reset-password', { token, password });
       toast.success('Mot de passe changé');
       navigate('/login');
     } catch (err) {
