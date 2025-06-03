@@ -1,27 +1,38 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const { app, setupRoutes } = require('../../app');
 
 // ✅ Fix : Clé secrète pour JWT utilisée dans tous les tests
 process.env.JWT_SECRET = 'test-secret';
+process.env.MONGOMS_DISTRO = 'ubuntu-22.04';
+jest.setTimeout(20000);
 
 let server;
+let mongoServer;
 
 beforeAll(async () => {
   setupRoutes(); // Active les routes sur l'app
-  await mongoose.connect(
-    process.env.MONGO_URI || 'mongodb://localhost:27017/api-pousse-test',
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  );
+  mongoServer = await MongoMemoryServer.create({
+    binary: { version: '7.0.5' },
+    instance: { storageEngine: 'wiredTiger' },
+  });
+  const uri = mongoServer.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   server = app.listen(4000); // Lancement serveur de test
 });
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await server.close(); // Important pour éviter les erreurs Jest
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+  if (server) {
+    await new Promise(resolve => server.close(resolve)); // Important pour éviter les erreurs Jest
+  }
 });
 
 describe('AuthController', () => {
