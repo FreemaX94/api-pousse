@@ -40,7 +40,6 @@ export default function Signup() {
 
     try {
       const token = await recaptchaRef.current.executeAsync();
-      console.log('✅ Token généré par reCAPTCHA :', token);
       if (!token) {
         setError('Token reCAPTCHA manquant.');
         return;

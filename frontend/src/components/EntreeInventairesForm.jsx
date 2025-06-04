@@ -23,10 +23,8 @@ function StockFormBloc({ categorie, produits = [], concepteurs = [] }) {
 
   const handleSubmit = async () => {
     setMessage(null);
-    console.log('🛰️ POST /stocks payload:', { categorie, ...data });
     try {
       const res = await axios.post('/stocks', { categorie, ...data });
-      console.log('🎉 Response:', res.data);
       setMessage('✅ Enregistré avec succès');
       setData({
         produit: '',

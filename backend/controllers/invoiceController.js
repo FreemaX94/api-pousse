@@ -23,8 +23,6 @@ exports.validateGetInvoices = celebrate({
 });
 
 exports.createInvoice = asyncHandler(async (req, res) => {
-  // 🐞 Log temporaire pour débogage
-  console.log('📦 Payload reçu :', req.body);
 
   const invoice = await invoiceService.createInvoice(req.body);
   res.status(201).json({ status: 'success', data: invoice });

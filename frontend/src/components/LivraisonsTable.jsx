@@ -59,7 +59,7 @@ export default function LivraisonsTable({ deliveries, onToggleFait }) {
                 <td>
                   <button
                     className="btn-action"
-                    onClick={() => console.log('Détails de', d)}
+                    onClick={() => {/* TODO: afficher les détails */}}
                   >
                     Détails
                   </button>
@@ -83,4 +83,3 @@ LivraisonsTable.propTypes = {
   deliveries: PropTypes.array.isRequired,
   onToggleFait: PropTypes.func.isRequired
 };
-

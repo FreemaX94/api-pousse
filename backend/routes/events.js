@@ -2,6 +2,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const express = require('express');
 const { google } = require('googleapis');
 const path = require('path');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 router.use(authMiddleware());
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
     });
     res.json(data.items);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).send('Erreur lors de la récupération des événements');
   }
 });

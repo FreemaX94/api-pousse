@@ -1,12 +1,13 @@
 // frontend/src/api/clientApi.js
 
 import axios from 'axios';
+import { log } from '../utils/logger';
 
 // Récupère l'URL depuis le .env ou fallback
 // If no env var is set, default to localhost
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
-console.log("✅ API utilisée :", baseURL);
+log('✅ API utilisée :', baseURL);
 
 const api = axios.create({
   baseURL,

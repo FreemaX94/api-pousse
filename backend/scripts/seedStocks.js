@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import CatalogueItem from '../models/CatalogueItem.js';
 import StockEntry from '../models/StockEntry.js';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 
@@ -9,7 +10,7 @@ const CATEGORIES = ['Plantes', 'Contenants', 'Décor', 'Artificiels', 'Séchés'
 
 const run = async () => {
   await mongoose.connect(process.env.MONGODB_URI);
-  console.log('📦 Connected to DB');
+  logger.log('📦 Connected to DB');
 
   let total = 0;
 
@@ -24,15 +25,15 @@ const run = async () => {
     }));
 
     const inserted = await StockEntry.insertMany(entries);
-    console.log(`✅ ${inserted.length} ajoutés pour ${categorie}`);
+    logger.log(`✅ ${inserted.length} ajoutés pour ${categorie}`);
     total += inserted.length;
   }
 
-  console.log(`🎉 Total importé : ${total} éléments`);
+  logger.log(`🎉 Total importé : ${total} éléments`);
   mongoose.disconnect();
 };
 
 run().catch(err => {
-  console.error('❌ Erreur import:', err);
+  logger.error('❌ Erreur import:', err);
   process.exit(1);
 });

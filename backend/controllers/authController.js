@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const crypto = require('crypto');
 const { sendResetPasswordEmail } = require('../services/mailService');
+const logger = require('../utils/logger');
 
 // 🔐 Génère un token JWT signé
 const generateToken = (payload, expiresIn) =>
@@ -22,7 +23,7 @@ exports.register = async (req, res) => {
 
     res.status(201).send({ message: 'Inscription réussie', user: { id: user._id } });
   } catch (err) {
-    console.error('❌ Erreur register:', err.message);
+    logger.error('❌ Erreur register:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -39,7 +40,7 @@ exports.activate = async (req, res) => {
 
     res.status(200).send({ message: 'Compte activé', user: { id: user._id } });
   } catch (err) {
-    console.error('❌ Erreur activate:', err.message);
+    logger.error('❌ Erreur activate:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -63,7 +64,7 @@ exports.login = async (req, res) => {
     res.cookie('accessToken', accessToken, { httpOnly: true });
     res.status(200).send({ refreshToken });
   } catch (err) {
-    console.error('❌ Erreur login:', err.message);
+    logger.error('❌ Erreur login:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -80,7 +81,7 @@ exports.refresh = async (req, res) => {
 
     res.status(200).send({ accessToken });
   } catch (err) {
-    console.error('❌ Erreur refresh:', err.message);
+    logger.error('❌ Erreur refresh:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -97,12 +98,12 @@ exports.forgotPassword = async (req, res) => {
       try {
         await sendResetPasswordEmail(user.email, token);
       } catch (e) {
-        console.error('❌ Envoi mail échoué:', e.message);
+        logger.error('❌ Envoi mail échoué:', e.message);
       }
     }
     res.status(200).send({ message: 'Si le compte existe, un e-mail a été envoyé.' });
   } catch (err) {
-    console.error('❌ Erreur forgotPassword:', err.message);
+    logger.error('❌ Erreur forgotPassword:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -123,7 +124,7 @@ exports.resetPassword = async (req, res) => {
     await user.save();
     res.status(200).send({ message: 'Mot de passe mis à jour' });
   } catch (err) {
-    console.error('❌ Erreur resetPassword:', err.message);
+    logger.error('❌ Erreur resetPassword:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -132,7 +133,7 @@ exports.me = async (req, res) => {
   try {
     res.status(200).send(req.user);
   } catch (err) {
-    console.error('❌ Erreur me:', err.message);
+    logger.error('❌ Erreur me:', err.message);
     res.status(500).send({ error: err.message });
   }
 };
@@ -142,7 +143,7 @@ exports.logout = async (req, res) => {
     res.clearCookie('accessToken');
     res.status(200).send({ message: 'Déconnecté' });
   } catch (err) {
-    console.error('❌ Erreur logout:', err.message);
+    logger.error('❌ Erreur logout:', err.message);
     res.status(500).send({ error: err.message });
   }
 }

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const User = require('../models/userModel');
+const logger = require('../utils/logger');
 
 // Middleware d'authentification avec rôle optionnel
 const authMiddleware = (requiredRole = null) => async (req, res, next) => {
@@ -18,7 +19,7 @@ const authMiddleware = (requiredRole = null) => async (req, res, next) => {
       if (err.name === 'TokenExpiredError') {
         return next(createError(401, 'Token expiré'));
       }
-      console.error('❗ Erreur authMiddleware :', err.message);
+      logger.error('❗ Erreur authMiddleware :', err.message);
       return next(createError(401, 'Token invalide'));
     }
 
@@ -34,7 +35,7 @@ const authMiddleware = (requiredRole = null) => async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.error('❗ Erreur authMiddleware :', err.message);
+    logger.error('❗ Erreur authMiddleware :', err.message);
     next(createError(500, 'Erreur serveur'));
   }
 };

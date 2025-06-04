@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const { errors } = require('celebrate');
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -77,7 +78,7 @@ app.use(errors());
 
 // 🛑 Middleware global de gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error('Erreur serveur :', err.message || err);
+  logger.error('Erreur serveur :', err.message || err);
   res.status(500).json({ error: 'Erreur interne du serveur' });
 });
 

@@ -34,7 +34,6 @@ export default function Dashboard() {
       ]);
       setInvoices(invData);
       setNotesFrais(nfData);
-      console.log('📊 Factures rechargées :', invData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,9 +51,7 @@ export default function Dashboard() {
   const dataByMonth = {};
   [...invoices, ...notesFrais].forEach(item => {
     try {
-      console.log('🧪 Facture date brute :', item.date);
       const date = new Date(item.date);
-      console.log('📅 Date JS interprétée :', date);
       if (isNaN(date)) throw new Error('Invalid date');
       const monthKey = date.toLocaleString('default', {
         month: 'short',
@@ -114,7 +111,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2">
-          {[ 
+          {[
             { label: 'Total factures carte', value: `${totalFactures.toFixed(2)} €`, color: 'text-red-600' },
             { label: 'Total notes de frais salariés', value: `${totalNotes.toFixed(2)} €`, color: 'text-yellow-600' },
           ].map((card, idx) => (

@@ -22,16 +22,12 @@ export default function ExpenseForm({ onSuccess }) {
       description
     }
 
-    console.log("📦 Payload envoyé :", payload)
-
     try {
       const res = await fetch(`${baseUrl}/api/expenses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-
-      console.log("🧾 Réponse brute :", res)
 
       if (res.status === 405) throw new Error('Méthode non autorisée (405)')
       if (!res.ok) {
@@ -56,7 +52,7 @@ export default function ExpenseForm({ onSuccess }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-gray-800">
       {error && <p className="text-red-600 text-sm">{error}</p>}
-      
+
       <div>
         <label className="block text-sm font-semibold text-gray-700">Salarié</label>
         <input

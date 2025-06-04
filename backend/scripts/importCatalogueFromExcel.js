@@ -1,8 +1,8 @@
-
 const mongoose = require('mongoose');
 const xlsx = require('xlsx');
 const path = require('path');
 const CatalogueItem = require('../models/CatalogueItem');
+const logger = require('../utils/logger');
 
 const MONGODB_URI = 'mongodb+srv://freemanlopez94140:t3lZozMgzmPTPRSI@freex94.5utv3iv.mongodb.net/api-pousse?retryWrites=true&w=majority&appName=freex94';
 
@@ -14,14 +14,13 @@ const CATEGORIES_VALIDES = [
   "ÉLÉMENTS DE DÉCOR"
 ];
 
-
 async function importCatalogueFromExcel(filePath) {
   try {
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connecté à MongoDB');
+    logger.log('✅ Connecté à MongoDB');
 
     await CatalogueItem.deleteMany({});
-    console.log('🧹 Ancien catalogue vidé');
+    logger.log('🧹 Ancien catalogue vidé');
 
     const absolutePath = path.resolve(filePath);
     const workbook = xlsx.readFile(absolutePath);
@@ -70,23 +69,23 @@ async function importCatalogueFromExcel(filePath) {
 
           const exists = await CatalogueItem.findOne({ categorie: currentCategory, nom });
           if (exists) {
-            console.log(`⚠️ Doublon ignoré : ${currentCategory} - ${nom}`);
+            logger.log(`⚠️ Doublon ignoré : ${currentCategory} - ${nom}`);
             skipped++;
             continue;
           }
 
           const { ["NOM DU PRODUIT"]: _, ...infos } = data;
           await CatalogueItem.create({ categorie: currentCategory, nom, infos });
-          console.log(`✅ Inséré : ${currentCategory} - ${nom}`);
+          logger.log(`✅ Inséré : ${currentCategory} - ${nom}`);
           inserted++;
         }
       }
     }
 
-    console.log(`\n🎉 Import terminé : ${inserted} insérés, ${skipped} ignorés`);
+    logger.log(`\n🎉 Import terminé : ${inserted} insérés, ${skipped} ignorés`);
     process.exit(0);
   } catch (err) {
-    console.error('❌ Erreur pendant l’import :', err);
+    logger.error('❌ Erreur pendant l’import :', err);
     process.exit(1);
   }
 }
@@ -94,7 +93,7 @@ async function importCatalogueFromExcel(filePath) {
 if (require.main === module) {
   const filePath = process.argv[2];
   if (!filePath) {
-    console.error('❌ Spécifie le fichier Excel en argument');
+    logger.error('❌ Spécifie le fichier Excel en argument');
     process.exit(1);
   }
   importCatalogueFromExcel(filePath);
