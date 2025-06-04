@@ -1,7 +1,7 @@
 // frontend/src/pages/ForgotPassword.jsx
 
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 
@@ -17,10 +17,7 @@ export default function ForgotPassword() {
     if (!token) return toast.error('Confirmez que vous n’êtes pas un robot');
     setLoading(true);
     try {
-      await axios.post(
-        'http://localhost:3001/api/auth/forgot-password',
-        { email, recaptcha: token }
-      );
+      await api.post('/auth/forgot-password', { email, recaptcha: token });
       toast.success('Email de réinitialisation envoyé');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Erreur');
@@ -30,33 +27,39 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow max-w-sm w-full">
-        <h2 className="text-xl font-bold mb-4">Mot de passe oublié</h2>
-        <label className="block mb-2">
-          Votre e-mail
-          <input
-            type="email"
-            value={email}
-            onChange={e=>setEmail(e.target.value)}
-            required
-            className="w-full mt-1 px-3 py-2 border rounded"
-          />
-        </label>
-        <div className="my-4">
-          <ReCAPTCHA
-            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-            onChange={handleRecaptcha}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
-        >
-          {loading ? 'Envoi…' : 'Envoyer le lien'}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="bg-white p-6 rounded shadow w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-2">Mot de passe oublié</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <label className="block">
+            Adresse e-mail
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              className="w-full mt-1 px-3 py-2 border rounded"
+            />
+          </label>
+          <div>
+            <ReCAPTCHA
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+              onChange={handleRecaptcha}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+          >
+            {loading ? 'Envoi…' : 'Envoyer le lien'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
+

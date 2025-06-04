@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 import zxcvbn from 'zxcvbn';
@@ -46,15 +46,17 @@ export default function Signup() {
         return;
       }
 
-      const res = await axios.post(
-        'http://localhost:3001/api/auth/register',
-        { ...form, recaptcha: token },
-        { withCredentials: true }
-      );
+      await api.post('/auth/register', {
+        username: form.username,
+        password: form.password,
+        email: form.email,
+        fullname: form.fullname,
+        recaptcha: token
+      });
       toast.success('Inscription réussie !');
       navigate('/login', { replace: true });
     } catch (err) {
-      console.error('❌ Erreur axios :', err);
+      console.error('❌ Erreur inscription :', err);
       if (err.response) {
         console.error('📦 Réponse du backend :', err.response.data);
         setError(err.response.data.message || 'Erreur inconnue');
@@ -71,19 +73,19 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 space-y-4">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-r from-blue-500 to-purple-600">
+      <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-xl rounded-2xl">
         <h2 className="text-3xl font-extrabold text-center">Créer un compte</h2>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded text-sm">
+          <div className="p-3 text-sm text-red-700 bg-red-100 rounded">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="fullname" className="block text-sm font-medium mb-1">
+            <label htmlFor="fullname" className="block mb-1 text-sm font-medium">
               Nom complet
             </label>
             <input
@@ -99,7 +101,7 @@ export default function Signup() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
+            <label htmlFor="email" className="block mb-1 text-sm font-medium">
               Adresse e-mail
             </label>
             <input
@@ -114,7 +116,7 @@ export default function Signup() {
           </div>
 
           <div>
-            <label htmlFor="username" className="block text-sm font-medium mb-1">
+            <label htmlFor="username" className="block mb-1 text-sm font-medium">
               Nom d’utilisateur
             </label>
             <input
@@ -129,7 +131,7 @@ export default function Signup() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label htmlFor="password" className="block mb-1 text-sm font-medium">
               Mot de passe
             </label>
             <input
@@ -141,17 +143,17 @@ export default function Signup() {
               required
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
             />
-            <div className="h-2 bg-gray-200 rounded mt-2">
+            <div className="h-2 mt-2 bg-gray-200 rounded">
               <div
                 className={`h-full rounded ${['w-1/5','w-2/5','w-3/5','w-4/5','w-full'][strength]}`}
                 style={{backgroundColor: ['#f56565','#ed8936','#ecc94b','#48bb78','#38a169'][strength]}}
               />
             </div>
-            <p className="text-xs mt-1">{strengthLabels[strength]}</p>
+            <p className="mt-1 text-xs">{strengthLabels[strength]}</p>
           </div>
 
           <div>
-            <label htmlFor="confirm" className="block text-sm font-medium mb-1">
+            <label htmlFor="confirm" className="block mb-1 text-sm font-medium">
               Confirmer le mot de passe
             </label>
             <input
@@ -172,7 +174,7 @@ export default function Signup() {
               type="checkbox"
               checked={form.acceptTOS}
               onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <label htmlFor="acceptTOS" className="ml-2">
               J’accepte les{' '}
@@ -193,13 +195,13 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-green-500 text-white rounded-lg disabled:opacity-50"
+            className="w-full py-2 text-white bg-green-500 rounded-lg disabled:opacity-50"
           >
             {loading ? 'Création…' : 'S’inscrire'}
           </button>
         </form>
 
-        <div className="text-center text-sm text-gray-600">
+        <div className="text-sm text-center text-gray-600">
           Déjà un compte ?{' '}
           <Link to="/login" className="text-blue-600 hover:underline">
             Se connecter

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 import zxcvbn from 'zxcvbn';
 
@@ -18,7 +18,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/api/auth/reset-password', { token, password });
+      await api.post('/auth/reset-password', { token, password });
       toast.success('Mot de passe changé');
       navigate('/login');
     } catch (err) {
@@ -29,7 +29,7 @@ export default function ResetPassword() {
   };
 
   const strengthLabels = ['Très faible','Faible','Moyen','Fort','Très fort'];
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow max-w-sm w-full space-y-4">
