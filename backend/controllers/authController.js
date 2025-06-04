@@ -145,4 +145,4 @@ exports.logout = async (req, res) => {
     console.error('❌ Erreur logout:', err.message);
     res.status(500).send({ error: err.message });
   }
-};
+}

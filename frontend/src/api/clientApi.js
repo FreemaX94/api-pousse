@@ -3,7 +3,8 @@
 import axios from 'axios';
 
 // Récupère l'URL depuis le .env ou fallback
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://144.126.228.24:3001/api';
+// If no env var is set, default to localhost
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 console.log("✅ API utilisée :", baseURL);
 
