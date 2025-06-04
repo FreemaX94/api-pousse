@@ -43,5 +43,7 @@
   "editor.smoothScrolling": true,
 
   // Terminal personnalisé
-  "terminal.integrated.shell.windows": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe"
+  "terminal.integrated.shell.windows": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  // Jest configuration
+  "jest.jestCommandLine": "npx jest --config jest.config.js"
 }

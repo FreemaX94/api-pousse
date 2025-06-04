@@ -37,16 +37,18 @@ afterAll(async () => {
 
 describe('AuthController', () => {
   let username;
+  let email;
 
   beforeEach(() => {
     // Génère un nom unique à chaque test pour éviter les conflits
     username = `testuser_${Date.now()}`;
+    email = `${username}@example.com`;
   });
 
   test('registers a new user', async () => {
     const res = await request(server)
       .post('/api/auth/register')
-      .send({ username, password: 'password123' });
+      .send({ username, password: 'password123', email: `${username}@example.com` });
 
     expect(res.statusCode).toBe(201);
   });
@@ -54,7 +56,7 @@ describe('AuthController', () => {
   test('activates a user account', async () => {
     await request(server)
       .post('/api/auth/register')
-      .send({ username, password: 'password123' });
+      .send({ username, password: 'password123', email: `${username}@example.com` });
 
     const res = await request(server)
       .post('/api/auth/activate')
@@ -66,7 +68,7 @@ describe('AuthController', () => {
   test('rejects login if user is not activated', async () => {
     await request(server)
       .post('/api/auth/register')
-      .send({ username, password: 'password123' });
+      .send({ username, password: 'password123', email: `${username}@example.com` });
 
     const res = await request(server)
       .post('/api/auth/login')
@@ -78,7 +80,7 @@ describe('AuthController', () => {
   test('refreshes token with valid refresh token', async () => {
     await request(server)
       .post('/api/auth/register')
-      .send({ username, password: 'password123' });
+      .send({ username, password: 'password123', email: `${username}@example.com` });
 
     await request(server)
       .post('/api/auth/activate')
