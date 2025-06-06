@@ -1,9 +1,8 @@
-(async () => {
 const createError = require('http-errors');
 const Contract = require('../models/contractModel.js');
 const mongoose = require('mongoose');
 
-exports.createContract(data) {
+exports.createContract = async function (data) {
   const { clientId, startDate, endDate, contractType, isB2B = false } = data;
   if (!mongoose.Types.ObjectId.isValid(clientId)) {
     throw createError(400, 'Invalid clientId');
@@ -11,27 +10,27 @@ exports.createContract(data) {
   const contract = new Contract({ client: clientId, startDate, endDate, contractType, isB2B });
   await contract.save();
   return contract.toObject();
-}
+};
 
-exports.countContracts(filter = {}) {
+exports.countContracts = function (filter = {}) {
   return Contract.countDocuments(filter);
-}
+};
 
-exports.listContracts({ isB2B, contractType, page = 1, limit = 50 }) {
+exports.listContracts = async function ({ isB2B, contractType, page = 1, limit = 50 } = {}) {
   const filter = {};
   if (typeof isB2B === 'boolean') filter.isB2B = isB2B;
   if (contractType) filter.contractType = contractType;
 
   const skip = (page - 1) * limit;
-  const [ total, data ] = await Promise.all([
-    countContracts(filter),
+  const [total, data] = await Promise.all([
+    exports.countContracts(filter),
     Contract.find(filter).sort({ startDate: -1 }).skip(skip).limit(limit).lean()
   ]);
   const meta = { total, page, limit };
   return { data, meta };
-}
+};
 
-exports.getContractById(id) {
+exports.getContractById = async function (id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw createError(400, 'Invalid contract id');
   }
@@ -40,9 +39,9 @@ exports.getContractById(id) {
     throw createError(404, 'Contract not found');
   }
   return contract;
-}
+};
 
-exports.updateContract(id, update) {
+exports.updateContract = async function (id, update) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw createError(400, 'Invalid contract id');
   }
@@ -51,9 +50,9 @@ exports.updateContract(id, update) {
     throw createError(404, 'Contract not found');
   }
   return contract;
-}
+};
 
-exports.deleteContract(id) {
+exports.deleteContract = async function (id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw createError(400, 'Invalid contract id');
   }
@@ -62,5 +61,4 @@ exports.deleteContract(id) {
     throw createError(404, 'Contract not found');
   }
   return result;
-}
-})();
+};

@@ -1,4 +1,4 @@
-const * as service = require('../services/concepteurService.js');
+const service = require('../services/concepteurService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
 
 exports.getAllConcepteurs = async (req, res, next) => {

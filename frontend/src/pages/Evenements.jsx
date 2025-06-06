@@ -69,7 +69,7 @@ useEffect(() => {
 
         {/* Sidebar */}
         <aside
-          className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#e9e3d5] dark:bg-[#1e1e1e] text-black dark:text-white p-6 space-y-6 shadow-md transform transition-transform duration-300 \${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:block`}
+          className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#e9e3d5] dark:bg-[#1e1e1e] text-black dark:text-white p-6 space-y-6 shadow-md transform transition-transform duration-300 ${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:block`}
         >
           <h1 className="text-2xl font-bold tracking-wide">POUSSE</h1>
           <nav className="space-y-4">
