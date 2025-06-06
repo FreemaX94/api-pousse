@@ -66,11 +66,17 @@ function setupRoutes() {
   const stockRoutes = require('./routes/stocks');
   const invoiceRoutes = require('./routes/invoices');
   const vehicleRoutes = require('./routes/vehicles');
+  const concepteurRoutes = require('./routes/concepteurs');
+  const catalogueRoutes = require('./routes/catalogue');
+  const catalogueItemRoutes = require('./routes/catalogueitems');
 
   app.use('/api/auth', authRoutes);
   app.use('/stocks', stockRoutes);
   app.use('/api/invoices', invoiceRoutes);
   app.use('/api/vehicles', vehicleRoutes);
+  app.use('/concepteurs', concepteurRoutes);
+  app.use('/catalogue', catalogueRoutes);
+  app.use('/api/catalogueitems', catalogueItemRoutes);
 }
 
 // 🎯 Gestion des erreurs Celebrate (validation Joi)

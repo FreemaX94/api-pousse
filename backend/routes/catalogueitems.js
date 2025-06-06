@@ -1,8 +1,9 @@
 const express = require('express');
-const router = express.Router();
-router.use(authMiddleware());
 const authMiddleware = require('../middlewares/authMiddleware');
 const CatalogueItem = require('../models/CatalogueItem');
+
+const router = express.Router();
+router.use(authMiddleware());
 
 router.get('/', authMiddleware, async (req, res) => {
   const items = await CatalogueItem.find();
@@ -16,7 +17,11 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 router.put('/:id', authMiddleware, async (req, res) => {
-  const updated = await CatalogueItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const updated = await CatalogueItem.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
   res.status(200).json(updated);
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/clientApi';
 
 const categories = ['Plantes', 'Contenants', 'Décor', 'Artificiels', 'Séchés'];
 
@@ -15,7 +15,7 @@ export default function StockViewer() {
     if (!categorie) return;
     setLoading(true);
     try {
-      const res = await axios.get(`/stocks?categorie=${categorie}`, {
+      const res = await api.get(`/stocks?categorie=${categorie}`, {
         headers: {
           'Cache-Control': 'no-cache'
         }
@@ -42,7 +42,7 @@ export default function StockViewer() {
   const handleDelete = async (id) => {
     if (!window.confirm('🗑️ Supprimer cette fiche ?')) return;
     try {
-      await axios.delete(`/stocks/${encodeURIComponent(id)}`);
+      await api.delete(`/stocks/${encodeURIComponent(id)}`);
       alert('✅ Supprimé avec succès');
       handleRefresh();
     } catch (err) {

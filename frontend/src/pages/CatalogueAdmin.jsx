@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/clientApi';
 
 const CatalogueAdmin = () => {
   const [items, setItems] = useState([]);
@@ -7,7 +7,7 @@ const CatalogueAdmin = () => {
   const [editingId, setEditingId] = useState(null);
 
   const fetchCatalogue = async () => {
-    const res = await axios.get('/api/catalogueitems');
+    const res = await api.get('/api/catalogueitems');
     setItems(res.data);
   };
 
@@ -17,12 +17,12 @@ const CatalogueAdmin = () => {
 
   const handleSubmit = async () => {
     if (editingId) {
-      await axios.put('/api/catalogueitems/' + editingId, {
+      await api.put('/api/catalogueitems/' + editingId, {
         ...form,
         infos: JSON.parse(form.infos),
       });
     } else {
-      await axios.post('/api/catalogueitems', {
+      await api.post('/api/catalogueitems', {
         ...form,
         infos: JSON.parse(form.infos),
       });
@@ -43,7 +43,7 @@ const CatalogueAdmin = () => {
 
   const handleDelete = async id => {
     if (window.confirm('Supprimer cet item ?')) {
-      await axios.delete('/api/catalogueitems/' + id);
+      await api.delete('/api/catalogueitems/' + id);
       fetchCatalogue();
     }
   };

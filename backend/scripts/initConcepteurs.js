@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Concepteur = require('./models/Concepteur');
+const Concepteur = require('../models/Concepteur');
 const logger = require('../utils/logger');
 
 /**
@@ -17,7 +17,8 @@ async function seedConcepteurs() {
 
 // Si exécuté directement
 if (require.main === module) {
-  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  mongoose
+    .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => seedConcepteurs().then(() => process.exit()))
     .catch(err => { logger.error(err); process.exit(1); });
 }

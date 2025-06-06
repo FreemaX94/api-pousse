@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import StockViewerDrawer from './StockViewerDrawer';
-import axios from 'axios';
+import api from '../api/clientApi';
 
 const categories = ['Plantes', 'Contenants', 'Décor', 'Artificiels', 'Séchés'];
 
@@ -24,7 +24,7 @@ function StockFormBloc({ categorie, produits = [], concepteurs = [] }) {
   const handleSubmit = async () => {
     setMessage(null);
     try {
-      const res = await axios.post('/stocks', { categorie, ...data });
+      await api.post('/stocks', { categorie, ...data });
       setMessage('✅ Enregistré avec succès');
       setData({
         produit: '',
@@ -124,7 +124,7 @@ export default function EntreeInventairesForm() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const concRes = await axios.get('/concepteurs');
+        const concRes = await api.get('/concepteurs');
         const cs = Array.isArray(concRes.data)
           ? concRes.data
           : Array.isArray(concRes.data.data)
@@ -134,7 +134,7 @@ export default function EntreeInventairesForm() {
 
         const results = await Promise.all(
           categories.map(cat =>
-            axios
+            api
               .get(`/catalogue/${encodeURIComponent(cat)}`)
               .then(res => ({
                 cat,

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/clientApi';
 import { toast } from 'react-hot-toast';
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
     try {
       // Appel à votre API d'authentification
       // Le backend doit répondre avec un JWT ou un cookie httpOnly
-      await axios.post(
+      await api.post(
         '/api/auth/login',
         { username: form.username, password: form.password },
         { withCredentials: true }
@@ -61,19 +61,19 @@ export default function Login() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
-        <h2 className="text-3xl font-extrabold text-center mb-6">Se connecter</h2>
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-r from-blue-500 to-purple-600">
+      <div className="w-full max-w-sm p-8 bg-white shadow-xl rounded-2xl">
+        <h2 className="mb-6 text-3xl font-extrabold text-center">Se connecter</h2>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+          <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium mb-1">
+            <label htmlFor="username" className="block mb-1 text-sm font-medium">
               Nom d’utilisateur
             </label>
             <input
@@ -89,7 +89,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label htmlFor="password" className="block mb-1 text-sm font-medium">
               Mot de passe
             </label>
             <input
@@ -110,7 +110,7 @@ export default function Login() {
                 type="checkbox"
                 checked={form.remember}
                 onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="ml-2">Se souvenir de moi</span>
             </label>
@@ -122,7 +122,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 rounded-lg text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
+            className="w-full py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
           >
             {loading ? 'Connexion…' : 'Se connecter'}
           </button>
@@ -134,7 +134,7 @@ export default function Login() {
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-sm text-center text-gray-600">
           Pas de compte ?{' '}
           <Link to="/signup" className="text-blue-600 hover:underline">
             S’inscrire
@@ -144,5 +144,3 @@ export default function Login() {
     </div>
   );
 }
-
-
