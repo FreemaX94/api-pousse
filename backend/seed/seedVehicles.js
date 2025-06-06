@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import createError from 'http-errors';
-import Vehicle from '../models/vehicleModel.js';
+const mongoose = require('mongoose');
+const createError = require('http-errors');
+const Vehicle = require('../models/vehicleModel.js');
 
 const URI = process.env.MONGO_URI;
 if (!URI) throw new Error('MONGO_URI is required');
@@ -63,7 +63,7 @@ const vehicles = [
   }
 ];
 
-export async function seedVehicles() {
+async function seedVehicles() {
   try {
     await mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true });
     const results = [];
@@ -80,3 +80,5 @@ export async function seedVehicles() {
     await mongoose.disconnect();
   }
 }
+
+module.exports = { seedVehicles };

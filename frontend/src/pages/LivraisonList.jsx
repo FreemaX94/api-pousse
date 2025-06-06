@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { CircularProgress, Typography, Box } from '@mui/material';
-import axios from 'axios';
+import api from '../api/clientApi';
 
 const SHEET_ID = '1qVl2__hq4Fs4KIfQQbccvK7mWizFL0hPvJUHa7UW8zQ';
 const API_KEY = 'AIzaSyCYOXexYdFusZZJjmNSZcMYu0waJ2i0XieG';
@@ -18,7 +18,7 @@ export default function LivraisonList() {
 
   async function fetchLivraisonsFromSheet() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-    const res = await axios.get(url);
+    const res = await api.get(url);
     const data = res.data.values || [];
     if (data.length === 0) return [];
 
@@ -76,6 +76,3 @@ export default function LivraisonList() {
     </Box>
   );
 }
-
-
-

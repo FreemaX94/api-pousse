@@ -76,13 +76,17 @@ export default function StockViewer() {
 
             <div className="flex gap-2">
               <button
-                onClick={() => window.open('/stocks/export?format=csv', '_blank')}
+                onClick={() =>
+                  window.open(`${api.defaults.baseURL}/stocks/export?format=csv`, '_blank')
+                }
                 className="px-3 py-1 text-white bg-yellow-500 rounded hover:bg-yellow-600"
               >
                 📄 Export CSV
               </button>
               <button
-                onClick={() => window.open('/stocks/export?format=pdf', '_blank')}
+                onClick={() =>
+                  window.open(`${api.defaults.baseURL}/stocks/export?format=pdf`, '_blank')
+                }
                 className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
               >
                 🖨️ Export PDF

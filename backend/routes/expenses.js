@@ -1,11 +1,12 @@
+// backend/routes/expenses.js
 const express = require('express');
 const { createExpense, getExpenses, validateCreateExpense, validateGetExpenses } = require('../controllers/expenseController.js');
-const authMiddleware = require('../middlewares/authMiddleware.js');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 router.use(authMiddleware());
 
-router.post('/', authMiddleware, validateCreateExpense, createExpense);
-router.get('/', authMiddleware, validateGetExpenses, getExpenses);
+router.post('/', validateCreateExpense, createExpense);
+router.get('/', validateGetExpenses, getExpenses);
 
 module.exports = router;

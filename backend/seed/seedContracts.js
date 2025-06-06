@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import createError from 'http-errors';
-import Contract from '../models/contractModel.js';
+const mongoose = require('mongoose');
+const createError = require('http-errors');
+const Contract = require('../models/contractModel.js');
 
 const URI = process.env.MONGO_URI;
 if (!URI) throw new Error('MONGO_URI is required');
@@ -18,7 +18,7 @@ const seedData = [
   // … vos autres lignes issues du PDF
 ];
 
-export async function seedContracts() {
+async function seedContracts() {
   try {
     await mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true });
     const results = [];
@@ -39,3 +39,5 @@ export async function seedContracts() {
     await mongoose.disconnect();
   }
 }
+
+module.exports = { seedContracts };

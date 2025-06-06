@@ -4,7 +4,7 @@ const path = require('path');
 const CatalogueItem = require('../models/CatalogueItem');
 const logger = require('../utils/logger');
 
-const MONGODB_URI = 'mongodb+srv://freemanlopez94140:t3lZozMgzmPTPRSI@freex94.5utv3iv.mongodb.net/api-pousse?retryWrites=true&w=majority&appName=freex94';
+const MONGODB_URI = 'mongodb+srv://freemanlopez94140:t3lZozMgzmPTPRSI@freex94.utv3iv.mongodb.net/api-pousse?retryWrites=true&w=majority&appName=freex94';
 
 const CATEGORIES_VALIDES = [
   "PLANTES",

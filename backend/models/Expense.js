@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ExpenseSchema = new Schema({
@@ -8,4 +8,4 @@ const ExpenseSchema = new Schema({
   currency: { type: String, required: true, uppercase: true, match: /^[A-Z]{3}$/ }
 }, { timestamps: true });
 
-export default mongoose.model('Expense', ExpenseSchema);
+module.exports = mongoose.model('Expense', ExpenseSchema);

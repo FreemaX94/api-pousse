@@ -1,5 +1,5 @@
 // backend/models/salesOrdersModel.js
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 // Sous-schéma pour les items de commande
@@ -65,4 +65,4 @@ SalesOrderSchema.pre('save', async function(next) {
 // Index pour trier rapidement par date de création
 SalesOrderSchema.index({ createdAt: -1 })
 
-export default mongoose.model('SalesOrder', SalesOrderSchema)
+module.exports = mongoose.model('SalesOrder', SalesOrderSchema)

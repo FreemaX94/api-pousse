@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const SheetEntrySchema = new Schema({
@@ -7,4 +7,4 @@ const SheetEntrySchema = new Schema({
   source: { type: String, default: 'manual' }
 }, { timestamps: true });
 
-export default mongoose.model('SheetEntry', SheetEntrySchema);
+module.exports = mongoose.model('SheetEntry', SheetEntrySchema);

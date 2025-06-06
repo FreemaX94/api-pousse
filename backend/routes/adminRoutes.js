@@ -7,7 +7,7 @@ router.use(authMiddleware('admin'));
 
 router.post('/seed/contracts', adminMiddleware, async (req, res, next) => {
   try {
-    const { seedContracts } = await import('../seed/seedContracts.js');
+    const { seedContracts } = require('../seed/seedContracts.js');
     const result = await seedContracts();
     res.json({ status: 'success', data: result });
   } catch (err) {
@@ -17,7 +17,7 @@ router.post('/seed/contracts', adminMiddleware, async (req, res, next) => {
 
 router.post('/seed/vehicles', adminMiddleware, async (req, res, next) => {
   try {
-    const { seedVehicles } = await import('../seed/seedVehicles.js');
+    const { seedVehicles } = require('../seed/seedVehicles.js');
     const result = await seedVehicles();
     res.json({ status: 'success', data: result });
   } catch (err) {

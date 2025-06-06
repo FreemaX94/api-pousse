@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ProduitSchema = new Schema({
@@ -8,4 +8,4 @@ const ProduitSchema = new Schema({
   category: { type: String, required: true, index: true }
 }, { timestamps: true });
 
-export default mongoose.model('Produit', ProduitSchema);
+module.exports = mongoose.model('Produit', ProduitSchema);

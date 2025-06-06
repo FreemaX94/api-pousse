@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ContractSchema = new Schema({
@@ -16,4 +16,4 @@ ContractSchema.pre('save', function(next) {
   next();
 });
 
-export default mongoose.model('Contract', ContractSchema);
+module.exports = mongoose.model('Contract', ContractSchema);

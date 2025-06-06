@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import CatalogueItem from '../models/CatalogueItem.js';
-import StockEntry from '../models/StockEntry.js';
-import logger from '../utils/logger.js';
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const CatalogueItem = require('../models/CatalogueItem');
+const StockEntry = require('../models/StockEntry');
+const logger = require('../utils/logger');
 
 dotenv.config();
 

@@ -1,8 +1,7 @@
 // src/api/produits.js
-import API_BASE_URL from './config';
-import axios from 'axios';
+import api from './clientApi';
 
 export const getProduits = async () => {
-  const res = await axios.get(`${API_BASE_URL}/produits`);
+  const res = await api.get('/produits');
   return res.data;
 };

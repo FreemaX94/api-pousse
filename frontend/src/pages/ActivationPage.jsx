@@ -10,7 +10,7 @@ const ActivationPage = () => {
   useEffect(() => {
     const activateAccount = async () => {
       try {
-        const response = await api.get(`/api/auth/activate/${token}`);
+        const response = await api.get(`/auth/activate/${token}`);
         setStatus({ loading: false, message: response.data.message || 'Votre compte a bien été activé !', error: false });
       } catch (err) {
         const msg = err.response?.data?.message || 'Échec de l’activation : token invalide ou expiré.';
@@ -49,6 +49,6 @@ export default ActivationPage;
   Modifications ajoutées :
   1. Création d’un nouveau composant React `ActivationPage.jsx` sous `src/pages/`.
   2. Récupération du `token` depuis l’URL via `useParams()`.
-  3. Appel GET à `/api/auth/activate/:token` avec `axios`.
+  3. Appel GET à `/auth/activate/:token` avec `api`.
   4. Gestion des états `loading`, `success` et `error` pour afficher un message approprié et un lien.
 */

@@ -28,7 +28,7 @@ export default defineConfig({
     open: true,
     cors: true,
     proxy: isProd ? {} : {
-      '/stocks': {
+      '/api/stocks': {
         target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false,

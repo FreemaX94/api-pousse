@@ -1,5 +1,5 @@
 // backend/models/Item.js
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const ItemSchema = new Schema({
@@ -13,4 +13,4 @@ const ItemSchema = new Schema({
 // Index pour optimiser les recherches par type et nom
 ItemSchema.index({ type: 1, name: 1 })
 
-export default mongoose.model('Item', ItemSchema)
+module.exports = mongoose.model('Item', ItemSchema)

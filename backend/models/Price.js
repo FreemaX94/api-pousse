@@ -1,5 +1,5 @@
 // backend/models/Price.js
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const PriceSchema = new Schema({
@@ -31,4 +31,4 @@ const PriceSchema = new Schema({
 // Index pour récupérer rapidement les tarifs les plus récents
 PriceSchema.index({ product: 1, validFrom: -1 })
 
-export default mongoose.model('Price', PriceSchema)
+module.exports = mongoose.model('Price', PriceSchema)

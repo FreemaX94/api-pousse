@@ -1,4 +1,5 @@
-const authMiddleware = require('../middlewares/authMiddleware');
+// backend/routes/events.js
+const { authMiddleware } = require('../middlewares/authMiddleware');
 const express = require('express');
 const { google } = require('googleapis');
 const path = require('path');

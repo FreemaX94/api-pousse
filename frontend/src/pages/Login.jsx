@@ -28,7 +28,7 @@ export default function Login() {
       // Appel à votre API d'authentification
       // Le backend doit répondre avec un JWT ou un cookie httpOnly
       await api.post(
-        '/api/auth/login',
+        '/auth/login',
         { username: form.username, password: form.password },
         { withCredentials: true }
       );

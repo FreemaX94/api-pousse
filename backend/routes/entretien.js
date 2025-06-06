@@ -1,4 +1,5 @@
-const authMiddleware = require('../middlewares/authMiddleware');
+// backend/routes/entretien.js
+const { authMiddleware } = require('../middlewares/authMiddleware');
 const express = require('express');
 const router = express.Router();
 router.use(authMiddleware());
