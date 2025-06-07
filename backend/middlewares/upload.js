@@ -1,10 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { fileURLToPath } = require('url');
 const createError = require('http-errors');
 
-const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const uploadDir = path.join(__dirname, '..', 'public', 'vehicles');

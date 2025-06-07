@@ -61,7 +61,13 @@ exports.login = async (req, res) => {
     const accessToken = generateToken({ userId: user._id }, '15m');
     const refreshToken = generateToken({ userId: user._id }, '7d');
 
-    res.cookie('accessToken', accessToken, { httpOnly: true });
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : true,
+      sameSite: process.env.COOKIE_SAMESITE || 'strict'
+    };
+
+    res.cookie('accessToken', accessToken, cookieOptions);
     res.status(200).send({ refreshToken });
   } catch (err) {
     logger.error('❌ Erreur login:', err.message);

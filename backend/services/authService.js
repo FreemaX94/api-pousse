@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const createError = require('../utils/createError.js');
 const User = require('../models/userModel.js');
 
@@ -7,7 +8,8 @@ exports.createUser = async function({ username, password }) {
   if (exists) {
     throw createError(409, 'Username already exists');
   }
-  const user = await User.create({ username, password });
+  const hashed = await bcrypt.hash(password, 10);
+  const user = await User.create({ username, password: hashed });
   return user;
 }
 
