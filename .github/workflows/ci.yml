@@ -1,123 +1,158 @@
-# .github/workflows/ci.yml
 name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
+  # Lint job: vérifie la qualité du code sans bloquer les tests
   lint:
     name: Lint Backend & Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Lint Backend
-        working-directory: backend
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install & Lint Backend
         run: |
-          npm ci
-          npm run lint
-      - name: Lint Frontend
-        working-directory: frontend
-        run: |
+          cd backend
           npm ci
           npm run lint
 
+      - name: Install & Lint Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run lint
+
+  # Tests backend, exécutés en parallèle
   test-backend:
     name: Test Backend
     runs-on: ubuntu-latest
-    needs: lint
     services:
       mongo:
-        image: mongo:6.0
-        ports:
-          - 27017:27017
+        image: mongo:5.0
+        ports: [27017:27017]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Install & Test Backend
-        working-directory: backend
-        env:
-          MONGODB_URI: mongodb://localhost:27017/api-pousse-test
-          JWT_SECRET: testsecret
-          SESSION_SECRET: testsecret
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies & Run Tests
         run: |
+          cd backend
           npm ci
           npm test
+        env:
+          MONGO_URL: mongodb://localhost:27017/test-db
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
+  # Tests frontend, exécutés en parallèle
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
-    needs: lint
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Install & Test Frontend
-        working-directory: frontend
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies & Run Tests
         run: |
+          cd frontend
           npm ci
           npm test
 
-  e2e:
-    name: End-to-End (Cypress)
+  # Audit de sécurité des dépendances backend
+  security-scan:
+    name: Security Audit (npm audit)
     runs-on: ubuntu-latest
-    needs:
-      - test-backend
-      - test-frontend
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Start Backend (Staging)
-        working-directory: backend
-        run: |
-          npm ci
-          npm run dev &     # démarre le serveur (ex : sur le port défini)
-          sleep 10          # attends qu’il soit prêt
-      - name: Run Cypress Tests
-        working-directory: frontend
-        run: |
-          npm ci
-          npm run cypress:run
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
-  security-scan:
-    name: Security Scan (npm audit)
+      - name: Run npm audit
+        run: |
+          cd backend
+          npm ci
+          npm audit --audit-level=high
+
+  # Tests end-to-end avec Cypress
+  e2e:
+    name: End-to-End (Cypress)
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [test-backend, test-frontend]
+    services:
+      mongo:
+        image: mongo:5.0
+        ports: [27017:27017]
     steps:
-      - uses: actions/checkout@v4
-      - name: Audit Backend Dependencies
-        working-directory: backend
-        run: |
-          npm ci
-          npm audit --audit-level=high
-      - name: Audit Frontend Dependencies
-        working-directory: frontend
-        run: |
-          npm ci
-          npm audit --audit-level=high
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install All Dependencies
+        run: npm ci
+
+      - name: Run Cypress Tests
+        run: npm run cypress:run
+
+  # Analyse de performance via Lighthouse CI
   performance:
-    name: Performance Budget (Lighthouse CI)
+    name: Performance Budget (Lighthouse)
     runs-on: ubuntu-latest
     needs: e2e
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12   # <-- mise à jour de la version de l’action :contentReference[oaicite:1]{index=1}
+        uses: treosh/lighthouse-ci-action@v12
         with:
           configPath: .lighthouserc.json
           uploadArtifacts: true
