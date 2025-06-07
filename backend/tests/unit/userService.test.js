@@ -1,9 +1,7 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userService = require('../../services/userService');
 const User = require('../../models/userModel');
 
-jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 jest.mock('../../models/userModel', () => ({
   create: jest.fn(),
@@ -17,15 +15,13 @@ describe('userService', () => {
   });
 
   describe('registerUser', () => {
-    it('hashes password and creates user', async () => {
-      bcrypt.hash.mockResolvedValue('hashed');
+    it('creates user with plain password', async () => {
       const user = { username: 'u' };
       User.create.mockResolvedValue(user);
 
       const result = await userService.registerUser({ username: 'u', password: 'p' });
 
-      expect(bcrypt.hash).toHaveBeenCalledWith('p', 10);
-      expect(User.create).toHaveBeenCalledWith({ username: 'u', password: 'hashed' });
+      expect(User.create).toHaveBeenCalledWith({ username: 'u', password: 'p' });
       expect(result).toBe(user);
     });
   });

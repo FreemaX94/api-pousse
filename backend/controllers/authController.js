@@ -12,12 +12,11 @@ const generateToken = (payload, expiresIn) =>
 exports.register = async (req, res) => {
   try {
     const { username, password, email, fullname } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({
       username,
       email,
       fullname,
-      password: hashed,
+      password,
       isActive: false
     });
 
@@ -124,7 +123,7 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).send({ message: 'Token invalide ou expiré' });
     }
-    user.password = await bcrypt.hash(password, 10);
+    user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();

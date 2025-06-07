@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel.js').default || require('../models/userModel.js');
 
@@ -6,8 +5,7 @@ const User = require('../models/userModel.js').default || require('../models/use
  * Enregistre un utilisateur
  */
 async function registerUser(data) {
-  const hashed = await bcrypt.hash(data.password, 10);
-  const user = await User.create({ ...data, password: hashed });
+  const user = await User.create({ ...data });
   return user;
 }
 
