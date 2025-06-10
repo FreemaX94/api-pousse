@@ -1,5 +1,5 @@
 // frontend/src/pages/Evenements.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   CalendarDaysIcon,
   ClipboardDocumentListIcon,
@@ -9,6 +9,7 @@ import {
   XMarkIcon,
   MoonIcon,
   SunIcon,
+  TagIcon,               // AJOUT
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import FormulaireMain from "../components/FormulaireMain.jsx";
@@ -26,6 +27,15 @@ export default function Evenements() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
+  // AJOUT : états pour stock global, tags, et toggle affichage
+  const [stock, setStock] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [showStocksDetails, setShowStocksDetails] = useState(false);
+
+  // Ref pour scroller vers les détails
+  const stocksRef = useRef(null);
+
+  // Fetch des événements + images
   useEffect(() => {
     const from = new Date().toISOString();
     fetch(`/api/events?from=${encodeURIComponent(from)}`, {
@@ -45,9 +55,7 @@ export default function Evenements() {
               {
                 headers: {
                   Accept: "application/json",
-                  Authorization: `Basic ${window.btoa(
-                    "Seeds127040:4F8C608F51"
-                  )}`,
+                  Authorization: `Basic ${window.btoa("Seeds127040:4F8C608F51")}`,
                 },
               }
             )
@@ -56,7 +64,10 @@ export default function Evenements() {
                 return resImg.json();
               })
               .then(img => {
-                setImages(prev => ({ ...prev, [ev.id]: `data:image/png;base64,${img.Image}` }));
+                setImages(prev => ({
+                  ...prev,
+                  [ev.id]: `data:image/png;base64,${img.Image}`
+                }));
               })
               .catch(err => console.error(`Erreur fetch image ${ev.description}:`, err));
           }
@@ -64,6 +75,37 @@ export default function Evenements() {
       })
       .catch(err => console.error("Erreur fetch events:", err));
   }, []);
+
+  // AJOUT : fetch global stock et tags
+  useEffect(() => {
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Basic ${window.btoa("Seeds127040:4F8C608F51")}`,
+    };
+
+    fetch("https://customerapi.nieuwkoop-europe.com/stock", { headers })
+      .then(res => {
+        if (!res.ok) throw new Error(`Stock HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => setStock(data))
+      .catch(err => console.error("Erreur fetch stock:", err));
+
+    fetch("https://customerapi.nieuwkoop-europe.com/tags", { headers })
+      .then(res => {
+        if (!res.ok) throw new Error(`Tags HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => setTags(data))
+      .catch(err => console.error("Erreur fetch tags:", err));
+  }, []);
+
+  // Scroll automatique vers les détails quand on l'affiche
+  useEffect(() => {
+    if (showStocksDetails && stocksRef.current) {
+      stocksRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [showStocksDetails]);
 
   return (
     <div className={darkMode ? "dark" : ""}>
@@ -73,14 +115,22 @@ export default function Evenements() {
           className="md:hidden absolute top-4 left-4 z-50"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {menuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+          {menuOpen ? (
+            <XMarkIcon className="w-6 h-6" />
+          ) : (
+            <Bars3Icon className="w-6 h-6" />
+          )}
         </button>
         {/* Toggle dark mode */}
         <button
           className="absolute top-4 right-4 z-50"
           onClick={() => setDarkMode(!darkMode)}
         >
-          {darkMode ? <SunIcon className="w-6 h-6 text-yellow-400" /> : <MoonIcon className="w-6 h-6" />}
+          {darkMode ? (
+            <SunIcon className="w-6 h-6 text-yellow-400" />
+          ) : (
+            <MoonIcon className="w-6 h-6" />
+          )}
         </button>
 
         {/* Sidebar */}
@@ -91,16 +141,28 @@ export default function Evenements() {
         >
           <h1 className="text-2xl font-bold tracking-wide">POUSSE</h1>
           <nav className="mt-8 space-y-4">
-            <a href="#plannings" className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300">
+            <a
+              href="#plannings"
+              className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300"
+            >
               <CalendarDaysIcon className="w-5 h-5" /> Plannings
             </a>
-            <a href="#formulaires" className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300">
+            <a
+              href="#formulaires"
+              className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300"
+            >
               <ClipboardDocumentListIcon className="w-5 h-5" /> Formulaires
             </a>
-            <a href="#inventaire" className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300">
+            <a
+              href="#inventaire"
+              className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300"
+            >
               <ArchiveBoxIcon className="w-5 h-5" /> Entrée Inventaire
             </a>
-            <a href="#stocks" className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300">
+            <a
+              onClick={() => setShowStocksDetails(v => !v)}
+              className="flex items-center gap-2 hover:text-green-700 dark:hover:text-green-300 cursor-pointer"
+            >
               <Squares2X2Icon className="w-5 h-5" /> Stocks
             </a>
           </nav>
@@ -109,12 +171,21 @@ export default function Evenements() {
         {/* Main content */}
         <main className="flex-1 p-6 sm:p-8 space-y-16 mt-12 md:mt-0">
           {/* Plannings Section */}
-          <motion.section id="plannings" className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.section
+            id="plannings"
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="flex justify-between items-center">
               <h2 className="text-3xl font-bold text-green-800 dark:text-green-400 flex items-center gap-2">
                 <CalendarDaysIcon className="w-6 h-6" /> Plannings
               </h2>
-              <button onClick={() => setDrawerOpen(true)} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+              >
                 📋 Détails
               </button>
             </div>
@@ -122,7 +193,9 @@ export default function Evenements() {
               <div className="xl:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                 <iframe
                   title="Google Agenda POUSSE"
-                  src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(import.meta.env.VITE_GOOGLE_CALENDAR_ID)}&ctz=Europe%2FParis`}
+                  src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(
+                    import.meta.env.VITE_GOOGLE_CALENDAR_ID
+                  )}&ctz=Europe%2FParis`}
                   style={{ border: 0 }}
                   width="100%"
                   height="600"
@@ -132,15 +205,32 @@ export default function Evenements() {
                 />
               </div>
               <div className="bg-[#f8f9fa] dark:bg-gray-900 rounded-lg p-4 shadow space-y-2">
-                <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">📌 Événements à venir</h3>
+                <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
+                  📌 Événements à venir
+                </h3>
                 <ul className="text-sm space-y-3">
                   {events.map(ev => (
-                    <li key={ev.id} className="border-b pb-2 dark:border-gray-700 flex items-center gap-2">
-                      {images[ev.id] && <img src={images[ev.id]} alt={ev.summary} className="w-12 h-12 rounded-md" />}
+                    <li
+                      key={ev.id}
+                      className="border-b pb-2 dark:border-gray-700 flex items-center gap-2"
+                    >
+                      {images[ev.id] && (
+                        <img
+                          src={images[ev.id]}
+                          alt={ev.summary}
+                          className="w-12 h-12 rounded-md"
+                        />
+                      )}
                       <div>
-                        <strong>{ev.summary}</strong> —{' '}
-                        {new Date(ev.start.dateTime || ev.start.date).toLocaleString('fr-FR', {
-                          weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                        <strong>{ev.summary}</strong> —{" "}
+                        {new Date(
+                          ev.start.dateTime || ev.start.date
+                        ).toLocaleString("fr-FR", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </div>
                     </li>
@@ -151,7 +241,13 @@ export default function Evenements() {
           </motion.section>
 
           {/* Formulaires Section */}
-          <motion.section id="formulaires" className="space-y-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <motion.section
+            id="formulaires"
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <h2 className="text-3xl font-bold text-green-800 dark:text-green-400 flex items-center gap-2">
               <ClipboardDocumentListIcon className="w-6 h-6" /> Formulaires
             </h2>
@@ -166,7 +262,13 @@ export default function Evenements() {
           </motion.section>
 
           {/* Entrée Inventaire Section */}
-          <motion.section id="inventaire" className="space-y-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <motion.section
+            id="inventaire"
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <h2 className="text-3xl font-bold text-green-800 dark:text-green-400 flex items-center gap-2">
               <ArchiveBoxIcon className="w-6 h-6" /> Entrée Inventaire
             </h2>
@@ -179,7 +281,13 @@ export default function Evenements() {
           </motion.section>
 
           {/* Stocks Section */}
-          <motion.section id="stocks" className="space-y-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <motion.section
+            id="stocks"
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <h2 className="text-3xl font-bold text-green-800 dark:text-green-400 flex items-center gap-2">
               <Squares2X2Icon className="w-6 h-6" /> Stocks
             </h2>
@@ -187,14 +295,53 @@ export default function Evenements() {
               <StockViewer />
             </div>
           </motion.section>
-
         </main>
 
         {/* Drawer & Modal */}
         {drawerOpen && <StockViewerDrawer onClose={() => setDrawerOpen(false)} />}
         <Modal />
+
+        {/* AJOUT : Section Stock global & Tags (affichée au clic) */}
+        {showStocksDetails && (
+          <div ref={stocksRef}>
+            <motion.section
+              id="stock-global"
+              className="space-y-6 p-6 bg-white dark:bg-gray-800"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <Bars3Icon className="w-6 h-6" /> Stock global
+              </h2>
+              <ul className="list-disc pl-6">
+                {stock.map(item => (
+                  <li key={item.id}>
+                    {item.Itemcode || item.code}: {item.Quantity || item.quantity}
+                  </li>
+                ))}
+              </ul>
+            </motion.section>
+
+            <motion.section
+              id="tags"
+              className="space-y-6 p-6 bg-white dark:bg-gray-800"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-3xl font-bold flex items-center gap-2">
+                <TagIcon className="w-6 h-6" /> Tags disponibles
+              </h2>
+              <ul className="list-disc pl-6">
+                {tags.map(tag => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            </motion.section>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-

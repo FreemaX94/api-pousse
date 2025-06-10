@@ -1,26 +1,37 @@
 const express = require('express');
 const { celebrate, Joi, Segments } = require('celebrate');
-const { authMiddleware } = require('../middlewares/authMiddleware'); // ✅ correction ici
+const { authMiddleware } = require('../middlewares/authMiddleware');
+const { getStockByCategory, exportStocks } = require('../controllers/stockController'); // MODIF : import des controllers
 
 const router = express.Router();
 
-// 🔒 Route protégée avec validation de la query
+// 🔒 Récupération des stocks par catégorie
 router.get(
   '/',
-  authMiddleware(), // ✅ appelle bien la fonction
+  authMiddleware(), // vous protégez toujours la route
   celebrate({
     [Segments.QUERY]: Joi.object().keys({
       search: Joi.string().optional(),
+      categorie: Joi.string()                             // MODIF : on autorise la query `categorie`
+        .valid('Plantes', 'Contenants', 'Décor', 'Artificiels', 'Séchés')
+        .required(),                                      // obligatoire côté back
     }),
   }),
-  async (req, res) => {
-    try {
-      // Logique métier de récupération des stocks (à compléter si besoin)
-      res.status(200).json({ message: 'Stocks récupérés avec succès' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
+  getStockByCategory                                    // MODIF : on appelle directement le controller
+);
+
+// (Optionnel) 🔒 Export PDF des stocks par catégorie
+router.get(
+  '/export',
+  authMiddleware(),
+  celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+      categorie: Joi.string()
+        .valid('Plantes', 'Contenants', 'Décor', 'Artificiels', 'Séchés')
+        .required(),
+    }),
+  }),
+  exportStocks                                          // MODIF : export via controller
 );
 
 module.exports = router;
