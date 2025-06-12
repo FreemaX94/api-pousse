@@ -72,10 +72,10 @@ function setupRoutes() {
   app.use('/api/catalogue',        catalogueRoutes);
   app.use('/api/catalogueitems',   catalogueItemRoutes);
   app.use('/api/nieuwkoop',        nieuwkoopRoutes);
-  app.use('/api/events',           eventsRoutes); // Montage de la vraie route événements
+  app.use('/api/events',           eventsRoutes);
 }
 
-setupRoutes();
+setupRoutes();  // ← appel unique ici
 
 // 🎯 Gestion des erreurs Celebrate (validation Joi)
 app.use(errors());
