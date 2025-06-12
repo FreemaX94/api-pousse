@@ -27,9 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//
 // 🧪 Routes factices de test (temporairement conservées)
-//
 app.use('/api/users',               (req, res) => res.status(200).send([]));
 app.use('/api/sanitize-test',       (req, res) => res.status(200).send([]));
 app.use('/api/statistiques',        (req, res) => res.status(200).send([]));
@@ -38,7 +36,7 @@ app.use('/api/parametres',          (req, res) => res.status(200).send([]));
 app.use('/api/creation',            (req, res) => res.status(200).send([]));
 app.use('/api/contracts',           (req, res) => res.status(200).send([]));
 app.use('/api/depots',              (req, res) => res.status(200).send([]));
-app.use('/api/events',              (req, res) => res.status(200).send([]));
+// (Stub /api/events supprimé pour utiliser la vraie route)
 app.use('/api/livraisons',          (req, res) => res.status(200).send([]));
 app.use('/api/deliveries',          (req, res) => res.status(200).send([]));
 app.use('/api/entretien',           (req, res) => res.status(200).send([]));
@@ -54,18 +52,17 @@ app.get('/api/products/:id',        (req, res) => {
   res.status(200).json(found);
 });
 
-//
 // ✅ Brancher toutes les vraies routes dynamiques
-//
 function setupRoutes() {
-  const authRoutes        = require('./routes/authRoutes');
-  const stockRoutes       = require('./routes/stocks');
-  const invoiceRoutes     = require('./routes/invoices');
-  const vehicleRoutes     = require('./routes/vehicles');
-  const concepteurRoutes  = require('./routes/concepteurs');
+  const authRoutes         = require('./routes/authRoutes');
+  const stockRoutes        = require('./routes/stocks');
+  const invoiceRoutes      = require('./routes/invoices');
+  const vehicleRoutes      = require('./routes/vehicles');
+  const concepteurRoutes   = require('./routes/concepteurs');
   const catalogueRoutes    = require('./routes/catalogue');
-  const catalogueItemRoutes = require('./routes/catalogueitems');
-  const nieuwkoopRoutes   = require('./routes/nieuwkoop'); // Proxy vers l’API Nieuwkoop
+  const catalogueItemRoutes= require('./routes/catalogueitems');
+  const nieuwkoopRoutes    = require('./routes/nieuwkoop');
+  const eventsRoutes       = require('./routes/events'); // Ajout du routeur événements
 
   app.use('/api/auth',             authRoutes);
   app.use('/api/stocks',           stockRoutes);
@@ -74,12 +71,10 @@ function setupRoutes() {
   app.use('/api/concepteurs',      concepteurRoutes);
   app.use('/api/catalogue',        catalogueRoutes);
   app.use('/api/catalogueitems',   catalogueItemRoutes);
-
-  // 📦 Routes proxy pour l’API Nieuwkoop (ex. /api/nieuwkoop/plantes)
   app.use('/api/nieuwkoop',        nieuwkoopRoutes);
+  app.use('/api/events',           eventsRoutes); // Montage de la vraie route événements
 }
 
-// Initialise les routes
 setupRoutes();
 
 // 🎯 Gestion des erreurs Celebrate (validation Joi)
