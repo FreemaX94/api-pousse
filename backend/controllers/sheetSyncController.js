@@ -1,4 +1,4 @@
-const * as service = require('../services/sheetSyncService.js');
+const service = require('../services/sheetSyncService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
 
 exports.syncSheet = async (req, res, next) =>{

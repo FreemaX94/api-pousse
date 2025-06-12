@@ -1,4 +1,4 @@
-const * as service = require('../services/itemsService.js');
+const service = require('../services/itemsService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
 
 exports.validateCreateItem = celebrate({

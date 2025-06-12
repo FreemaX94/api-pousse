@@ -1,4 +1,4 @@
-import { celebrate, Joi, Segments } from 'celebrate'
+const { celebrate, Joi, Segments } = require('celebrate');
 
 // Politique de username : chaîne alphanumérique, 3–30 caractères
 const username = Joi.string()
@@ -13,7 +13,7 @@ const username = Joi.string()
     'string.min': `"username" doit contenir au moins {#limit} caractères`,
     'string.max': `"username" doit contenir au plus {#limit} caractères`,
     'any.required': `"username" est requis`,
-  })
+  });
 
 // Politique de password : chaîne, 8–128 caractères, au moins 1 chiffre et 1 lettre majuscule
 const password = Joi.string()
@@ -23,18 +23,19 @@ const password = Joi.string()
     'string.pattern.base': `"password" doit contenir entre 8 et 128 caractères, dont au moins une majuscule et un chiffre`,
     'string.empty': `"password" ne peut pas être vide`,
     'any.required': `"password" est requis`,
-  })
+  });
 
-export const registerValidation = celebrate({
+exports.registerValidation = celebrate({
   [Segments.BODY]: Joi.object({
     username,
     password,
-  })
-})
+  }),
+});
 
-export const loginValidation = celebrate({
+exports.loginValidation = celebrate({
   [Segments.BODY]: Joi.object({
     username,
     password,
-  })
-})
+  }),
+});
+

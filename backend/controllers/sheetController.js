@@ -1,4 +1,4 @@
-const * as service = require('../services/sheetService.js');
+const service = require('../services/sheetService.js');
 const { celebrate, Joi, Segments } = require('celebrate');
 
 exports.validateImportSheet = celebrate({
