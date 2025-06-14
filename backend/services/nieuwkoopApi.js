@@ -1,54 +1,43 @@
+// backend/services/nieuwkoopApi.js
+
 const axios = require('axios');
-const createError = require('http-errors');
 const { getToken } = require('./nieuwkoopAuth');
+const { fetchItemImageBasic } = require('./nieuwkoopCustomerApi');
 
-const API_URL = process.env.NIEUWKOOP_BASE_URL;
-const MAX_RETRIES = 3;
-
-const client = axios.create({
-  baseURL: API_URL,
-  timeout: 5000
+// Client OAuth2 pour l'API principale
+const apiClient = axios.create({
+  baseURL: process.env.NIEUWKOOP_BASE_URL,
+  timeout: 5000,
 });
-
-client.interceptors.response.use(
-  response => response,
-  async error => {
-    const { config, response } = error;
-    const shouldRetry =
-      !config.__isRetryRequest && (!response || response.status >= 500);
-    if (shouldRetry && config.__retryCount < MAX_RETRIES) {
-      config.__retryCount = (config.__retryCount || 0) + 1;
-      return client(config);
-    }
-    return Promise.reject(
-      createError(response?.status || 500, error.message)
-    );
-  }
-);
 
 async function authorizedRequest(options) {
   const token = await getToken();
-  const headers = { ...options.headers, Authorization: `Bearer ${token}` };
-  return client({ ...options, headers });
+  options.headers = {
+    ...options.headers,
+    Authorization: `Bearer ${token}`,
+  };
+  const response = await apiClient(options);
+  return response.data;
 }
 
-exports.fetchCatalog = async function () {
-  try {
-    const res = await authorizedRequest({ method: 'get', url: '/catalog' });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
-};
+module.exports = {
+  // Items endpoints OAuth2
+  fetchItems: () => authorizedRequest({ method: 'GET', url: '/items' }),
+  fetchItem: (productId) => authorizedRequest({ method: 'GET', url: `/items/${productId}` }),
 
-exports.fetchStock = async function (productId) {
-  try {
-    const res = await authorizedRequest({
-      method: 'get',
-      url: `/stock/${productId}`
-    });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  // Fetch image via Customer API Basic Auth
+  fetchItemImage: fetchItemImageBasic,
+
+  // Catalog endpoints OAuth2
+  fetchCatalog: () => authorizedRequest({ method: 'GET', url: '/catalog' }),
+  fetchCatalogById: (catalogId) =>
+    authorizedRequest({ method: 'GET', url: `/catalog/${catalogId}` }),
+
+  // Stock endpoints OAuth2
+  fetchStock: () => authorizedRequest({ method: 'GET', url: '/stock' }),
+  fetchStockById: (productId) =>
+    authorizedRequest({ method: 'GET', url: `/stock/${productId}` }),
+
+  // Health endpoint OAuth2
+  fetchHealth: () => authorizedRequest({ method: 'GET', url: '/health' }),
 };

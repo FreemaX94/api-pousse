@@ -1,37 +1,28 @@
 // backend/routes/nieuwkoop.js
+
 const express = require('express');
-const axios = require('axios');
 const { authMiddleware } = require('../middlewares/authMiddleware');
+const controller = require('../controllers/nieuwkoopController');
+
 const router = express.Router();
 
+// Appliquer l'authentification à toutes les routes Nieuwkoop
 router.use(authMiddleware());
 
-// GET /api/nieuwkoop/plantes
-router.get(
-  '/plantes',
-  async (req, res) => {
-    try {
-      const auth = Buffer.from(
-        `${process.env.NIEUWKOOP_USER}:${process.env.NIEUWKOOP_PASS}`
-      ).toString('base64');
+// Items
+router.get('/items', controller.getItems);
+router.get('/items/:productId', controller.getItem);
+router.get('/items/:productId/image', controller.getItemImage);
 
-      const response = await axios.get(
-        'https://customerapi.nieuwkoop-europe.com/stock?categorie=Plantes',
-        {
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Basic ${auth}`,
-          },
-        }
-      );
+// Catalogue
+router.get('/catalog', controller.getCatalog);
+router.get('/catalog/:catalogId', controller.getCatalogById);
 
-      return res.json(response.data);
-    } catch (err) {
-      console.error('Erreur proxy Nieuwkoop Plantes :', err.message);
-      const status = err.response?.status || 500;
-      return res.status(status).json({ error: err.message });
-    }
-  }
-);
+// Stock
+router.get('/stock', controller.getStocks);
+router.get('/stock/:productId', controller.getStockById);
+
+// Health check
+router.get('/health', controller.getHealth);
 
 module.exports = router;
