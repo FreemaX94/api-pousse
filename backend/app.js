@@ -36,7 +36,6 @@ app.use('/api/parametres',          (req, res) => res.status(200).send([]));
 app.use('/api/creation',            (req, res) => res.status(200).send([]));
 app.use('/api/contracts',           (req, res) => res.status(200).send([]));
 app.use('/api/depots',              (req, res) => res.status(200).send([]));
-// (Stub /api/events supprimé pour utiliser la vraie route)
 app.use('/api/livraisons',          (req, res) => res.status(200).send([]));
 app.use('/api/deliveries',          (req, res) => res.status(200).send([]));
 app.use('/api/entretien',           (req, res) => res.status(200).send([]));
@@ -62,7 +61,7 @@ function setupRoutes() {
   const catalogueRoutes    = require('./routes/catalogue');
   const catalogueItemRoutes= require('./routes/catalogueitems');
   const nieuwkoopRoutes    = require('./routes/nieuwkoop');
-  const eventsRoutes       = require('./routes/events'); // Ajout du routeur événements
+  const eventsRoutes       = require('./routes/events');
 
   app.use('/api/auth',             authRoutes);
   app.use('/api/stocks',           stockRoutes);
@@ -75,15 +74,17 @@ function setupRoutes() {
   app.use('/api/events',           eventsRoutes);
 }
 
-setupRoutes();  // ← appel unique ici
+setupRoutes();
 
 // 🎯 Gestion des erreurs Celebrate (validation Joi)
 app.use(errors());
 
-// 🛑 Middleware global de gestion des erreurs
+// 🛑 Middleware global de gestion des erreurs corrigé
 app.use((err, req, res, next) => {
-  logger.error('Erreur serveur :', err.message || err);
-  res.status(500).json({ error: 'Erreur interne du serveur' });
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || 'Erreur interne du serveur';
+  logger.error(`Erreur ${status} :`, message);
+  res.status(status).json({ error: message });
 });
 
 module.exports = { app, setupRoutes };

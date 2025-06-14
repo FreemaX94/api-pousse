@@ -29,16 +29,21 @@ describe('authMiddleware', () => {
 
   test('rejette token manquant', async () => {
     await authMiddleware()(req, res, next);
-    expect(next).toHaveBeenCalledWith(expect.any(Error));
-    expect(next.mock.calls[0][0].status || 401).toBe(401);
+    const err = next.mock.calls[0][0];
+    console.dir(err, { depth: 10 }); // 🔍 DEBUG : Affichage complet
+    expect(err).toBeInstanceOf(Error);
+    expect(err.message).toMatch(/token/i);
+    expect(err.status ?? err.statusCode ?? 500).toBe(401);
   });
 
   test('rejette token invalide', async () => {
     jwt.verify = () => { throw new Error('invalid token'); };
     req.cookies.accessToken = 'invalid.token';
     await authMiddleware()(req, res, next);
-    expect(next).toHaveBeenCalledWith(expect.any(Error));
-    expect(next.mock.calls[0][0].status || 401).toBe(401);
+    const err = next.mock.calls[0][0];
+    expect(err).toBeInstanceOf(Error);
+    expect(err.message).toMatch(/token/i);
+    expect(err.status ?? err.statusCode ?? 500).toBe(401);
   });
 
   test('rejette utilisateur inactif', async () => {
@@ -47,21 +52,28 @@ describe('authMiddleware', () => {
     findById.mockResolvedValue(inactiveUser);
     req.cookies.accessToken = 'valid.token';
     await authMiddleware()(req, res, next);
-    expect(next.mock.calls[0][0].status || 401).toBe(403);
+    const err = next.mock.calls[0][0];
+    expect(err.status ?? err.statusCode ?? 500).toBe(403);
   });
 
   test('rejette utilisateur avec mauvais rôle', async () => {
     req.user = { ...userMock, role: 'user' };
     await requireAdmin(req, res, next);
-    expect(next.mock.calls[0][0].status || 401).toBe(403);
+    const err = next.mock.calls[0][0];
+    expect(err.status ?? err.statusCode ?? 500).toBe(403);
   });
 
   test('rejette token expiré', async () => {
-    jwt.verify = () => { const err = new Error('Token expiré'); err.name = 'TokenExpiredError'; throw err; };
+    jwt.verify = () => {
+      const err = new Error('Token expiré');
+      err.name = 'TokenExpiredError';
+      throw err;
+    };
     req.cookies.accessToken = 'expired.token';
     findById.mockResolvedValue(userMock);
     await authMiddleware()(req, res, next);
-    expect(next.mock.calls[0][0].status || 401).toBe(401);
-    expect(next.mock.calls[0][0].message).toMatch(/expiré/i);
+    const err = next.mock.calls[0][0];
+    expect(err.status ?? err.statusCode ?? 500).toBe(401);
+    expect(err.message).toMatch(/expiré/i);
   });
 });

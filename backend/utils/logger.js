@@ -1,13 +1,9 @@
-function log(...args) {
-  if (process.env.NODE_ENV !== 'test') {
-    console.log(...args);
-  }
-}
+// utils/logger.js
 
-function error(...args) {
-  if (process.env.NODE_ENV !== 'test') {
-    console.error(...args);
-  }
-}
+const logger = {
+  info: (...args) => console.log('[INFO]', ...args),
+  warn: (...args) => console.warn('[WARN]', ...args),
+  error: (...args) => console.error('[ERROR]', ...args)
+};
 
-module.exports = { log, error };
+module.exports = logger;
