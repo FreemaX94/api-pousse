@@ -9,6 +9,7 @@ function getEnv(name, defValue = undefined) {
 }
 
 module.exports = {
+  getEnv, // <--- ajoute cette ligne
   port: parseInt(getEnv("PORT", 3000)),
   mongoURI: getEnv("MONGO_URI"),
   jwtSecret: getEnv("JWT_SECRET"),

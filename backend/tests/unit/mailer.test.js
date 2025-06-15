@@ -1,4 +1,4 @@
-jest.mock("nodemailer");
+jest.mock("nodemailer"); // Mock le module
 const nodemailer = require("nodemailer");
 
 const transporterMock = {
@@ -7,15 +7,15 @@ const transporterMock = {
 
 nodemailer.createTransport.mockReturnValue(transporterMock);
 
-let mailer;
-
-beforeAll(() => {
-  jest.resetModules();
-  require('dotenv').config({ path: './.env.test' });
-  mailer = require("../../../backend/config/mailer");
-});
-
 describe("mailer.js", () => {
+  let mailer;
+
+  beforeAll(() => {
+    jest.resetModules();
+    require('dotenv').config({ path: './.env.test' }); // ✅ Charge .env
+    mailer = require("../../../backend/config/mailer"); // ✅ Charge après
+  });
+
   test("devrait créer un transporteur et vérifier la configuration", () => {
     expect(nodemailer.createTransport).toHaveBeenCalled();
     expect(transporterMock.verify).toHaveBeenCalled();
