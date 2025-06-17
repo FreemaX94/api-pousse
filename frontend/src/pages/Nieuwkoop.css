@@ -1,0 +1,7 @@
+.hover-animate {
+  transition: all 0.2s ease;
+}
+.hover-animate:hover {
+  transform: translateX(2px);
+  color: #16a34a; /* Tailwind green-600 */
+}

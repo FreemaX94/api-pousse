@@ -1,6 +1,8 @@
 // backend/routes/nieuwkoopHealth.js
+
 const { authMiddleware } = require('../middlewares/authMiddleware');
 const express = require('express');
+
 const router = express.Router();
 router.use(authMiddleware());
 
