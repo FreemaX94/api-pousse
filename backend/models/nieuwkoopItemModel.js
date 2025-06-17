@@ -11,6 +11,11 @@ const nieuwkoopItemSchema = new mongoose.Schema({
   diameter: Number,
   price: Number,
   image: String,
+  quantity: {
+    type: Number,
+    default: 1,
+    min: 1,
+  },
 }, {
   timestamps: true
 });

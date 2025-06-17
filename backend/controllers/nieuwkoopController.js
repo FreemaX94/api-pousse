@@ -70,7 +70,16 @@ exports.createNieuwkoopItem = async (req, res) => {
       return res.status(400).json({ message: 'Ce produit est déjà dans le stock local.' });
     }
 
-    const item = await NieuwkoopItem.create({ reference, name, height, diameter, price, image });
+    const item = await NieuwkoopItem.create({
+      reference,
+      name,
+      height,
+      diameter,
+      price,
+      image,
+      quantity: 1 // valeur initiale
+    });
+
     res.status(201).json(item);
   } catch (err) {
     console.error("❌ Erreur ajout Nieuwkoop item:", err.message);
@@ -86,6 +95,50 @@ exports.getNieuwkoopItems = async (req, res) => {
   } catch (err) {
     console.error("❌ Erreur récupération des items Nieuwkoop:", err.message);
     res.status(500).json({ error: "Erreur lors de la récupération." });
+  }
+};
+
+// ✅ Modifier la quantité
+exports.updateNieuwkoopQuantity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ message: "Quantité invalide." });
+    }
+
+    const updated = await NieuwkoopItem.findByIdAndUpdate(
+      id,
+      { quantity },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Article introuvable." });
+    }
+
+    res.json(updated);
+  } catch (err) {
+    console.error("❌ Erreur mise à jour quantité:", err.message);
+    res.status(500).json({ error: "Erreur serveur lors de la mise à jour." });
+  }
+};
+
+// ✅ Supprimer un article
+exports.deleteNieuwkoopItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await NieuwkoopItem.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Article introuvable." });
+    }
+
+    res.json({ message: "Article supprimé avec succès." });
+  } catch (err) {
+    console.error("❌ Erreur suppression article:", err.message);
+    res.status(500).json({ error: "Erreur lors de la suppression." });
   }
 };
 

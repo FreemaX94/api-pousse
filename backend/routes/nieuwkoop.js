@@ -4,10 +4,10 @@ const controller = require('../controllers/nieuwkoopController');
 
 const router = express.Router();
 
-// 🔐 Authentification globale sur toutes les routes Nieuwkoop
+// 🔐 Appliquer auth sur tout
 router.use(authMiddleware());
 
-// 🔍 Lecture des produits de l'API externe
+// 🔍 Produits (API Nieuwkoop)
 router.get('/items', controller.getItems);
 router.get('/items/:productId', controller.getItem);
 router.get('/items/:productId/image', controller.getItemImage);
@@ -17,16 +17,18 @@ router.get('/prices/:productId', controller.getItemPrice);
 // 📦 Stock local (importé depuis Nieuwkoop)
 router.post('/stock', controller.createNieuwkoopItem);
 router.get('/stock', controller.getNieuwkoopItems);
+router.put('/stock/:id', controller.updateNieuwkoopQuantity);  // ✅ modification quantité
+router.delete('/stock/:id', controller.deleteNieuwkoopItem);   // ✅ suppression article
 
 // 📚 Catalogue
 router.get('/catalog', controller.getCatalog);
 router.get('/catalog/:catalogId', controller.getCatalogById);
 
-// 🧾 Stock API externe
+// 🧾 Stock (API officielle)
 router.get('/stock/:productId', controller.getStockById);
 router.get('/stock', controller.getStocks);
 
-// 🩺 Health Check
+// 🩺 Health
 router.get('/health', controller.getHealth);
 
 module.exports = router;

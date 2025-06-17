@@ -70,9 +70,27 @@ const Nieuwkoop = () => {
       });
   };
 
+  const updateQuantity = (id, quantity) => {
+    fetch(`/api/nieuwkoop/stock/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quantity })
+    })
+      .then(res => res.json())
+      .then(updated => {
+        setAddedItems(prev => prev.map(item => item._id === id ? updated : item));
+      });
+  };
+
+  const deleteItem = (id) => {
+    fetch(`/api/nieuwkoop/stock/${id}`, { method: "DELETE" })
+      .then(() => {
+        setAddedItems(prev => prev.filter(item => item._id !== id));
+      });
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
       <aside className="flex flex-col gap-6 p-4 bg-white border-r shadow-sm w-52">
         <h2 className="text-xl font-bold">Nieuwkoop</h2>
         <nav className="flex flex-col gap-3 text-sm font-medium">
@@ -93,7 +111,6 @@ const Nieuwkoop = () => {
         </nav>
       </aside>
 
-      {/* Main */}
       <main className="flex-1 p-8">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">POUSSE</h1>
@@ -148,14 +165,16 @@ const Nieuwkoop = () => {
               </div>
             )}
 
-            {/* Liste des produits ajoutés */}
             {addedItems.length > 0 && (
               <div className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
                 {addedItems.map((prod) => (
-                  <div
-                    key={prod._id}
-                    className="p-4 bg-white shadow rounded-xl"
-                  >
+                  <div key={prod._id} className="relative p-4 bg-white shadow rounded-xl">
+                    <button
+                      onClick={() => deleteItem(prod._id)}
+                      className="absolute text-red-500 top-2 right-2 hover:text-red-700"
+                    >
+                      🗑️
+                    </button>
                     <img
                       src={prod.image}
                       alt={prod.name}
@@ -164,7 +183,19 @@ const Nieuwkoop = () => {
                     <h3 className="font-semibold">{prod.name}</h3>
                     <p className="text-sm text-gray-500">Hauteur : {prod.height} cm</p>
                     <p className="text-sm text-gray-500">Diamètre : {prod.diameter} cm</p>
-                    <p className="font-bold text-green-700">{prod.price.toFixed(2)} €</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="number"
+                        min={1}
+                        value={prod.quantity}
+                        onChange={(e) => updateQuantity(prod._id, parseInt(e.target.value))}
+                        className="w-16 px-2 py-1 border rounded"
+                      />
+                      <span className="text-sm text-gray-600">x {prod.price.toFixed(2)} €</span>
+                    </div>
+                    <p className="mt-1 font-bold text-green-700">
+                      Total : {(prod.price * prod.quantity).toFixed(2)} €
+                    </p>
                   </div>
                 ))}
               </div>
