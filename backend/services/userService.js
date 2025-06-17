@@ -22,7 +22,28 @@ async function loginUser({ username, password }) {
 }
 
 /**
- * Met à jour le profil utilisateur
+ * Récupère tous les utilisateurs
+ */
+async function getAllUsers() {
+  return await User.find();
+}
+
+/**
+ * Récupère un utilisateur par ID
+ */
+async function getUserById(id) {
+  return await User.findById(id);
+}
+
+/**
+ * Met à jour un utilisateur (admin)
+ */
+async function updateUser(id, data) {
+  return await User.findByIdAndUpdate(id, data, { new: true });
+}
+
+/**
+ * Met à jour son propre profil
  */
 async function updateProfile(id, data) {
   const updated = await User.findByIdAndUpdate(id, data, { new: true });
@@ -30,4 +51,19 @@ async function updateProfile(id, data) {
   return updated;
 }
 
-module.exports = { registerUser, loginUser, updateProfile };
+/**
+ * Supprime un utilisateur
+ */
+async function deleteUser(id) {
+  return await User.findByIdAndDelete(id);
+}
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  updateProfile, // ✅ maintenant inclus
+  deleteUser
+};
