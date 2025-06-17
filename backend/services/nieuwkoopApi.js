@@ -4,7 +4,7 @@ const axios = require('axios');
 const { getToken } = require('./nieuwkoopAuth');
 const { fetchItemImageBasic } = require('./nieuwkoopCustomerApi');
 
-// Client OAuth2 pour l'API principale
+// Client principal pour l’API OAuth2
 const apiClient = axios.create({
   baseURL: process.env.NIEUWKOOP_BASE_URL,
   timeout: 5000,
@@ -20,7 +20,7 @@ async function authorizedRequest(options) {
   return response.data;
 }
 
-// Client Customer API pour détails produit + prix
+// Client pour l’API Customer (authentification Basic)
 const customerClient = axios.create({
   baseURL: process.env.NIEUWKOOP_CUSTOMER_BASE_URL,
   timeout: 5000,
@@ -30,20 +30,36 @@ const customerClient = axios.create({
   },
 });
 
+/**
+ * Récupère les infos détaillées d'un produit Nieuwkoop
+ */
 async function fetchItem(productId) {
-  const res = await customerClient.get(`/items?itemCode=${productId}`);
-  return res.data[0]; // premier élément
+  const res = await customerClient.get(`/items`, {
+    params: {
+      itemCode: productId,
+      sysmodified: '2020-01-01T00:00:00Z'
+    }
+  });
+  return res.data[0];
 }
 
+/**
+ * Récupère le prix d’un produit Nieuwkoop
+ */
 async function fetchItemPrice(productId) {
-  const res = await customerClient.get(`/prices?itemCode=${productId}`);
+  const res = await customerClient.get(`/prices`, {
+    params: {
+      itemCode: productId,
+      sysmodified: '2020-01-01T00:00:00Z'
+    }
+  });
   return res.data[0];
 }
 
 module.exports = {
   fetchItems: () => authorizedRequest({ method: 'GET', url: '/items' }),
-  fetchItem, // Customer API
-  fetchItemPrice, // Customer API
+  fetchItem,
+  fetchItemPrice,
   fetchItemImage: fetchItemImageBasic,
   fetchCatalog: () => authorizedRequest({ method: 'GET', url: '/catalog' }),
   fetchCatalogById: (catalogId) => authorizedRequest({ method: 'GET', url: `/catalog/${catalogId}` }),
