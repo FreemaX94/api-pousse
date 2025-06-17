@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Nieuwkoop.css";
 
 const Nieuwkoop = () => {
@@ -7,7 +7,17 @@ const Nieuwkoop = () => {
   const [error, setError] = useState(null);
   const [item, setItem] = useState(null);
   const [price, setPrice] = useState(null);
+  const [addedItems, setAddedItems] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    if (activeSection === "Stock") {
+      fetch("/api/nieuwkoop/stock")
+        .then(res => res.json())
+        .then(data => setAddedItems(data))
+        .catch(err => console.error("Erreur chargement stock local:", err));
+    }
+  }, [activeSection]);
 
   const handleSearch = () => {
     setError(null);
@@ -28,6 +38,35 @@ const Nieuwkoop = () => {
       .catch(err => {
         console.error("Erreur prix:", err);
         setPrice(null);
+      });
+  };
+
+  const handleAddToStock = () => {
+    if (!item || !price) return;
+
+    const payload = {
+      reference: item.Itemcode,
+      name: item.ItemDescription_EN || item.ItemDescription_FR,
+      height: item.Height,
+      diameter: item.DiameterCulturePot || item.PotSize,
+      price: price.PriceNett,
+    };
+
+    fetch("/api/nieuwkoop/stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Erreur lors de l'ajout");
+        return res.json();
+      })
+      .then(newItem => {
+        setAddedItems([newItem, ...addedItems]);
+      })
+      .catch(err => {
+        console.error("Erreur ajout stock:", err);
+        setError("Déjà dans le stock ou erreur serveur.");
       });
   };
 
@@ -83,28 +122,53 @@ const Nieuwkoop = () => {
 
             {error && <p className="text-red-600">{error}</p>}
 
-            <div className="max-w-xs p-4 bg-white shadow rounded-xl">
-              {imageUrl && (
-                <img
-                  src={imageUrl}
-                  alt="Product Nieuwkoop"
-                  className="w-full h-auto mb-4 rounded"
-                  onError={() => setError("❌ Image introuvable")}
-                />
-              )}
-              {item && (
+            {item && (
+              <div className="max-w-xs p-4 bg-white shadow rounded-xl">
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt="Product Nieuwkoop"
+                    className="w-full h-auto mb-4 rounded"
+                  />
+                )}
                 <div className="space-y-1 text-sm text-gray-700">
                   <p><strong>Nom :</strong> {item.ItemDescription_EN || item.ItemDescription_FR}</p>
                   <p><strong>Hauteur :</strong> {item.Height} cm</p>
-                  <p><strong>Diamètre du pot :</strong> {item.DiameterCulturePot} cm</p>
+                  <p><strong>Diamètre pot :</strong> {item.DiameterCulturePot || item.PotSize} cm</p>
                 </div>
-              )}
-              {price && (
-                <p className="mt-2 font-bold text-green-700">
-                  💶 Prix : {price.PriceNett?.toFixed(2)} €
-                </p>
-              )}
-            </div>
+                {price && (
+                  <p className="mt-2 font-bold text-green-700">💶 Prix : {price.PriceNett?.toFixed(2)} €</p>
+                )}
+                <button
+                  onClick={handleAddToStock}
+                  className="w-full px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700"
+                >
+                  ➕ Ajouter au stock
+                </button>
+              </div>
+            )}
+
+            {/* Liste des produits ajoutés */}
+            {addedItems.length > 0 && (
+              <div className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
+                {addedItems.map((prod) => (
+                  <div
+                    key={prod._id}
+                    className="p-4 bg-white shadow rounded-xl"
+                  >
+                    <img
+                      src={prod.image}
+                      alt={prod.name}
+                      className="object-contain w-full h-40 mb-2"
+                    />
+                    <h3 className="font-semibold">{prod.name}</h3>
+                    <p className="text-sm text-gray-500">Hauteur : {prod.height} cm</p>
+                    <p className="text-sm text-gray-500">Diamètre : {prod.diameter} cm</p>
+                    <p className="font-bold text-green-700">{prod.price.toFixed(2)} €</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
       </main>

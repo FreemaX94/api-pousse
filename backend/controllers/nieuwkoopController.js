@@ -1,5 +1,6 @@
 const fs = require('fs');
 const nieuwkoopApi = require('../services/nieuwkoopApi');
+const NieuwkoopItem = require('../models/nieuwkoopItemModel');
 
 exports.getItems = async (req, res, next) => {
   try {
@@ -55,6 +56,36 @@ exports.getItemPrice = async (req, res, next) => {
   } catch (err) {
     console.error("❌ Erreur getItemPrice:", err.message);
     res.status(500).json({ error: "Erreur lors de la récupération du prix." });
+  }
+};
+
+// ✅ Ajouter un produit au stock local
+exports.createNieuwkoopItem = async (req, res) => {
+  try {
+    const { reference, name, height, diameter, price } = req.body;
+    const image = `/api/nieuwkoop/items/${reference}/image`;
+
+    const exists = await NieuwkoopItem.findOne({ reference });
+    if (exists) {
+      return res.status(400).json({ message: 'Ce produit est déjà dans le stock local.' });
+    }
+
+    const item = await NieuwkoopItem.create({ reference, name, height, diameter, price, image });
+    res.status(201).json(item);
+  } catch (err) {
+    console.error("❌ Erreur ajout Nieuwkoop item:", err.message);
+    res.status(500).json({ error: "Erreur serveur lors de l'ajout." });
+  }
+};
+
+// ✅ Récupérer tous les produits stockés localement
+exports.getNieuwkoopItems = async (req, res) => {
+  try {
+    const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (err) {
+    console.error("❌ Erreur récupération des items Nieuwkoop:", err.message);
+    res.status(500).json({ error: "Erreur lors de la récupération." });
   }
 };
 
