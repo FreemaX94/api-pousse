@@ -17,8 +17,10 @@ router.get('/prices/:productId', controller.getItemPrice);
 // 📦 Stock local (importé depuis Nieuwkoop)
 router.post('/stock', controller.createNieuwkoopItem);
 router.get('/stock', controller.getNieuwkoopItems);
-router.put('/stock/:id', controller.updateNieuwkoopQuantity);  // ✅ modification quantité
-router.delete('/stock/:id', controller.deleteNieuwkoopItem);   // ✅ suppression article
+router.put('/stock/:id', controller.updateNieuwkoopQuantity);   // Modifier quantité
+router.put('/stock/:id/note', controller.updateNieuwkoopNote);  // ✅ Modifier note
+router.delete('/stock/:id', controller.deleteNieuwkoopItem);    // Supprimer un article
+router.delete('/stock/all', controller.deleteAllNieuwkoopItems); // ✅ Supprimer tout
 
 // 📚 Catalogue
 router.get('/catalog', controller.getCatalog);
@@ -28,7 +30,7 @@ router.get('/catalog/:catalogId', controller.getCatalogById);
 router.get('/stock/:productId', controller.getStockById);
 router.get('/stock', controller.getStocks);
 
-// 🩺 Health
+// 🩺 Health check
 router.get('/health', controller.getHealth);
 
 module.exports = router;

@@ -16,6 +16,10 @@ const nieuwkoopItemSchema = new mongoose.Schema({
     default: 1,
     min: 1,
   },
+  note: {
+    type: String,
+    default: "",
+  }
 }, {
   timestamps: true
 });

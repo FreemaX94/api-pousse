@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import NavBar from './components/NavBar';
 
@@ -20,15 +20,18 @@ import ActivationPage from './pages/ActivationPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword  from './pages/ResetPassword';
 
-import Nieuwkoop      from './pages/Nieuwkoop'; // ✅ ajout de la page Nieuwkoop
+import Nieuwkoop      from './pages/Nieuwkoop';
 
 import PrivateRoute   from './components/PrivateRoute';
 import TestSanitize   from './components/TestSanitize';
 
 export default function App() {
+  const location = useLocation();
+  const hideNavBar = location.pathname === "/nieuwkoop";
+
   return (
     <>
-      <NavBar />
+      {!hideNavBar && <NavBar />}
       <Toaster position="top-center" />
       <div className="bg-white min-h-[calc(100vh-4rem)]">
         <Routes>
@@ -49,7 +52,7 @@ export default function App() {
           <Route path="/entretien/add"element={<PrivateRoute><AddContract /></PrivateRoute>} />
           <Route path="/depot"        element={<PrivateRoute><Depot /></PrivateRoute>} />
           <Route path="/vehicules"    element={<PrivateRoute><Vehicules /></PrivateRoute>} />
-          <Route path="/nieuwkoop"    element={<PrivateRoute><Nieuwkoop /></PrivateRoute>} /> {/* ✅ nouvelle route */}
+          <Route path="/nieuwkoop"    element={<PrivateRoute><Nieuwkoop /></PrivateRoute>} />
           <Route path="/statistiques" element={<PrivateRoute><Statistiques /></PrivateRoute>} />
           <Route path="/parametres"   element={<PrivateRoute><Parametres /></PrivateRoute>} />
           <Route path="/comptabilite" element={<PrivateRoute><Comptabilite /></PrivateRoute>} />

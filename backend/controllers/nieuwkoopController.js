@@ -2,6 +2,7 @@ const fs = require('fs');
 const nieuwkoopApi = require('../services/nieuwkoopApi');
 const NieuwkoopItem = require('../models/nieuwkoopItemModel');
 
+// 🔍 API Nieuwkoop - Infos produits
 exports.getItems = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchItems();
@@ -77,7 +78,7 @@ exports.createNieuwkoopItem = async (req, res) => {
       diameter,
       price,
       image,
-      quantity: 1 // valeur initiale
+      quantity: 1
     });
 
     res.status(201).json(item);
@@ -87,7 +88,7 @@ exports.createNieuwkoopItem = async (req, res) => {
   }
 };
 
-// ✅ Récupérer tous les produits stockés localement
+// ✅ Récupérer les produits
 exports.getNieuwkoopItems = async (req, res) => {
   try {
     const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
@@ -98,7 +99,7 @@ exports.getNieuwkoopItems = async (req, res) => {
   }
 };
 
-// ✅ Modifier la quantité
+// ✅ Mettre à jour la quantité
 exports.updateNieuwkoopQuantity = async (req, res) => {
   try {
     const { id } = req.params;
@@ -142,6 +143,41 @@ exports.deleteNieuwkoopItem = async (req, res) => {
   }
 };
 
+// ✅ Supprimer tous les articles
+exports.deleteAllNieuwkoopItems = async (req, res) => {
+  try {
+    await NieuwkoopItem.deleteMany();
+    res.json({ message: "Tous les articles ont été supprimés." });
+  } catch (err) {
+    console.error("❌ Erreur suppression globale:", err);
+    res.status(500).json({ error: "Erreur lors de la suppression globale." });
+  }
+};
+
+// ✅ Mettre à jour une note
+exports.updateNieuwkoopNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { note } = req.body;
+
+    const updated = await NieuwkoopItem.findByIdAndUpdate(
+      id,
+      { note },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Article introuvable." });
+    }
+
+    res.json(updated);
+  } catch (err) {
+    console.error("❌ Erreur mise à jour note:", err.message);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+};
+
+// 📚 Catalogue (API externe)
 exports.getCatalog = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchCatalog();
@@ -160,6 +196,7 @@ exports.getCatalogById = async (req, res, next) => {
   }
 };
 
+// 🧾 Stock général
 exports.getStocks = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchStock();
@@ -178,6 +215,7 @@ exports.getStockById = async (req, res, next) => {
   }
 };
 
+// Health check
 exports.getHealth = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchHealth();
