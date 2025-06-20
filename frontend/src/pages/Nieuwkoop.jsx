@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Nieuwkoop.css";
+import MouvementForm from "../components/MouvementForm";
+import MouvementList from "../components/MouvementList";
+import {
+  getMovements,
+  createMovement,
+  validateMovement,
+  markReturned
+, createPartnerItem } from "../api/clientApi";
+
 
 const Nieuwkoop = () => {
   const [activeSection, setActiveSection] = useState("Catalogue");
@@ -11,8 +20,12 @@ const Nieuwkoop = () => {
   const [addedItems, setAddedItems] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [showPartnerForm, setShowPartnerForm] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [mouvements, setMouvements] = useState([]);
 
   useEffect(() => {
+    if (activeSection === "Entrées/Sorties") fetchMovements();
     if (activeSection === "Stock") {
       fetch("/api/nieuwkoop/stock")
         .then(res => res.json())
@@ -136,7 +149,7 @@ const Nieuwkoop = () => {
         <div className="flex flex-col gap-8">
           <h1 className="text-2xl font-extrabold tracking-wide text-green-700">POUSSE</h1>
           <nav className="flex flex-col gap-2 text-sm font-medium">
-            {["Catalogue", "Produits", "Stock"].map((item) => (
+            {["Catalogue", "Produits", "Stock", "Entrées/Sorties"].map((item) => (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -151,6 +164,7 @@ const Nieuwkoop = () => {
                 {item === "Catalogue" && "🌿"}
                 {item === "Produits" && "🧺"}
                 {item === "Stock" && "📦"}
+                {item === "Entrées/Sorties" && "🔁"}
                 {item}
               </motion.button>
             ))}
@@ -174,6 +188,13 @@ const Nieuwkoop = () => {
             Se déconnecter
           </motion.button>
         </motion.header>
+
+        {activeSection === "Entrées/Sorties" && (
+          <motion.section key="mouvements" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">
+            <MouvementForm onSubmit={handleSubmitMouvement} />
+            <MouvementList mouvements={mouvements} onValidate={handleValidate} onMarkReturned={handleReturn} />
+          </motion.section>
+        )}
 
         {activeSection === "Stock" && (
           <motion.section
@@ -241,12 +262,39 @@ const Nieuwkoop = () => {
                     Total : {totalPrice.toFixed(2)} € | Quantités : {totalQty}
                   </p>
                   <div className="flex gap-2">
-                    <motion.button whileHover={{ scale: 1.05 }} onClick={handleExportCSV} className="px-3 py-1 text-white rounded bg-sky-600 hover:bg-sky-700">
+                    <motion.button whileHover={{ scale: 1.05 }} onClick={() => setShowPartnerForm(true)} className="px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700">
+  ➕ Ajouter un article
+</motion.button>
+          <motion.button whileHover={{ scale: 1.05 }} onClick={handleExportCSV} className="px-3 py-1 text-white rounded bg-sky-600 hover:bg-sky-700">
                       Export CSV
                     </motion.button>
                     <motion.button whileHover={{ scale: 1.05 }} onClick={handleClearAll} className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700">
                       Tout vider
                     </motion.button>
+
+{showPartnerForm && (
+  <div className="p-4 mt-4 space-y-4 bg-white rounded shadow">
+    <h3 className="text-lg font-semibold">➕ Nouvel article partenaire</h3>
+    <input id="partner-name" type="text" placeholder="Nom" className="w-full p-2 border rounded" />
+    <input id="partner-ref" type="text" placeholder="Référence" className="w-full p-2 border rounded" />
+    <input id="partner-price" type="number" placeholder="Prix (€)" className="w-full p-2 border rounded" />
+    <input id="partner-qty" type="number" placeholder="Quantité" className="w-full p-2 border rounded" />
+    <input type="file" accept="image/*" className="w-full p-2 border rounded" onChange={(e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => setPreviewImage(reader.result);
+        reader.readAsDataURL(file);
+      }
+    }} />
+    {previewImage && <img src={previewImage} alt="Aperçu" className="object-cover w-32 h-32 rounded" />}
+    <div className="flex gap-2">
+      <button onClick={handleAddPartnerItem} className="px-4 py-2 text-white bg-green-600 rounded">✅ Ajouter</button>
+      <button onClick={() => setShowPartnerForm(false)} className="px-4 py-2 bg-gray-300 rounded">❌ Annuler</button>
+    </div>
+  </div>
+)}
+
                     <motion.button whileHover={{ scale: 1.05 }} onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} className="px-3 py-1 bg-gray-300 rounded">
                       Trier par prix ({sortOrder === 'asc' ? '⬆️' : '⬇️'})
                     </motion.button>
@@ -308,3 +356,56 @@ const Nieuwkoop = () => {
 };
 
 export default Nieuwkoop;
+
+
+  const fetchMovements = async () => {
+    try {
+      const data = await getMovements();
+      setMouvements(data);
+    } catch (err) {
+      console.error("Erreur chargement mouvements:", err);
+    }
+  };
+
+  const handleSubmitMouvement = async (formData) => {
+    await createMovement(formData);
+    fetchMovements();
+  };
+
+  const handleValidate = async (id) => {
+    await validateMovement(id);
+    fetchMovements();
+  };
+
+
+  const handleAddPartnerItem = async () => {
+    const name = document.querySelector("#partner-name")?.value;
+    const reference = document.querySelector("#partner-ref")?.value;
+    const price = parseFloat(document.querySelector("#partner-price")?.value || 0);
+    const quantity = parseInt(document.querySelector("#partner-qty")?.value || 1);
+
+    if (!name || !reference) return alert("Nom et référence requis");
+
+    const payload = {
+      name,
+      reference,
+      price,
+      quantity,
+      image: previewImage,
+    };
+
+    try {
+      const newItem = await createPartnerItem(payload);
+      setAddedItems(prev => [newItem, ...prev]);
+      setShowPartnerForm(false);
+      setPreviewImage(null);
+    } catch (err) {
+      alert("Erreur ajout partenaire");
+      console.error(err);
+    }
+  };
+
+  const handleReturn = async (id) => {
+    await markReturned(id);
+    fetchMovements();
+  };

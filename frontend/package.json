@@ -27,6 +27,7 @@
     "@mui/x-data-grid": "^8.3.1",
     "antd": "^5.25.2",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "dompurify": "^3.2.6",
     "framer-motion": "^12.15.0",
     "lucide-react": "^0.259.0",
@@ -44,8 +45,8 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
-    "@testing-library/react": "^14.0.0",
     "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.0.0",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.43.0",
