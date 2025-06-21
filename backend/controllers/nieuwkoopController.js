@@ -71,11 +71,11 @@ exports.getPriceFromReference = async (req, res) => {
     const response = await axios.get(`https://api.nieuwkoop.nl/prices/${reference}`);
     const data = response.data;
 
-    if (!data || !data.PriceNett) {
+    if (!data || typeof data.PriceNett !== 'number') {
       return res.status(404).json({ error: "Prix non trouvé pour cette référence." });
     }
 
-    return res.json({ price: data });
+    return res.json({ price: data.PriceNett });
   } catch (error) {
     console.error("❌ Erreur dans getPriceFromReference :", error.message);
     return res.status(500).json({ error: "Erreur serveur lors de la récupération du prix." });
