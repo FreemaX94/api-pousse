@@ -31,6 +31,14 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// ✅ CORS uniquement pour la route des prix Nieuwkoop
+app.use("/api/nieuwkoop/prices/:ref", (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+
 // 🧪 Routes factices de test
 app.use('/api/users', (req, res) => res.status(200).send([]));
 app.use('/api/sanitize-test', (req, res) => res.status(200).send([]));
