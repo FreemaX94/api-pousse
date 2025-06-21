@@ -34,22 +34,6 @@ const Nieuwkoop = () => {
     }
   }, [activeSection]);
 
-useEffect(() => {
-  const handler = (e) => {
-    if (e.data?.type === "REFRESH_ITEMS") {
-      // Recharge le stock dès que l'extension envoie un signal
-      fetch("/api/nieuwkoop/stock")
-        .then(res => res.json())
-        .then(data => setAddedItems(data))
-        .catch(err => console.error("Erreur MAJ depuis extension:", err));
-    }
-  };
-
-  window.addEventListener("message", handler);
-  return () => window.removeEventListener("message", handler);
-}, []);
-
-
   const handleSearch = () => {
     setError(null);
     setImageUrl(`/api/nieuwkoop/items/${productId}/image`);
@@ -347,7 +331,7 @@ useEffect(() => {
                             onChange={(e) => updateQuantity(prod._id, parseInt(e.target.value))}
                             className="w-16 px-2 py-1 border rounded"
                           />
-                          <span className="text-sm text-gray-600">x {prod.price.toFixed(2)} €</span>
+                          <span className="text-sm text-gray-600">x {(typeof prod.price === "number") ? prod.price.toFixed(2) : "0.00"} €</span>
                         </div>
                         <textarea
                           placeholder="Note"
@@ -356,7 +340,7 @@ useEffect(() => {
                           className="w-full p-1 mt-2 text-sm border rounded"
                         />
                         <p className="mt-1 font-bold text-green-700">
-                          Total : {(prod.price * prod.quantity).toFixed(2)} €
+                          Total : {(typeof prod.price === "number" && typeof prod.quantity === "number") ? (prod.price * prod.quantity).toFixed(2) : "0.00"} €
                         </p>
                       </motion.div>
                     ))}
