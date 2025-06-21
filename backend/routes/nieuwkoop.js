@@ -33,4 +33,7 @@ router.get('/stock', controller.getStocks);
 // 🩺 Health check
 router.get('/health', controller.getHealth);
 
+// ✅ Route spéciale pour extension Chrome (import produit Nieuwkoop)
+router.post('/save', controller.createNieuwkoopItem);
+
 module.exports = router;
