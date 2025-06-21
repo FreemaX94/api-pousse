@@ -1,4 +1,5 @@
 const fs = require('fs');
+const axios = require("axios");
 const nieuwkoopApi = require('../services/nieuwkoopApi');
 const NieuwkoopItem = require('../models/nieuwkoopItemModel');
 
@@ -24,9 +25,7 @@ exports.getItem = async (req, res, next) => {
 exports.getItemImage = async (req, res, next) => {
   try {
     const buffer = await nieuwkoopApi.fetchItemImage(req.params.productId);
-    if (!buffer) {
-      return res.status(404).send("Image not found");
-    }
+    if (!buffer) return res.status(404).send("Image not found");
 
     const filePath = `./test_${req.params.productId}.jpg`;
     fs.writeFileSync(filePath, buffer);
@@ -60,6 +59,29 @@ exports.getItemPrice = async (req, res, next) => {
   }
 };
 
+// ✅ NOUVELLE ROUTE – Récupérer le prix depuis l'API officielle par référence
+exports.getPriceFromReference = async (req, res) => {
+  try {
+    const reference = req.params.ref;
+
+    if (!reference) {
+      return res.status(400).json({ error: "Référence manquante." });
+    }
+
+    const response = await axios.get(`https://api.nieuwkoop.nl/prices/${reference}`);
+    const data = response.data;
+
+    if (!data || !data.PriceNett) {
+      return res.status(404).json({ error: "Prix non trouvé pour cette référence." });
+    }
+
+    return res.json({ price: data });
+  } catch (error) {
+    console.error("❌ Erreur dans getPriceFromReference :", error.message);
+    return res.status(500).json({ error: "Erreur serveur lors de la récupération du prix." });
+  }
+};
+
 // ✅ Ajouter un produit au stock local
 exports.createNieuwkoopItem = async (req, res) => {
   try {
@@ -88,7 +110,6 @@ exports.createNieuwkoopItem = async (req, res) => {
   }
 };
 
-// ✅ Récupérer les produits
 exports.getNieuwkoopItems = async (req, res) => {
   try {
     const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
@@ -99,7 +120,6 @@ exports.getNieuwkoopItems = async (req, res) => {
   }
 };
 
-// ✅ Mettre à jour la quantité
 exports.updateNieuwkoopQuantity = async (req, res) => {
   try {
     const { id } = req.params;
@@ -109,12 +129,7 @@ exports.updateNieuwkoopQuantity = async (req, res) => {
       return res.status(400).json({ message: "Quantité invalide." });
     }
 
-    const updated = await NieuwkoopItem.findByIdAndUpdate(
-      id,
-      { quantity },
-      { new: true }
-    );
-
+    const updated = await NieuwkoopItem.findByIdAndUpdate(id, { quantity }, { new: true });
     if (!updated) {
       return res.status(404).json({ message: "Article introuvable." });
     }
@@ -126,11 +141,9 @@ exports.updateNieuwkoopQuantity = async (req, res) => {
   }
 };
 
-// ✅ Supprimer un article
 exports.deleteNieuwkoopItem = async (req, res) => {
   try {
     const { id } = req.params;
-
     const deleted = await NieuwkoopItem.findByIdAndDelete(id);
     if (!deleted) {
       return res.status(404).json({ message: "Article introuvable." });
@@ -143,7 +156,6 @@ exports.deleteNieuwkoopItem = async (req, res) => {
   }
 };
 
-// ✅ Supprimer tous les articles
 exports.deleteAllNieuwkoopItems = async (req, res) => {
   try {
     await NieuwkoopItem.deleteMany();
@@ -154,18 +166,12 @@ exports.deleteAllNieuwkoopItems = async (req, res) => {
   }
 };
 
-// ✅ Mettre à jour une note
 exports.updateNieuwkoopNote = async (req, res) => {
   try {
     const { id } = req.params;
     const { note } = req.body;
 
-    const updated = await NieuwkoopItem.findByIdAndUpdate(
-      id,
-      { note },
-      { new: true }
-    );
-
+    const updated = await NieuwkoopItem.findByIdAndUpdate(id, { note }, { new: true });
     if (!updated) {
       return res.status(404).json({ message: "Article introuvable." });
     }
@@ -177,7 +183,7 @@ exports.updateNieuwkoopNote = async (req, res) => {
   }
 };
 
-// 📚 Catalogue (API externe)
+// 📚 Catalogue
 exports.getCatalog = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchCatalog();
@@ -196,7 +202,6 @@ exports.getCatalogById = async (req, res, next) => {
   }
 };
 
-// 🧾 Stock général
 exports.getStocks = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchStock();
@@ -215,7 +220,6 @@ exports.getStockById = async (req, res, next) => {
   }
 };
 
-// Health check
 exports.getHealth = async (req, res, next) => {
   try {
     const data = await nieuwkoopApi.fetchHealth();
