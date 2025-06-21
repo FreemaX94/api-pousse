@@ -34,6 +34,22 @@ const Nieuwkoop = () => {
     }
   }, [activeSection]);
 
+useEffect(() => {
+  const handler = (e) => {
+    if (e.data?.type === "REFRESH_ITEMS") {
+      // Recharge le stock dès que l'extension envoie un signal
+      fetch("/api/nieuwkoop/stock")
+        .then(res => res.json())
+        .then(data => setAddedItems(data))
+        .catch(err => console.error("Erreur MAJ depuis extension:", err));
+    }
+  };
+
+  window.addEventListener("message", handler);
+  return () => window.removeEventListener("message", handler);
+}, []);
+
+
   const handleSearch = () => {
     setError(null);
     setImageUrl(`/api/nieuwkoop/items/${productId}/image`);
