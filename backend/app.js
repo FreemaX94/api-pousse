@@ -10,8 +10,13 @@ const app = express();
 // 🔍 Logger de requêtes HTTP
 app.use(morgan('dev'));
 
-// ✅ Origines autorisées
-const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',');
+// ✅ CORS autorisé : ajout de l'extension Chrome
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://api-pousse-app-5y2wo.ondigitalocean.app',
+  'chrome-extension://kfghnfjhfjcjnnlepodoalilippebfph'
+];
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
