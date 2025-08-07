@@ -1,0 +1,38 @@
+{
+  "version": "0.2",
+  "language": "fr",
+  "dictionaries": ["fr", "softwareTerms", "node"],
+  "words": [
+    "acompte",
+    "facture",
+    "livraison",
+    "Nieuwkoop",
+    "Pousse",
+    "contrat",
+    "entretien",
+    "concepteur",
+    "vehicule",
+    "frontend",
+    "backend",
+    "MongoDB",
+    "React",
+    "Tailwind",
+    "Edwin",
+    "Organilog",
+    "Evenements",
+    "Catalogue",
+    "Inventaire",
+    "Plannings",
+    "Stocks",
+    "depot",
+    "AdminPanel",
+    "StockViewer",
+    "NavBar"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**"
+  ]
+}

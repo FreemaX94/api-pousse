@@ -1,0 +1,158 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Lint job: vérifie la qualité du code sans bloquer les tests
+  lint:
+    name: Lint Backend & Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install & Lint Backend
+        run: |
+          cd backend
+          npm ci
+          npm run lint
+
+      - name: Install & Lint Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run lint
+
+  # Tests backend, exécutés en parallèle
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:5.0
+        ports: [27017:27017]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies & Run Tests
+        run: |
+          cd backend
+          npm ci
+          npm test
+        env:
+          MONGO_URL: mongodb://localhost:27017/test-db
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
+  # Tests frontend, exécutés en parallèle
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies & Run Tests
+        run: |
+          cd frontend
+          npm ci
+          npm test
+
+  # Audit de sécurité des dépendances backend
+  security-scan:
+    name: Security Audit (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Run npm audit
+        run: |
+          cd backend
+          npm ci
+          npm audit --audit-level=high
+
+  # Tests end-to-end avec Cypress
+  e2e:
+    name: End-to-End (Cypress)
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    services:
+      mongo:
+        image: mongo:5.0
+        ports: [27017:27017]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install All Dependencies
+        run: npm ci
+
+      - name: Run Cypress Tests
+        run: npm run cypress:run
+
+  # Analyse de performance via Lighthouse CI
+  performance:
+    name: Performance Budget (Lighthouse)
+    runs-on: ubuntu-latest
+    needs: e2e
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: .lighthouserc.json
+          uploadArtifacts: true

@@ -1,0 +1,584 @@
+// frontend/src/components/ProjetList.jsx
+
+import React from "react";
+import { motion } from "framer-motion";
+
+const STATUS_GRADIENT = {
+  "En cours": { from: "from-blue-400", to: "to-blue-600" },  // <-- changé en bleu
+  Terminé:  { from: "from-green-400", to: "to-green-600"  },
+  Archivé:  { from: "from-gray-400",  to: "to-gray-600"   }
+};
+
+// Mapper les statuts du modèle vers l'affichage frontend
+const mapStatus = (status) => {
+  switch(status) {
+    case 'active': return 'En cours';
+    case 'completed': return 'Terminé';
+    case 'archived': return 'Archivé';
+    case 'draft': return 'Brouillon';
+    case 'planned': return 'Planifié';
+    case 'on_hold': return 'En attente';
+    case 'cancelled': return 'Annulé';
+    default: return status || 'En cours';
+  }
+};
+
+// Mapper les statuts frontend vers le modèle
+const mapStatusToModel = (displayStatus) => {
+  switch(displayStatus) {
+    case 'En cours': return 'active';
+    case 'Terminé': return 'completed';
+    case 'Archivé': return 'archived';
+    case 'Brouillon': return 'draft';
+    case 'Planifié': return 'planned';
+    case 'En attente': return 'on_hold';
+    case 'Annulé': return 'cancelled';
+    default: return 'active';
+  }
+};
+
+const CheckIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M5 13l4 4L19 7" />
+  </svg>
+);
+const TrashIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0
+         01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1
+         1 0 00-1-1m-4 0h4" />
+  </svg>
+);
+
+export default function ProjetList({ projects, onUpdate, onDelete }) {
+  if (!projects?.length) {
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '4rem 2rem',
+        background: 'var(--color-surface)',
+        borderRadius: 'var(--radius-xl)',
+        border: '2px dashed var(--color-border)',
+        color: 'var(--color-text-secondary)',
+        fontSize: '1.2rem',
+        fontWeight: '600',
+        margin: '2rem auto',
+        maxWidth: '600px',
+        boxShadow: 'var(--shadow-lg)'
+      }}>
+        🏗️ Aucun projet pour le moment
+      </div>
+    );
+  }
+
+  const now = Date.now();
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+      gap: '2rem',
+      maxWidth: '1400px',
+      margin: '2rem auto',
+      padding: '1rem'
+    }}>
+      {projects.map((p) => {
+        const displayStatus = mapStatus(p.status);
+        const grad = STATUS_GRADIENT[displayStatus] || STATUS_GRADIENT["En cours"];
+        const start = new Date(p.dates?.start || p.dateDebut).getTime();
+        const end   = new Date(p.dates?.end || p.dateFin).getTime();
+        const pct   = Math.min(Math.max(((now - start) / (end - start)) * 100, 0), 100);
+
+        return (
+          <motion.div
+            key={p._id}
+            layout
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            whileHover={{ 
+              scale: 1.02, 
+              boxShadow: 'var(--shadow-2xl)', 
+              y: -6 
+            }}
+            style={{
+              background: 'var(--color-surface)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-lg)',
+              border: '1px solid var(--color-border)',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {/* Background decorative element */}
+            <div style={{
+              position: 'absolute',
+              top: '-50%',
+              right: '-30%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))',
+              borderRadius: '50%',
+              pointerEvents: 'none',
+              opacity: 0.1
+            }} />
+
+            {/* En-tête premium */}
+            <div style={{
+              background: displayStatus === 'En cours' 
+                ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' 
+                : displayStatus === 'Terminé'
+                ? 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))'
+                : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))',
+              padding: '1.5rem 2rem',
+              position: 'relative',
+              zIndex: 1
+            }}>
+              <h3 style={{
+                fontSize: '1.3rem',
+                fontWeight: '800',
+                color: 'var(--color-text-inverse)',
+                margin: 0,
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                {p.client?.name || p.client}
+              </h3>
+              <div style={{
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                padding: '0.25rem 0.75rem',
+                borderRadius: '12px',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                display: 'inline-block',
+                marginTop: '0.5rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid var(--color-border)'
+              }}>
+                {displayStatus === 'En cours' && '⚡ En cours'}
+                {displayStatus === 'Terminé' && '✅ Terminé'}
+                {displayStatus === 'Archivé' && '📁 Archivé'}
+                {displayStatus === 'Brouillon' && '📝 Brouillon'}
+                {displayStatus === 'Planifié' && '📅 Planifié'}
+                {displayStatus === 'En attente' && '⏸️ En attente'}
+                {displayStatus === 'Annulé' && '❌ Annulé'}
+              </div>
+            </div>
+
+            {/* Contenu */}
+            <div style={{
+              padding: '2rem',
+              position: 'relative',
+              zIndex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1
+            }}>
+              {p.description && (
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  backdropFilter: 'blur(10px)',
+                  marginBottom: '1.5rem'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.5rem'
+                  }}>📝 Description</div>
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: 'var(--color-text-primary)',
+                    lineHeight: '1.5',
+                    margin: 0,
+                    fontWeight: '500'
+                  }}>
+                    {p.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Dates et informations */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  backdropFilter: 'blur(10px)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.5rem'
+                  }}>🚀 Début</div>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}>
+                    {new Date(p.dates?.start || p.dateDebut).toLocaleDateString('fr-FR')}
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  backdropFilter: 'blur(10px)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.5rem'
+                  }}>🏁 Fin</div>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    fontWeight: '700',
+                    color: 'var(--color-text-primary)'
+                  }}>
+                    {new Date(p.dates?.end || p.dateFin).toLocaleDateString('fr-FR')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Barre de progression premium */}
+              <div style={{
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '0.5rem'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>📊 Progression</div>
+                  <div style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: displayStatus === 'En cours' ? 'var(--color-primary)' : displayStatus === 'Terminé' ? 'var(--color-success)' : 'var(--color-secondary)'
+                  }}>
+                    {Math.round(pct)}%
+                  </div>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: 'var(--color-bg-secondary)',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      background: displayStatus === 'En cours' 
+                        ? 'linear-gradient(90deg, var(--color-primary), var(--color-accent))' 
+                        : displayStatus === 'Terminé'
+                        ? 'linear-gradient(90deg, var(--color-success), var(--color-success-dark))'
+                        : 'linear-gradient(90deg, var(--color-secondary), var(--color-neutral))',
+                      borderRadius: '10px',
+                      width: `${pct}%`,
+                      transition: 'width 0.5s ease',
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Fichiers premium */}
+              {p.documents?.length > 0 && (
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  marginBottom: '1.5rem'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: '#3b82f6',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.75rem'
+                  }}>📎 Fichiers ({p.documents.length})</div>
+                  <div style={{
+                    display: 'grid',
+                    gap: '0.5rem'
+                  }}>
+                    {p.documents.map((doc, i) => (
+                      <a
+                        key={i}
+                        href={doc.path || `/uploads/${doc.name || doc}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '0.5rem 0.75rem',
+                          background: 'var(--color-surface)',
+                          borderRadius: '8px',
+                          fontSize: '0.9rem',
+                          fontWeight: '500',
+                          color: '#3b82f6',
+                          textDecoration: 'none',
+                          transition: 'all 0.3s ease',
+                          border: '1px solid var(--color-border)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'var(--color-bg-secondary)';
+                          e.target.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'var(--color-surface)';
+                          e.target.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        📄 {doc.name || doc}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Matériaux (Plantes) premium */}
+              {p.materials?.length > 0 && (
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  marginBottom: '1.5rem'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    color: 'var(--color-success)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.75rem'
+                  }}>🌱 Plantes du projet ({p.materials.length})</div>
+                  <div style={{
+                    display: 'grid',
+                    gap: '0.75rem'
+                  }}>
+                    {p.materials.map((material, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.75rem',
+                          background: 'var(--color-surface)',
+                          borderRadius: '12px',
+                          border: '1px solid var(--color-border)',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'var(--color-bg-secondary)';
+                          e.target.style.transform = 'translateX(2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'var(--color-surface)';
+                          e.target.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        {material.image && (
+                          <img
+                            src={material.image}
+                            alt={material.name}
+                            style={{
+                              width: '35px',
+                              height: '35px',
+                              borderRadius: '8px',
+                              objectFit: 'cover',
+                              border: '2px solid rgba(34,197,94,0.2)'
+                            }}
+                          />
+                        )}
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            color: 'var(--color-text-primary)',
+                            marginBottom: '0.25rem'
+                          }}>
+                            {material.reference} — {material.name}
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--color-primary)',
+                            display: 'flex',
+                            gap: '1rem'
+                          }}>
+                            <span>Qty: {material.quantity}</span>
+                            <span>{material.unitPrice}€/u</span>
+                            <span style={{
+                              fontWeight: '600',
+                              color: 'var(--color-success)'
+                            }}>
+                              Total: {(material.quantity * material.unitPrice).toFixed(2)}€
+                            </span>
+                          </div>
+                        </div>
+                        <div style={{
+                          background: material.status === 'needed' ? 'var(--color-warning)' : 
+                                     material.status === 'ordered' ? 'var(--color-primary)' :
+                                     material.status === 'delivered' ? 'var(--color-success)' : 'var(--color-secondary)',
+                          color: 'var(--color-text-inverse)',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '6px',
+                          fontSize: '0.7rem',
+                          fontWeight: '600',
+                          textTransform: 'uppercase'
+                        }}>
+                          {material.status === 'needed' && '📋 Requis'}
+                          {material.status === 'ordered' && '📦 Commandé'}
+                          {material.status === 'delivered' && '✅ Livré'}
+                          {material.status === 'used' && '🔧 Utilisé'}
+                          {material.status === 'returned' && '↩️ Retourné'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Total des matériaux */}
+                  <div style={{
+                    marginTop: '0.75rem',
+                    padding: '0.75rem',
+                    background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '0.7rem',
+                      color: 'var(--color-primary)',
+                      marginBottom: '0.25rem'
+                    }}>
+                      Coût total des plantes
+                    </div>
+                    <div style={{
+                      fontSize: '1.1rem',
+                      fontWeight: '800',
+                      color: 'var(--color-success)'
+                    }}>
+                      {p.materials.reduce((total, m) => total + (m.quantity * m.unitPrice), 0).toFixed(2)}€
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions premium */}
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center',
+                marginTop: 'auto'
+              }}>
+                <button
+                  onClick={() =>
+                    onUpdate(p._id, {
+                      statut: displayStatus === "En cours" ? "Terminé" : "En cours"
+                    })
+                  }
+                  title={displayStatus === "En cours" ? "Terminer" : "Réactiver"}
+                  style={{
+                    background: 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))',
+                    color: 'var(--color-text-inverse)',
+                    border: 'none',
+                    borderRadius: '16px',
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: 'var(--shadow-lg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px) scale(1.05)';
+                    e.target.style.boxShadow = 'var(--shadow-2xl)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                  }}
+                >
+                  <CheckIcon style={{width: '16px', height: '16px'}} />
+                  {displayStatus === "En cours" ? "Terminer" : "Réactiver"}
+                </button>
+                
+                <button
+                  onClick={() => onDelete(p._id)}
+                  title="Supprimer"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--color-error), var(--color-error-dark))',
+                    color: 'var(--color-text-inverse)',
+                    border: 'none',
+                    borderRadius: '16px',
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: 'var(--shadow-lg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px) scale(1.05)';
+                    e.target.style.boxShadow = 'var(--shadow-2xl)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                  }}
+                >
+                  <TrashIcon style={{width: '16px', height: '16px'}} />
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}

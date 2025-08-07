@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running security checks before commit..."
+
+# Run npm audit on backend
+echo "📊 Checking backend dependencies..."
+cd backend
+npm audit --audit-level=high --json > ../security-audit-backend.json 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo "❌ Backend security vulnerabilities found!"
+  echo "Run 'npm audit fix' to resolve issues"
+  exit 1
+fi
+
+# Run npm audit on frontend if it exists
+if [ -d "../frontend" ]; then
+  echo "📊 Checking frontend dependencies..."
+  cd ../frontend
+  npm audit --audit-level=high --json > ../security-audit-frontend.json 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo "❌ Frontend security vulnerabilities found!"
+    echo "Run 'npm audit fix' to resolve issues"
+    exit 1
+  fi
+  cd ..
+else
+  cd ..
+fi
+
+# Clean up audit files
+rm -f security-audit-backend.json security-audit-frontend.json
+
+echo "✅ Security checks passed!"

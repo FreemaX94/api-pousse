@@ -1,0 +1,661 @@
+/* Nieuwkoop Optimized Styles */
+
+/* Variables CSS pour les thèmes - Versions Premium */
+:root {
+  --nieuwkoop-primary: #1d4ed8;
+  --nieuwkoop-secondary: #1e3a8a;
+  --nieuwkoop-accent: #2563eb;
+  --nieuwkoop-background: #f1f5f9;
+  --nieuwkoop-surface: #ffffff;
+  --nieuwkoop-text: #1f2937;
+  --nieuwkoop-border: #94a3b8;
+  --nieuwkoop-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --nieuwkoop-radius: 0.75rem;
+  --nieuwkoop-transition: all 0.2s ease;
+}
+
+[data-theme="dark"] {
+  --nieuwkoop-primary: #14b8a6;
+  --nieuwkoop-secondary: #0d9488;
+  --nieuwkoop-background: #0a0f1c;
+  --nieuwkoop-surface: #1a202c;
+  --nieuwkoop-text: #f1f5f9;
+  --nieuwkoop-border: #2d3748;
+}
+
+[data-theme="beige"] {
+  --nieuwkoop-primary: #c2792a;
+  --nieuwkoop-secondary: #d4863a;
+  --nieuwkoop-background: #faf8f3;
+  --nieuwkoop-surface: #ffffff;
+  --nieuwkoop-text: #2d1b0e;
+  --nieuwkoop-border: #e6cba8;
+}
+
+/* Container */
+.nieuwkoop-container {
+  min-height: 100vh;
+  background: var(--nieuwkoop-background);
+  transition: var(--nieuwkoop-transition);
+}
+
+/* Header Styles */
+.nieuwkoop-header {
+  background: var(--nieuwkoop-surface);
+  border-bottom: 1px solid var(--nieuwkoop-border);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nieuwkoop-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--nieuwkoop-primary);
+  margin: 0;
+  line-height: 1;
+}
+
+.nieuwkoop-subtitle {
+  font-size: 0.875rem;
+  color: var(--nieuwkoop-text);
+  opacity: 0.7;
+  margin: 0;
+}
+
+.header-center {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--nieuwkoop-text);
+  opacity: 0.5;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: var(--nieuwkoop-radius);
+  background: var(--nieuwkoop-surface);
+  color: var(--nieuwkoop-text);
+  font-size: 1rem;
+  transition: var(--nieuwkoop-transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--nieuwkoop-primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cart-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--nieuwkoop-primary);
+  color: white;
+  border-radius: var(--nieuwkoop-radius);
+  font-weight: 600;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.cart-quantity {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.cart-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.cart-total {
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+/* Layout */
+.nieuwkoop-layout {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+}
+
+/* Sidebar */
+.nieuwkoop-sidebar {
+  width: 300px;
+  background: var(--nieuwkoop-surface);
+  border-right: 1px solid var(--nieuwkoop-border);
+  transition: var(--nieuwkoop-transition);
+  overflow: hidden;
+}
+
+.nieuwkoop-sidebar:not(.open) {
+  width: 60px;
+}
+
+.sidebar-toggle {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  background: var(--nieuwkoop-primary);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+}
+
+.sidebar-toggle:hover {
+  background: var(--nieuwkoop-secondary);
+}
+
+.toggle-icon {
+  font-size: 1.125rem;
+}
+
+.toggle-text {
+  white-space: nowrap;
+}
+
+.sidebar-content {
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.filter-section {
+  margin-bottom: 2rem;
+}
+
+.filter-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--nieuwkoop-text);
+  margin-bottom: 0.75rem;
+}
+
+/* Sort Dropdown */
+.sort-dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: var(--nieuwkoop-radius);
+  background: var(--nieuwkoop-surface);
+  color: var(--nieuwkoop-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+}
+
+.dropdown-trigger:hover {
+  border-color: var(--nieuwkoop-primary);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--nieuwkoop-surface);
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: var(--nieuwkoop-radius);
+  margin-top: 0.25rem;
+  box-shadow: var(--nieuwkoop-shadow);
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--nieuwkoop-transition);
+}
+
+.sort-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--nieuwkoop-text);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  background: var(--nieuwkoop-primary);
+  color: white;
+}
+
+/* Category Filters */
+.category-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-button {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: var(--nieuwkoop-radius);
+  background: var(--nieuwkoop-surface);
+  color: var(--nieuwkoop-text);
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+  font-size: 0.875rem;
+}
+
+.category-button:hover {
+  border-color: var(--nieuwkoop-primary);
+}
+
+.category-button.active {
+  background: var(--nieuwkoop-primary);
+  color: white;
+  border-color: var(--nieuwkoop-primary);
+}
+
+/* Statistics */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--nieuwkoop-background);
+  border-radius: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--nieuwkoop-text);
+  opacity: 0.7;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: var(--nieuwkoop-primary);
+}
+
+/* Main Content */
+.nieuwkoop-main {
+  flex: 1;
+  padding: 1rem;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--nieuwkoop-border);
+  overflow-x: auto;
+}
+
+.tab-button {
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--nieuwkoop-text);
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.tab-button:hover {
+  color: var(--nieuwkoop-primary);
+}
+
+.tab-button.active {
+  color: var(--nieuwkoop-primary);
+  border-bottom-color: var(--nieuwkoop-primary);
+}
+
+.tab-count {
+  background: var(--nieuwkoop-primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* Grid */
+.nieuwkoop-grid {
+  min-height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--nieuwkoop-text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-description {
+  color: var(--nieuwkoop-text);
+  opacity: 0.7;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Product Card */
+.product-card {
+  background: var(--nieuwkoop-surface);
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: var(--nieuwkoop-radius);
+  overflow: hidden;
+  transition: var(--nieuwkoop-transition);
+  box-shadow: var(--nieuwkoop-shadow);
+}
+
+.product-card:hover {
+  border-color: var(--nieuwkoop-primary);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-container {
+  position: relative;
+  height: 200px;
+  background: var(--nieuwkoop-background);
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--nieuwkoop-background);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+.category-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: var(--nieuwkoop-primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Product Info */
+.product-info {
+  padding: 1rem;
+}
+
+.product-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--nieuwkoop-text);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-code {
+  font-size: 0.875rem;
+  color: var(--nieuwkoop-text);
+  opacity: 0.6;
+  margin-bottom: 0.75rem;
+}
+
+.product-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: var(--nieuwkoop-text);
+  opacity: 0.6;
+  font-weight: 600;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: var(--nieuwkoop-text);
+  font-weight: 700;
+}
+
+.product-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--nieuwkoop-primary);
+  text-align: center;
+  padding: 0.5rem;
+  background: var(--nieuwkoop-background);
+  border-radius: 0.5rem;
+}
+
+/* Product Actions */
+.product-actions {
+  padding: 1rem;
+  border-top: 1px solid var(--nieuwkoop-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.quantity-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--nieuwkoop-border);
+  border-radius: 50%;
+  background: var(--nieuwkoop-surface);
+  color: var(--nieuwkoop-text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  border-color: var(--nieuwkoop-primary);
+  color: var(--nieuwkoop-primary);
+}
+
+.quantity-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantity-display {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--nieuwkoop-text);
+  min-width: 2rem;
+  text-align: center;
+}
+
+.assign-btn,
+.remove-btn {
+  padding: 0.75rem;
+  border: none;
+  border-radius: var(--nieuwkoop-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--nieuwkoop-transition);
+}
+
+.assign-btn {
+  background: var(--nieuwkoop-primary);
+  color: white;
+}
+
+.assign-btn:hover {
+  background: var(--nieuwkoop-secondary);
+}
+
+.remove-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+}
+
+/* Form Container */
+.form-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .nieuwkoop-layout {
+    flex-direction: column;
+  }
+  
+  .nieuwkoop-sidebar {
+    width: 100%;
+  }
+  
+  .nieuwkoop-sidebar:not(.open) {
+    width: 100%;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .form-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .nieuwkoop-header {
+    padding: 1rem;
+  }
+  
+  .tab-navigation {
+    flex-wrap: wrap;
+  }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}

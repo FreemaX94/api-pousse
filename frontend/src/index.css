@@ -1,0 +1,425 @@
+/* src/index.css */
+
+/* 1) L'@import doit être en tout premier (avant Tailwind) */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Déclaration de la police BodoniBauerBQ pour le titre/logo */
+@font-face {
+  font-family: 'BodoniBauerBQ';
+  src: url('/fonts/Bodoni Bauer BQ Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+:root {
+  --bg: #FFFFFF;
+  --text: #111;
+  --primary: #007BFF;
+  --border: #DDD;
+  
+  /* Variables pour la page Home et le système de thèmes */
+  --color-primary: #d97706;
+  --color-secondary: #f59e0b;
+  --color-accent: #fbbf24;
+  --color-bg-primary: #fffbeb;
+  --color-bg-secondary: #fef3c7;
+  
+  /* Variables pour les effets de verre */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(222, 184, 135, 0.3);
+  --glass-backdrop: blur(10px);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --transition-base: 0.3s;
+}
+
+/* Animations pour OrganipoussV2 */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--bg);
+    height: 100%;
+  }
+
+  body {
+    @apply text-[var(--text)] font-sans leading-relaxed;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'BodoniBauerBQ', serif;
+    color: var(--text);
+  }
+
+  button {
+    font-family: inherit;
+  }
+}
+
+/* Boutons et tables (inchangés) */
+.btn {
+  @apply inline-flex items-center border px-3 py-1 rounded text-sm font-medium;
+}
+.btn-primary {
+  @apply bg-[var(--primary)] text-white border-[var(--primary)];
+}
+.btn-outline-primary {
+  @apply border-[var(--primary)] text-[var(--primary)] bg-white;
+}
+.table {
+  @apply w-full border-collapse;
+}
+.table th,
+.table td {
+  @apply px-3 py-2 border-b border-[var(--border)] text-sm;
+}
+.table th {
+  @apply text-left font-semibold bg-white;
+}
+
+/* Mode sombre */
+.dark {
+  --bg: #121212;
+  --text: #e2e8f0;
+  --primary: #4ade80; /* vert doux */
+  --border: #333;
+}
+
+/* Thèmes pour la page Home - Versions Premium */
+[data-theme="light"] {
+  --color-primary: #1d4ed8;
+  --color-secondary: #1e3a8a;
+  --color-accent: #2563eb;
+  --color-bg-primary: #f1f5f9;
+  --color-bg-secondary: #cbd5e1;
+  --glass-bg: rgba(241, 245, 249, 0.45);
+  --glass-border: rgba(29, 78, 216, 0.35);
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-surface: rgba(241, 245, 249, 0.9);
+  --color-border: rgba(148, 163, 184, 0.3);
+  --color-primary-alpha: rgba(29, 78, 216, 0.1);
+  --color-accent-alpha: rgba(37, 99, 235, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --radius-xl: 1rem;
+}
+
+[data-theme="dark"] {
+  --color-primary: #0d9488;
+  --color-secondary: #0f766e;
+  --color-accent: #14b8a6;
+  --color-bg-primary: #0a0f1c;
+  --color-bg-secondary: #1a202c;
+  --glass-bg: rgba(10, 15, 28, 0.4);
+  --glass-border: rgba(13, 148, 136, 0.3);
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-surface: rgba(30, 41, 59, 0.5);
+  --color-border: rgba(71, 85, 105, 0.3);
+  --color-primary-alpha: rgba(13, 148, 136, 0.1);
+  --color-accent-alpha: rgba(20, 184, 166, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.14);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --radius-xl: 1rem;
+}
+
+[data-theme="beige"] {
+  --color-primary: #c2792a;
+  --color-secondary: #d4863a;
+  --color-accent: #e6934a;
+  --color-bg-primary: #faf8f3;
+  --color-bg-secondary: #f3f0e8;
+  --glass-bg: rgba(250, 248, 243, 0.4);
+  --glass-border: rgba(194, 121, 42, 0.25);
+}
+
+[data-theme="dawn"] {
+  --color-primary: #ec4899;
+  --color-secondary: #db2777;
+  --color-accent: #f97316;
+  --color-bg-primary: #fdf4ff;
+  --color-bg-secondary: #fce7f3;
+  --glass-bg: rgba(253, 244, 255, 0.35);
+  --glass-border: rgba(236, 72, 153, 0.3);
+  --color-text-primary: #831843;
+  --color-text-secondary: #9f1239;
+  --color-surface: rgba(251, 207, 232, 0.2);
+  --color-border: rgba(244, 114, 182, 0.3);
+  --color-primary-alpha: rgba(236, 72, 153, 0.1);
+  --color-accent-alpha: rgba(249, 115, 22, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(236, 72, 153, 0.1), 0 4px 6px -2px rgba(249, 115, 22, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(236, 72, 153, 0.15), 0 10px 10px -5px rgba(249, 115, 22, 0.08);
+  --shadow-2xl: 0 25px 50px -12px rgba(236, 72, 153, 0.25);
+  --radius-xl: 1rem;
+}
+
+[data-theme="neon"] {
+  --color-primary: #ff00ff;
+  --color-secondary: #00ffff;
+  --color-accent: #ff00aa;
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #1a0a2e;
+  --glass-bg: rgba(10, 10, 15, 0.85);
+  --glass-border: rgba(255, 0, 255, 0.5);
+  --color-text-primary: #f0f0ff;
+  --color-text-secondary: #00ffff;
+  --color-surface: rgba(255, 0, 255, 0.1);
+  --color-border: rgba(0, 255, 255, 0.4);
+  --color-primary-alpha: rgba(255, 0, 255, 0.2);
+  --color-accent-alpha: rgba(0, 255, 255, 0.2);
+  --shadow-lg: 0 0 30px rgba(255, 0, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.3);
+  --shadow-xl: 0 0 40px rgba(255, 0, 255, 0.6), 0 0 80px rgba(0, 255, 255, 0.4);
+  --shadow-2xl: 0 0 50px rgba(255, 0, 255, 0.7), 0 0 100px rgba(0, 255, 255, 0.5);
+  --radius-xl: 1rem;
+  --neon-glow: 0 0 20px rgba(255, 0, 255, 0.8);
+}
+
+[data-theme="ocean"] {
+  --color-primary: #006994;
+  --color-secondary: #00a8cc;
+  --color-accent: #40e0d0;
+  --color-bg-primary: #001f3f;
+  --color-bg-secondary: #003366;
+  --glass-bg: rgba(0, 31, 63, 0.65);
+  --glass-border: rgba(64, 224, 208, 0.4);
+  --color-text-primary: #e0f7fa;
+  --color-text-secondary: #80deea;
+  --color-surface: rgba(0, 168, 204, 0.15);
+  --color-border: rgba(64, 224, 208, 0.35);
+  --color-primary-alpha: rgba(0, 105, 148, 0.2);
+  --color-accent-alpha: rgba(64, 224, 208, 0.2);
+  --shadow-lg: 0 15px 35px rgba(0, 105, 148, 0.3), 0 5px 15px rgba(64, 224, 208, 0.2);
+  --shadow-xl: 0 25px 50px rgba(0, 105, 148, 0.4), 0 10px 25px rgba(64, 224, 208, 0.3);
+  --shadow-2xl: 0 35px 70px rgba(0, 105, 148, 0.5);
+  --radius-xl: 1rem;
+  --ocean-shimmer: linear-gradient(90deg, transparent, rgba(64, 224, 208, 0.3), transparent);
+}
+
+[data-theme="tropical"] {
+  --color-primary: #00a651;
+  --color-secondary: #ff6b35;
+  --color-accent: #ffd700;
+  --color-bg-primary: #f0fff4;
+  --color-bg-secondary: #e8f5e9;
+  --glass-bg: rgba(240, 255, 244, 0.75);
+  --glass-border: rgba(0, 166, 81, 0.4);
+  --color-text-primary: #1b5e20;
+  --color-text-secondary: #ff6b35;
+  --color-surface: rgba(0, 166, 81, 0.1);
+  --color-border: rgba(255, 107, 53, 0.3);
+  --color-primary-alpha: rgba(0, 166, 81, 0.15);
+  --color-accent-alpha: rgba(255, 215, 0, 0.2);
+  --shadow-lg: 0 10px 30px rgba(0, 166, 81, 0.2), 0 5px 15px rgba(255, 107, 53, 0.15);
+  --shadow-xl: 0 20px 40px rgba(0, 166, 81, 0.25), 0 10px 20px rgba(255, 107, 53, 0.2);
+  --shadow-2xl: 0 30px 60px rgba(0, 166, 81, 0.3);
+  --radius-xl: 1rem;
+  --tropical-gradient: linear-gradient(135deg, rgba(0, 166, 81, 0.2), rgba(255, 107, 53, 0.2));
+}
+
+[data-theme="lavender"] {
+  --color-primary: #9c88ff;
+  --color-secondary: #8c7ae6;
+  --color-accent: #c8b6ff;
+  --color-bg-primary: #f8f6ff;
+  --color-bg-secondary: #ede7f6;
+  --glass-bg: rgba(248, 246, 255, 0.8);
+  --glass-border: rgba(156, 136, 255, 0.35);
+  --color-text-primary: #5b3a9b;
+  --color-text-secondary: #7c4dff;
+  --color-surface: rgba(156, 136, 255, 0.08);
+  --color-border: rgba(200, 182, 255, 0.4);
+  --color-primary-alpha: rgba(156, 136, 255, 0.12);
+  --color-accent-alpha: rgba(200, 182, 255, 0.15);
+  --shadow-lg: 0 10px 25px rgba(156, 136, 255, 0.15), 0 5px 10px rgba(140, 122, 230, 0.1);
+  --shadow-xl: 0 20px 35px rgba(156, 136, 255, 0.2), 0 10px 15px rgba(140, 122, 230, 0.15);
+  --shadow-2xl: 0 30px 50px rgba(156, 136, 255, 0.25);
+  --radius-xl: 1rem;
+  --lavender-mist: radial-gradient(circle at 50% 50%, rgba(200, 182, 255, 0.1), transparent);
+}
+
+[data-theme="galaxy"] {
+  --color-primary: #4a148c;
+  --color-secondary: #7b1fa2;
+  --color-accent: #ffc107;
+  --color-bg-primary: #0a0015;
+  --color-bg-secondary: #1a0033;
+  --glass-bg: rgba(10, 0, 21, 0.9);
+  --glass-border: rgba(123, 31, 162, 0.5);
+  --color-text-primary: #e1bee7;
+  --color-text-secondary: #ffc107;
+  --color-surface: rgba(74, 20, 140, 0.2);
+  --color-border: rgba(255, 193, 7, 0.3);
+  --color-primary-alpha: rgba(74, 20, 140, 0.3);
+  --color-accent-alpha: rgba(255, 193, 7, 0.2);
+  --shadow-lg: 0 0 40px rgba(123, 31, 162, 0.4), 0 0 20px rgba(255, 193, 7, 0.2);
+  --shadow-xl: 0 0 60px rgba(123, 31, 162, 0.5), 0 0 30px rgba(255, 193, 7, 0.3);
+  --shadow-2xl: 0 0 80px rgba(123, 31, 162, 0.6), 0 0 40px rgba(255, 193, 7, 0.4);
+  --radius-xl: 1rem;
+  --galaxy-stars: radial-gradient(2px 2px at 20% 30%, white, transparent),
+                  radial-gradient(2px 2px at 60% 70%, white, transparent),
+                  radial-gradient(1px 1px at 50% 50%, white, transparent);
+  --galaxy-nebula: linear-gradient(120deg, rgba(123, 31, 162, 0.3), rgba(255, 193, 7, 0.1), rgba(74, 20, 140, 0.3));
+}
+
+[data-theme="autumn"] {
+  --color-primary: #d2691e;
+  --color-secondary: #8b4513;
+  --color-accent: #dc143c;
+  --color-bg-primary: #fff8f3;
+  --color-bg-secondary: #faebd7;
+  --glass-bg: rgba(255, 248, 243, 0.85);
+  --glass-border: rgba(210, 105, 30, 0.4);
+  --color-text-primary: #5d2e0f;
+  --color-text-secondary: #a0522d;
+  --color-surface: rgba(210, 105, 30, 0.08);
+  --color-border: rgba(139, 69, 19, 0.3);
+  --color-primary-alpha: rgba(210, 105, 30, 0.15);
+  --color-accent-alpha: rgba(220, 20, 60, 0.15);
+  --shadow-lg: 0 10px 30px rgba(210, 105, 30, 0.2), 0 5px 15px rgba(139, 69, 19, 0.15);
+  --shadow-xl: 0 20px 40px rgba(210, 105, 30, 0.25), 0 10px 20px rgba(139, 69, 19, 0.2);
+  --shadow-2xl: 0 30px 60px rgba(210, 105, 30, 0.3);
+  --radius-xl: 1rem;
+  --autumn-gradient: linear-gradient(135deg, rgba(210, 105, 30, 0.2), rgba(220, 20, 60, 0.1), rgba(139, 69, 19, 0.2));
+  --autumn-leaves: radial-gradient(circle at 30% 40%, rgba(255, 140, 0, 0.1), transparent),
+                   radial-gradient(circle at 70% 60%, rgba(220, 20, 60, 0.08), transparent);
+}
+
+[data-theme="glacier"] {
+  --color-primary: #5dade2;
+  --color-secondary: #aed6f1;
+  --color-accent: #e5e7e9;
+  --color-bg-primary: #f8fbff;
+  --color-bg-secondary: #eef6ff;
+  --glass-bg: rgba(248, 251, 255, 0.9);
+  --glass-border: rgba(93, 173, 226, 0.35);
+  --color-text-primary: #1b4f72;
+  --color-text-secondary: #5499c7;
+  --color-surface: rgba(174, 214, 241, 0.1);
+  --color-border: rgba(229, 231, 233, 0.5);
+  --color-primary-alpha: rgba(93, 173, 226, 0.12);
+  --color-accent-alpha: rgba(229, 231, 233, 0.3);
+  --shadow-lg: 0 10px 30px rgba(93, 173, 226, 0.15), 0 5px 15px rgba(174, 214, 241, 0.1);
+  --shadow-xl: 0 20px 40px rgba(93, 173, 226, 0.2), 0 10px 20px rgba(174, 214, 241, 0.15);
+  --shadow-2xl: 0 30px 60px rgba(93, 173, 226, 0.25);
+  --radius-xl: 1rem;
+  --glacier-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(174, 214, 241, 0.3), rgba(255, 255, 255, 0.2));
+  --ice-crystals: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.4), transparent),
+                  radial-gradient(circle at 80% 70%, rgba(229, 231, 233, 0.3), transparent);
+}
+
+[data-theme="sakura"] {
+  --color-primary: #ffb7c5;
+  --color-secondary: #ffc0cb;
+  --color-accent: #b91c1c;
+  --color-bg-primary: #fff5f7;
+  --color-bg-secondary: #ffeef1;
+  --glass-bg: rgba(255, 245, 247, 0.85);
+  --glass-border: rgba(255, 183, 197, 0.4);
+  --color-text-primary: #831843;
+  --color-text-secondary: #be185d;
+  --color-surface: rgba(255, 183, 197, 0.08);
+  --color-border: rgba(255, 192, 203, 0.35);
+  --color-primary-alpha: rgba(255, 183, 197, 0.12);
+  --color-accent-alpha: rgba(185, 28, 28, 0.1);
+  --shadow-lg: 0 10px 25px rgba(255, 183, 197, 0.18), 0 5px 10px rgba(255, 192, 203, 0.12);
+  --shadow-xl: 0 20px 35px rgba(255, 183, 197, 0.22), 0 10px 15px rgba(255, 192, 203, 0.16);
+  --shadow-2xl: 0 30px 50px rgba(255, 183, 197, 0.28);
+  --radius-xl: 1rem;
+  --sakura-petals: radial-gradient(circle at 25% 25%, rgba(255, 183, 197, 0.15), transparent),
+                   radial-gradient(circle at 75% 75%, rgba(255, 192, 203, 0.12), transparent),
+                   radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.3), transparent);
+  --sakura-bloom: linear-gradient(135deg, rgba(255, 183, 197, 0.2), rgba(255, 255, 255, 0.4), rgba(255, 192, 203, 0.2));
+}
+
+[data-theme="midnight"] {
+  --color-primary: #191970;
+  --color-secondary: #ffd700;
+  --color-accent: #c0c0c0;
+  --color-bg-primary: #0a0a1f;
+  --color-bg-secondary: #15152a;
+  --glass-bg: rgba(10, 10, 31, 0.92);
+  --glass-border: rgba(255, 215, 0, 0.3);
+  --color-text-primary: #e8e8f0;
+  --color-text-secondary: #ffd700;
+  --color-surface: rgba(25, 25, 112, 0.15);
+  --color-border: rgba(192, 192, 192, 0.25);
+  --color-primary-alpha: rgba(25, 25, 112, 0.25);
+  --color-accent-alpha: rgba(255, 215, 0, 0.15);
+  --shadow-lg: 0 10px 30px rgba(25, 25, 112, 0.4), 0 5px 15px rgba(255, 215, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(25, 25, 112, 0.5), 0 10px 20px rgba(255, 215, 0, 0.15);
+  --shadow-2xl: 0 30px 60px rgba(25, 25, 112, 0.6);
+  --radius-xl: 1rem;
+  --midnight-stars: radial-gradient(1px 1px at 10% 20%, #ffd700, transparent),
+                    radial-gradient(1px 1px at 30% 40%, #c0c0c0, transparent),
+                    radial-gradient(2px 2px at 50% 60%, #ffffff, transparent),
+                    radial-gradient(1px 1px at 70% 80%, #ffd700, transparent);
+  --midnight-glow: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05), transparent);
+}
+
+[data-theme="lava"] {
+  --color-primary: #ff4500;
+  --color-secondary: #ff8c00;
+  --color-accent: #ffd700;
+  --color-bg-primary: #1a0500;
+  --color-bg-secondary: #2d0a00;
+  --glass-bg: rgba(26, 5, 0, 0.9);
+  --glass-border: rgba(255, 69, 0, 0.5);
+  --color-text-primary: #ffccb3;
+  --color-text-secondary: #ff8c00;
+  --color-surface: rgba(255, 69, 0, 0.15);
+  --color-border: rgba(255, 140, 0, 0.4);
+  --color-primary-alpha: rgba(255, 69, 0, 0.2);
+  --color-accent-alpha: rgba(255, 215, 0, 0.15);
+  --shadow-lg: 0 0 30px rgba(255, 69, 0, 0.5), 0 0 15px rgba(255, 140, 0, 0.3);
+  --shadow-xl: 0 0 40px rgba(255, 69, 0, 0.6), 0 0 20px rgba(255, 140, 0, 0.4);
+  --shadow-2xl: 0 0 60px rgba(255, 69, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.3);
+  --radius-xl: 1rem;
+  --lava-flow: linear-gradient(180deg, rgba(255, 69, 0, 0.8), rgba(255, 140, 0, 0.6), rgba(255, 215, 0, 0.3), rgba(26, 5, 0, 0.9));
+  --lava-bubbles: radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.3), transparent),
+                  radial-gradient(circle at 80% 20%, rgba(255, 69, 0, 0.4), transparent),
+                  radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.2), transparent);
+}
+
+/* Transition fluide pour les changements de thème */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

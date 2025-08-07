@@ -1,0 +1,26 @@
+{
+  "name": "api-pousse-backend",
+  "version": "1.0.0",
+  "description": "API Backend for Pousse",
+  "main": "index.js",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'Build completed - using pre-built frontend'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.4.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "express-mongo-sanitize": "^2.2.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0"
+  }
+}

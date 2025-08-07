@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\.30ff0fcca49160aa2d569a9b7b7cfb3a74022a34-audit.json",
+    "files": [
+        {
+            "date": 1754483485508,
+            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-errors-2025-08-06.log",
+            "hash": "fe3a63e7d885024efdbe040e00a55d6fd4bad1a020580bf96cf673ff12e077fc"
+        }
+    ],
+    "hashType": "sha256"
+}

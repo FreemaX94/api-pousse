@@ -1,0 +1,259 @@
+/* frontend/src/components/ExitList.css */
+
+.exit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+}
+
+.empty-list {
+  font-style: italic;
+  color: var(--color-muted);
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+/* Carte de sortie */
+.exit-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.8);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+.exit-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  border-color: var(--color-accent);
+}
+
+/* En-tête : date, statut, type */
+.exit-card-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.exit-date {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.exit-date::before {
+  content: "📅";
+  font-size: 1rem;
+}
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.status-badge.pending {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #ffffff;
+}
+.status-badge.validated {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+}
+.type-badge-header {
+  margin-left: auto;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Corps de la carte : image à gauche, infos à droite */
+.exit-card-body {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  align-items: flex-start;
+}
+
+.body-image {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.body-image img {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 3px solid rgba(255,255,255,0.8);
+}
+
+.body-image img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.no-image {
+  width: 120px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  border-radius: 12px;
+  color: var(--color-muted);
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 600;
+  border: 3px dashed #d1d5db;
+  position: relative;
+}
+
+.no-image::before {
+  content: "🖼️";
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.body-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+
+.info-item {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 10px;
+  border-left: 4px solid var(--color-accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.info-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left-color: #3b82f6;
+}
+
+.info-item strong {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.info-item strong::after {
+  content: ":";
+  margin-left: 2px;
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.5rem;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  background: linear-gradient(135deg, #fafbfc, #f8fafc);
+}
+
+.btn-sm {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-sm::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-sm:hover::before {
+  left: 100%;
+}
+
+.btn-sm:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.btn-sm:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .exit-card-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .body-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .exit-card-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .type-badge-header {
+    margin-left: 0;
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+}

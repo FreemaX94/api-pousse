@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-07-27T09:38:02.637Z",
+  "summary": {
+    "totalTests": 5,
+    "passed": 4,
+    "failed": 0
+  },
+  "details": [
+    {
+      "test": "Projection Optimization",
+      "unoptimizedTime": "20.25ms",
+      "optimizedTime": "7.36ms",
+      "improvement": "63.7%",
+      "dataReduction": "72.2%",
+      "status": "PASS",
+      "recommendation": "Projections optimales"
+    },
+    {
+      "test": "Index Strategy",
+      "queries": [
+        {
+          "collection": "users",
+          "queryType": "email",
+          "hasOptimalIndex": true,
+          "estimatedTime": "10.89ms",
+          "efficiency": "HIGH"
+        },
+        {
+          "collection": "users",
+          "queryType": "role, isActive",
+          "hasOptimalIndex": true,
+          "estimatedTime": "8.84ms",
+          "efficiency": "HIGH"
+        },
+        {
+          "collection": "stockentries",
+          "queryType": "createdAt",
+          "hasOptimalIndex": true,
+          "estimatedTime": "9.05ms",
+          "efficiency": "HIGH"
+        },
+        {
+          "collection": "catalogueitems",
+          "queryType": "categorie, status",
+          "hasOptimalIndex": true,
+          "estimatedTime": "12.55ms",
+          "efficiency": "HIGH"
+        }
+      ],
+      "avgEfficiency": "100.0%",
+      "status": "PASS",
+      "recommendation": "Indexation optimale"
+    },
+    {
+      "test": "Cache Performance",
+      "cacheMissTime": "54.16ms",
+      "cacheHitTime": "0.14ms",
+      "speedup": "393.9x",
+      "hitRateTarget": "80%",
+      "status": "PASS",
+      "recommendation": "Cache performant"
+    },
+    {
+      "test": "Aggregation Optimization",
+      "unoptimizedTime": "8.35ms",
+      "optimizedTime": "0.16ms",
+      "improvement": "98.1%",
+      "pipelineStages": 4,
+      "status": "PASS",
+      "recommendation": "Agrégations optimales"
+    },
+    {
+      "test": "Load Performance",
+      "results": [
+        {
+          "concurrentRequests": 10,
+          "totalTime": "27.65ms",
+          "avgResponseTime": "2.76ms",
+          "throughput": "362 req/s",
+          "status": "GOOD"
+        },
+        {
+          "concurrentRequests": 50,
+          "totalTime": "33.49ms",
+          "avgResponseTime": "0.67ms",
+          "throughput": "1493 req/s",
+          "status": "GOOD"
+        },
+        {
+          "concurrentRequests": 100,
+          "totalTime": "29.99ms",
+          "avgResponseTime": "0.30ms",
+          "throughput": "3334 req/s",
+          "status": "GOOD"
+        },
+        {
+          "concurrentRequests": 200,
+          "totalTime": "46.05ms",
+          "avgResponseTime": "0.23ms",
+          "throughput": "4343 req/s",
+          "status": "GOOD"
+        }
+      ],
+      "maxConcurrency": 200,
+      "recommendation": "Surveiller les métriques en production"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "area": "Monitoring",
+      "recommendation": "Implémenter New Relic APM pour monitoring en temps réel",
+      "impact": "Observabilité"
+    },
+    {
+      "priority": "MEDIUM",
+      "area": "Caching",
+      "recommendation": "Démarrer les tâches de maintenance cache automatique",
+      "impact": "Performance"
+    },
+    {
+      "priority": "LOW",
+      "area": "Database",
+      "recommendation": "Planifier maintenance indexes mensuelle",
+      "impact": "Maintenabilité"
+    }
+  ],
+  "performanceScore": {
+    "score": 95,
+    "grade": "A+",
+    "status": "EXCELLENT"
+  }
+}

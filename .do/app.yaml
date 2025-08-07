@@ -1,0 +1,14 @@
+name: api-pousse-app
+services:
+  - name: api-pousse-backend
+    source_dir: backend
+    github:
+      repo: FreemaX94/api-pousse
+      branch: main
+    run_command: npm start
+    build_command: npm run build
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /

@@ -1,0 +1,5 @@
+# API routes should go to backend
+/api/*  https://api-pousse-backend-fd98bbbd8c-2wzxh:3001/api/:splat  200!
+
+# Handle client-side routing
+/*    /index.html   200

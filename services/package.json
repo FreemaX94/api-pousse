@@ -1,0 +1,53 @@
+{
+  "name": "api-pousse-microservices",
+  "version": "1.0.0",
+  "description": "Architecture microservices pour API Pousse",
+  "main": "shared/orchestrator/index.js",
+  "scripts": {
+    "start": "node scripts/start-all.js",
+    "start:dev": "nodemon scripts/start-all.js",
+    "start:auth": "node -e \"const AuthService = require('./auth-service'); new AuthService().start(3002);\"",
+    "start:stock": "node -e \"const StockService = require('./stock-service'); new StockService().start(3003);\"",
+    "start:catalog": "node -e \"const CatalogService = require('./catalog-service'); new CatalogService().start(3004);\"",
+    "start:invoice": "node -e \"const InvoiceService = require('./invoice-service'); new InvoiceService().start(3005);\"",
+    "health": "node scripts/health-check.js",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --config jest.config.js --watch",
+    "test:coverage": "jest --config jest.config.js --coverage",
+    "lint": "eslint . --ext .js",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "redis": "^4.6.0",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.0",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "microservices",
+    "nodejs",
+    "express",
+    "redis",
+    "event-driven",
+    "architecture"
+  ],
+  "author": "API Pousse Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/api-pousse"
+  }
+}

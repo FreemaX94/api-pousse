@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
+
+.livraison-page {
+  font-family: 'Montserrat', sans-serif;
+  background: #fafafa;
+  padding: 0 24px 40px;
+}
+
+.livraison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0 16px;
+}
+
+.livraison-select {
+  min-width: 160px;
+}
+
+/* DataGrid styling via theme, pas besoin d’overrides CSS ici */

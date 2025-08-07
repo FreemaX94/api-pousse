@@ -1,0 +1,167 @@
+/**
+ * New Relic agent configuration pour API Pousse
+ * 
+ * Installation:
+ * 1. npm install newrelic
+ * 2. Copier ce fichier vers newrelic.js
+ * 3. Configurer NEW_RELIC_LICENSE_KEY dans .env
+ * 4. require('newrelic') en premier dans index.js
+ */
+
+'use strict'
+
+exports.config = {
+  // Nom de l'application dans New Relic
+  app_name: ['API-Pousse-Backend'],
+  
+  // Clé de licence (à mettre dans .env)
+  license_key: process.env.NEW_RELIC_LICENSE_KEY,
+  
+  // Logging configuration
+  logging: {
+    level: 'info',
+    filepath: 'stdout'
+  },
+  
+  // 🚀 Performance optimizations
+  performance_metrics: {
+    enabled: true
+  },
+  
+  // 📊 Custom instrumentation
+  api: {
+    // Instrumenter les routes personnalisées
+    custom_instrumentation_editor: true,
+    notice_error: true,
+    custom_events_enabled: true
+  },
+  
+  // 🎯 Specific to api-pousse
+  attributes: {
+    exclude: [
+      'request.headers.cookie',
+      'request.headers.authorization',
+      'request.headers.x-*',
+      'response.headers.set-cookie*'
+    ]
+  },
+  
+  // 📡 Distributed tracing
+  distributed_tracing: {
+    enabled: true
+  },
+  
+  // 🔍 Error collection
+  error_collector: {
+    enabled: true,
+    ignore_status_codes: [404],
+    expected_messages: {},
+    expected_classes: []
+  },
+  
+  // 🎛 Transaction tracer
+  transaction_tracer: {
+    enabled: true,
+    transaction_threshold: 'apdex_f',
+    record_sql: 'obfuscated',
+    explain_threshold: 500,
+    // 📦 Instrumenter les opérations MongoDB
+    top_n: 20
+  },
+  
+  // 🏃‍♂️ Application specific settings
+  rules: {
+    ignore: [
+      // Ignorer les routes de health check
+      '^/health',
+      '^/ping',
+      // Ignorer les assets statiques
+      '.*\\.(css|js|png|jpg|jpeg|gif|ico|svg)$'
+    ]
+  },
+  
+  // 🎨 Browser monitoring (pour servir le frontend)
+  browser_monitoring: {
+    enable: true,
+    debug: false
+  },
+  
+  // 🔧 Environment specific
+  ...(process.env.NODE_ENV === 'production' ? {
+    // Production settings
+    audit_log: {
+      enabled: false
+    },
+    capture_params: false
+  } : {
+    // Development settings  
+    audit_log: {
+      enabled: true
+    },
+    capture_params: true,
+    logging: {
+      level: 'debug'
+    }
+  })
+}
+
+// 📈 Custom metrics helpers
+exports.recordApiCall = (endpoint, method, statusCode, duration) => {
+  const newrelic = require('newrelic')
+  
+  newrelic.recordCustomEvent('ApiCall', {
+    endpoint,
+    method,
+    statusCode,
+    duration,
+    timestamp: Date.now()
+  })
+  
+  // Métrique de performance par endpoint
+  newrelic.recordMetric(`Custom/API/${endpoint}/${method}`, duration)
+}
+
+// 🎯 Business metrics pour api-pousse
+exports.recordBusinessEvent = (eventType, data) => {
+  const newrelic = require('newrelic')
+  
+  const businessEvents = {
+    'nieuwkoop_search': {
+      category: 'catalog',
+      impact: 'high'
+    },
+    'stock_operation': {
+      category: 'inventory', 
+      impact: 'critical'
+    },
+    'invoice_creation': {
+      category: 'finance',
+      impact: 'high'
+    },
+    'user_login': {
+      category: 'auth',
+      impact: 'medium'
+    }
+  }
+  
+  const eventConfig = businessEvents[eventType] || { category: 'general', impact: 'low' }
+  
+  newrelic.recordCustomEvent('BusinessEvent', {
+    type: eventType,
+    category: eventConfig.category,
+    impact: eventConfig.impact,
+    ...data,
+    timestamp: Date.now()
+  })
+}
+
+// 🚨 Error tracking avec contexte
+exports.recordError = (error, context = {}) => {
+  const newrelic = require('newrelic')
+  
+  newrelic.noticeError(error, {
+    ...context,
+    service: 'api-pousse-backend',
+    timestamp: Date.now()
+  })
+}

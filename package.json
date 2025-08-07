@@ -1,0 +1,27 @@
+{
+  "name": "api-pousse-fullstack",
+  "version": "1.0.0",
+  "description": "API Pousse - Full Stack Application",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd .. && mkdir -p backend/public backend/dist && cp -r frontend/dist/* backend/public/ && cp -r frontend/dist/* backend/dist/",
+    "start": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FreemaX94/api-pousse.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\.ee3ed51eebc15f18ce84a024eeded810a29aae86-audit.json",
+    "files": [
+        {
+            "date": 1754483485503,
+            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-08-06.log",
+            "hash": "e8e4477daa18cbb8612e93a1aec5d9897ee543f1f15cc39625b7e646723ab918"
+        },
+        {
+            "date": 1754517652918,
+            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-08-07.log",
+            "hash": "35077e56675344907357a8a13c8f239868f9f1896eb4fc9c6597357b29c6a9ee"
+        }
+    ],
+    "hashType": "sha256"
+}
