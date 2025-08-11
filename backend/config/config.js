@@ -17,10 +17,10 @@ const config = {
   isProduction: getEnv('NODE_ENV', 'development') === 'production',
 
   // Base de données
-  mongoURI: getEnv('MONGODB_URI'),
+  mongoURI: getEnv('MONGODB_URI', 'mongodb://localhost:27017/api-pousse'),
 
   // Authent JWT
-  jwtSecret: getEnv('JWT_SECRET'),
+  jwtSecret: getEnv('JWT_SECRET', 'dev-secret-key-change-in-production'),
 
   // Redis
   redis: {
@@ -29,10 +29,10 @@ const config = {
     url: `redis://${getEnv('REDIS_HOST', '127.0.0.1')}:${getEnv('REDIS_PORT', '6379')}`,
   },
 
-  // SMTP / mailing
+  // SMTP / mailing (optionnel)
   email: {
-    user: getEnv('EMAIL_USER'),
-    pass: getEnv('EMAIL_PASS'),
+    user: getEnv('EMAIL_USER', ''),
+    pass: getEnv('EMAIL_PASS', ''),
   },
 };
 
