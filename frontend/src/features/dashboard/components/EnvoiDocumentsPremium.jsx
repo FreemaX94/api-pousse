@@ -741,7 +741,7 @@ const EnvoiDocumentsPremium = ({ themeColors }) => {
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center space-x-2">
             <DocumentArrowUpIcon className="w-8 h-8 text-blue-400" />
-            <span>Envoi Documents Premium</span>
+            <span>Envoi Documents</span>
             <motion.span
               className="ml-2 px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs rounded-full"
               animate={{ scale: [1, 1.1, 1] }}

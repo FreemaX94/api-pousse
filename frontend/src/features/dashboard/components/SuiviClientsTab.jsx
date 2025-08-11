@@ -21,9 +21,16 @@ import AffairesView from '../../../components/AffairesView';
 import ContactsView from '../../../components/ContactsView';
 import FichiersView from '../../../components/FichiersView';
 
+// Import des composants Premium
+import ClientsPremium from './ClientsPremium';
+import AdressesPremium from './AdressesPremium';
+import EquipementsPremium from './EquipementsPremium';
+import ContratsPremium from './ContratsPremium';
+import { useTheme } from '../../../contexts/ThemeContext';
+
 const SuiviClientsTab = ({ initialActiveTab = 'Clients' }) => {
-  console.log('🔍 SuiviClientsTab - Composant rendu, onglet initial:', initialActiveTab);
   const navigate = useNavigate();
+  const { theme: currentTheme } = useTheme();
   const [activeSubTab, setActiveSubTab] = useState(initialActiveTab);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [selectedClients, setSelectedClients] = useState([]);
@@ -166,13 +173,13 @@ const SuiviClientsTab = ({ initialActiveTab = 'Clients' }) => {
 
   const handleApplyFilters = (filters) => {
     setActiveFilters(filters);
-    console.log('Filtres appliqués:', filters);
+    // Filtres appliqués
     // Ici vous pourriez appliquer les filtres aux données
     // Par exemple: filtrer la liste des clients selon les critères
   };
 
   const handleSaveFilter = (filters) => {
-    console.log('Sauvegarde du filtre:', filters);
+    // Sauvegarde du filtre
     // Ici vous pourriez sauvegarder le filtre en base de données
     // ou dans le localStorage pour réutilisation
   };
@@ -664,13 +671,13 @@ const SuiviClientsTab = ({ initialActiveTab = 'Clients' }) => {
   const renderMainContent = () => {
     switch (activeSubTab) {
       case 'Clients':
-        return renderClientsView();
+        return <ClientsPremium theme={currentTheme} />;
       case 'Adresses':
-        return <AdressesView />;
+        return <AdressesPremium theme={currentTheme} />;
       case 'Équipements':
-        return <EquipementsView />;
+        return <EquipementsPremium theme={currentTheme} />;
       case 'Contrats':
-        return <ContratsView />;
+        return <ContratsPremium theme={currentTheme} />;
       case 'Affaires':
         return <AffairesView />;
       case 'Contacts':
@@ -678,7 +685,7 @@ const SuiviClientsTab = ({ initialActiveTab = 'Clients' }) => {
       case 'Fichiers':
         return <FichiersView />;
       default:
-        return renderClientsView();
+        return <ClientsPremium theme={currentTheme} />;
     }
   };
 
@@ -710,7 +717,7 @@ const SuiviClientsTab = ({ initialActiveTab = 'Clients' }) => {
             isOpen={showAddClientModal}
             onClose={() => setShowAddClientModal(false)}
             onSave={(clientData) => {
-              console.log('Nouveau client:', clientData);
+              // Nouveau client créé
               setShowAddClientModal(false);
             }}
           />

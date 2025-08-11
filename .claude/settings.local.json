@@ -87,7 +87,17 @@
       "Bash(npx --yes npm@10 install)",
       "Bash(npx --yes create-vite@latest . --template react --force)",
       "Bash(npx:*)",
-      "Bash(del \"C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\frontend\\src\\components\\ThemeToggle.jsx\")"
+      "Bash(del \"C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\frontend\\src\\components\\ThemeToggle.jsx\")",
+      "Bash(for file in *.jsx)",
+      "Bash(do if grep -q \"TrendingUpIcon\\|TrendingDownIcon\" \"$file\")",
+      "Bash(then sed -i \"s/TrendingUpIcon/ArrowTrendingUpIcon/g; s/TrendingDownIcon/ArrowTrendingDownIcon/g\" \"$file\")",
+      "Bash(echo \"Fixed: $file\")",
+      "Bash(done)",
+      "Bash(sed:*)",
+      "Bash(do if grep -q \"ArrowArrowTrending\" \"$file\")",
+      "Bash(then sed -i \"s/ArrowArrowTrendingUpIcon/ArrowTrendingUpIcon/g; s/ArrowArrowTrendingDownIcon/ArrowTrendingDownIcon/g\" \"$file\")",
+      "Bash(for:*)",
+      "Bash(do echo \"Creating $comp.jsx\")"
     ],
     "deny": []
   }

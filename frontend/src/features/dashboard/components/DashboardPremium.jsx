@@ -161,7 +161,7 @@ const DashboardPremium = ({ themeColors }) => {
             >
               <SparklesIcon className="w-8 h-8 text-purple-500" />
             </motion.div>
-            <span>Dashboard Premium</span>
+            <span>Dashboard</span>
           </h1>
           <p className={`${themeColors?.textSecondary || 'text-gray-400'} mt-1`}>
             Vue d'ensemble de votre activité

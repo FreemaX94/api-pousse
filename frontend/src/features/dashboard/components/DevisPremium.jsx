@@ -471,7 +471,7 @@ const DevisPremium = ({ themeColors }) => {
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center space-x-2">
             <DocumentTextIcon className="w-8 h-8 text-purple-400" />
-            <span>Devis Premium</span>
+            <span>Devis</span>
             <span className="ml-2 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full">
               BETA
             </span>

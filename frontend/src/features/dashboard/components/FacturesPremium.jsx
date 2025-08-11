@@ -592,7 +592,7 @@ const FacturesPremium = ({ themeColors }) => {
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center space-x-2">
             <BanknotesIcon className="w-8 h-8 text-green-400" />
-            <span>Factures Premium</span>
+            <span>Factures</span>
             <motion.span 
               className="ml-2 px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs rounded-full"
               animate={{ scale: [1, 1.1, 1] }}

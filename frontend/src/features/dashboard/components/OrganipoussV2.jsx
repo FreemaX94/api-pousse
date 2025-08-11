@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { useOrganipoussV2 } from '../hooks/useOrganipoussV2';
+import { useTheme } from '../../../contexts/ThemeContext';
 import { 
   PremiumKPICard, 
   PremiumNotification, 
@@ -131,6 +132,45 @@ import FacturesPremium from './FacturesPremium';
 import InterventionsPremium from './InterventionsPremium';
 import EnvoiDocumentsPremium from './EnvoiDocumentsPremium';
 import DemandesClientPremium from './DemandesClientPremium';
+import AffairesPremium from './AffairesPremium';
+import ContratsPremium from './ContratsPremium';
+import ProduitsServicesPremium from './ProduitsServicesPremium';
+import PointagesPremium from './PointagesPremium';
+import ClientsPremium from './ClientsPremium';
+import AdressesPremium from './AdressesPremium';
+import EquipementsPremium from './EquipementsPremium';
+import ContactsPremium from './ContactsPremium';
+import FichiersPremium from './FichiersPremium';
+
+// Demandes Client Premium
+import TableauDeBordDemandesClientPremium from './TableauDeBordDemandesClientPremium';
+import PlanningDemandesClientPremium from './PlanningDemandesClientPremium';
+import StatistiquesDemandesClientPremium from './StatistiquesDemandesClientPremium';
+
+// Planning Premium
+import PlanningGeneralPremium from './PlanningGeneralPremium';
+import MonPlanningPremium from './MonPlanningPremium';
+import SemainePremium from './SemainePremium';
+import MoisPremium from './MoisPremium';
+
+// Interventions Premium
+import TableauDeBordInterventionsPremium from './TableauDeBordInterventionsPremium';
+import JourneePremium from './JourneePremium';
+import CarteGeographiquePremium from './CarteGeographiquePremium';
+import ChantiersPremium from './ChantiersPremium';
+import VehiculesPremium from './VehiculesPremium';
+import EnvoiMassePremium from './EnvoiMassePremium';
+import RecurrencePremium from './RecurrencePremium';
+import TempsTravaillePremium from './TempsTravaillePremium';
+import StatistiquesInterventionsPremium from './StatistiquesInterventionsPremium';
+import ActionsCourantesPremium from './ActionsCourantesPremium';
+
+// Facturation Premium
+import DevisFacturationPremium from './DevisFacturationPremium';
+import FacturesFacturationPremium from './FacturesFacturationPremium';
+import FacturesAcomptePremium from './FacturesAcomptePremium';
+import AvoirsFacturationPremium from './AvoirsFacturationPremium';
+import StatistiquesFacturationPremium from './StatistiquesFacturationPremium';
 
 // Composants Premium Ultra - Lazy loading uniquement pour les moins utilisés
 const GamificationSystem = createLazyComponent(
@@ -148,6 +188,7 @@ const PresentationMode = createLazyComponent(
 
 const OrganipoussV2 = () => {
   const location = useLocation();
+  const { theme: currentTheme, currentThemeConfig, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeMenuItem, setActiveMenuItem] = useState('Dashboard');
@@ -157,7 +198,7 @@ const OrganipoussV2 = () => {
   const [activeInterventionsTab, setActiveInterventionsTab] = useState('Tableau de bord');
   const [activeFacturationTab, setActiveFacturationTab] = useState('Devis');
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
-  const [theme, setTheme] = useState('cosmic'); // light, dark, cosmic
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [showPresentationMode, setShowPresentationMode] = useState(false);
   const [showGamification, setShowGamification] = useState(false);
@@ -337,7 +378,7 @@ const OrganipoussV2 = () => {
     { name: 'Demandes client', icon: DocumentTextIcon, hasSubmenu: true, submenu: ['Tableau de bord', 'Planning', 'Statistiques'], gradient: 'from-purple-400 to-pink-500' },
     { name: 'Planning', icon: CalendarDaysIcon, hasSubmenu: true, submenu: ['Planning général', 'Mon planning', 'Semaine', 'Mois'], gradient: 'from-green-400 to-teal-500' },
     { name: 'Interventions', icon: WrenchScrewdriverIcon, hasSubmenu: true, submenu: ['Tableau de bord', 'Journée', 'Carte géographique', 'Chantiers', 'Véhicules', 'Envoi en masse', 'Récurrence', 'Temps travaillé', 'Statistiques', 'Actions courantes'], gradient: 'from-red-400 to-pink-500' },
-    { name: 'Facturation', icon: CurrencyEuroIcon, hasSubmenu: true, submenu: ['Devis', 'Factures', 'Factures d\'acompte'], gradient: 'from-emerald-400 to-green-500' },
+    { name: 'Facturation', icon: CurrencyEuroIcon, hasSubmenu: true, submenu: ['Devis', 'Factures', 'Factures d\'acompte', 'Avoirs', 'Statistiques'], gradient: 'from-emerald-400 to-green-500' },
     { name: 'Locations', icon: BuildingOfficeIcon, gradient: 'from-indigo-400 to-purple-500' },
     { name: 'Stocks', icon: ShoppingBagIcon, gradient: 'from-amber-400 to-orange-500' },
     { name: 'Achat', icon: ShoppingBagIcon, gradient: 'from-cyan-400 to-blue-500' },
@@ -873,45 +914,243 @@ const OrganipoussV2 = () => {
     </footer>
   );
 
-  const getThemeColors = () => {
+  const getThemeColors = (theme) => {
     switch(theme) {
       case 'dark':
         return {
+          // Backgrounds
           bg: 'bg-gray-900',
           bgSecondary: 'bg-gray-800',
           bgTertiary: 'bg-gray-700',
+          bgHover: 'hover:bg-gray-700',
+          // Text
           text: 'text-gray-100',
           textSecondary: 'text-gray-300',
+          textMuted: 'text-gray-500',
+          // Borders
           border: 'border-gray-700',
+          borderLight: 'border-gray-600/50',
+          // Glass effects
           glass: 'bg-gray-800/50 backdrop-blur-xl',
-          gradient: 'from-gray-800 to-gray-900'
+          glassLight: 'bg-gray-700/30 backdrop-blur-lg',
+          // Gradients
+          gradient: 'from-gray-800 to-gray-900',
+          gradientAccent: 'from-gray-700 via-gray-600 to-gray-700',
+          // Cards
+          cardGradient: 'from-gray-800/90 via-gray-800/80 to-gray-900/90',
+          cardHover: 'hover:from-gray-700/90 hover:to-gray-800/90',
+          // Shadows
+          shadow: 'shadow-gray-900/50',
+          shadowLg: 'shadow-2xl shadow-gray-900/60',
+          // Accents
+          primary: 'blue-500',
+          secondary: 'purple-500',
+          success: 'green-500',
+          warning: 'yellow-500',
+          danger: 'red-500'
         };
       case 'cosmic':
         return {
+          // Backgrounds
           bg: 'bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900',
           bgSecondary: 'bg-indigo-800/30',
           bgTertiary: 'bg-purple-800/30',
+          bgHover: 'hover:bg-purple-800/40',
+          // Text
           text: 'text-purple-100',
           textSecondary: 'text-purple-200',
+          textMuted: 'text-purple-300/70',
+          // Borders
           border: 'border-purple-600/30',
+          borderLight: 'border-purple-500/20',
+          // Glass effects
           glass: 'bg-purple-900/20 backdrop-blur-2xl',
-          gradient: 'from-purple-600 to-indigo-600'
+          glassLight: 'bg-indigo-800/15 backdrop-blur-xl',
+          // Gradients
+          gradient: 'from-purple-600 to-indigo-600',
+          gradientAccent: 'from-pink-600 via-purple-600 to-indigo-600',
+          // Cards
+          cardGradient: 'from-purple-800/30 via-indigo-800/25 to-blue-800/30',
+          cardHover: 'hover:from-purple-700/40 hover:to-indigo-700/40',
+          // Shadows
+          shadow: 'shadow-purple-900/50',
+          shadowLg: 'shadow-2xl shadow-purple-900/60',
+          // Accents
+          primary: 'purple-400',
+          secondary: 'pink-400',
+          success: 'emerald-400',
+          warning: 'amber-400',
+          danger: 'rose-400'
         };
-      default:
+      case 'midnight':
         return {
+          // Backgrounds
+          bg: 'bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950',
+          bgSecondary: 'bg-slate-900/50',
+          bgTertiary: 'bg-blue-900/30',
+          bgHover: 'hover:bg-slate-800/50',
+          // Text
+          text: 'text-slate-100',
+          textSecondary: 'text-slate-300',
+          textMuted: 'text-slate-400',
+          // Borders
+          border: 'border-slate-700/50',
+          borderLight: 'border-slate-600/30',
+          // Glass effects
+          glass: 'bg-slate-900/40 backdrop-blur-2xl',
+          glassLight: 'bg-slate-800/20 backdrop-blur-xl',
+          // Gradients
+          gradient: 'from-blue-600 to-cyan-600',
+          gradientAccent: 'from-cyan-500 via-blue-500 to-indigo-500',
+          // Cards
+          cardGradient: 'from-slate-800/50 via-blue-900/40 to-slate-900/50',
+          cardHover: 'hover:from-slate-700/60 hover:to-blue-800/50',
+          // Shadows
+          shadow: 'shadow-slate-950/70',
+          shadowLg: 'shadow-2xl shadow-slate-950/80',
+          // Accents
+          primary: 'cyan-400',
+          secondary: 'blue-400',
+          success: 'teal-400',
+          warning: 'yellow-400',
+          danger: 'red-400'
+        };
+      case 'forest':
+        return {
+          // Backgrounds
+          bg: 'bg-gradient-to-br from-green-950 via-emerald-950 to-teal-950',
+          bgSecondary: 'bg-emerald-900/40',
+          bgTertiary: 'bg-green-900/30',
+          bgHover: 'hover:bg-emerald-800/40',
+          // Text
+          text: 'text-emerald-100',
+          textSecondary: 'text-emerald-200',
+          textMuted: 'text-emerald-300/70',
+          // Borders
+          border: 'border-emerald-700/40',
+          borderLight: 'border-emerald-600/25',
+          // Glass effects
+          glass: 'bg-emerald-900/25 backdrop-blur-2xl',
+          glassLight: 'bg-green-800/15 backdrop-blur-xl',
+          // Gradients
+          gradient: 'from-emerald-600 to-teal-600',
+          gradientAccent: 'from-green-500 via-emerald-500 to-teal-500',
+          // Cards
+          cardGradient: 'from-emerald-900/35 via-green-900/30 to-teal-900/35',
+          cardHover: 'hover:from-emerald-800/45 hover:to-teal-800/45',
+          // Shadows
+          shadow: 'shadow-emerald-950/60',
+          shadowLg: 'shadow-2xl shadow-emerald-950/70',
+          // Accents
+          primary: 'emerald-400',
+          secondary: 'teal-400',
+          success: 'green-400',
+          warning: 'amber-400',
+          danger: 'rose-400'
+        };
+      case 'sunset':
+        return {
+          // Backgrounds
+          bg: 'bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50',
+          bgSecondary: 'bg-white/90',
+          bgTertiary: 'bg-orange-50/50',
+          bgHover: 'hover:bg-orange-100/50',
+          // Text
+          text: 'text-gray-900',
+          textSecondary: 'text-gray-700',
+          textMuted: 'text-gray-500',
+          // Borders
+          border: 'border-orange-200/50',
+          borderLight: 'border-pink-200/30',
+          // Glass effects
+          glass: 'bg-white/60 backdrop-blur-xl',
+          glassLight: 'bg-white/40 backdrop-blur-lg',
+          // Gradients
+          gradient: 'from-orange-500 to-pink-500',
+          gradientAccent: 'from-yellow-400 via-orange-400 to-pink-400',
+          // Cards
+          cardGradient: 'from-white/80 via-orange-50/70 to-pink-50/80',
+          cardHover: 'hover:from-white/90 hover:to-orange-100/80',
+          // Shadows
+          shadow: 'shadow-orange-200/50',
+          shadowLg: 'shadow-2xl shadow-orange-300/60',
+          // Accents
+          primary: 'orange-500',
+          secondary: 'pink-500',
+          success: 'green-500',
+          warning: 'yellow-500',
+          danger: 'red-500'
+        };
+      case 'ocean':
+        return {
+          // Backgrounds
+          bg: 'bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50',
+          bgSecondary: 'bg-white/85',
+          bgTertiary: 'bg-blue-50/40',
+          bgHover: 'hover:bg-cyan-100/40',
+          // Text
+          text: 'text-gray-900',
+          textSecondary: 'text-gray-700',
+          textMuted: 'text-gray-500',
+          // Borders
+          border: 'border-blue-200/50',
+          borderLight: 'border-cyan-200/30',
+          // Glass effects
+          glass: 'bg-white/65 backdrop-blur-xl',
+          glassLight: 'bg-white/45 backdrop-blur-lg',
+          // Gradients
+          gradient: 'from-blue-500 to-cyan-500',
+          gradientAccent: 'from-teal-400 via-cyan-400 to-blue-400',
+          // Cards
+          cardGradient: 'from-white/75 via-cyan-50/60 to-blue-50/75',
+          cardHover: 'hover:from-white/85 hover:to-cyan-100/75',
+          // Shadows
+          shadow: 'shadow-blue-200/50',
+          shadowLg: 'shadow-2xl shadow-blue-300/60',
+          // Accents
+          primary: 'blue-500',
+          secondary: 'cyan-500',
+          success: 'teal-500',
+          warning: 'amber-500',
+          danger: 'rose-500'
+        };
+      default: // light theme
+        return {
+          // Backgrounds
           bg: 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50',
           bgSecondary: 'bg-white',
           bgTertiary: 'bg-gray-50',
+          bgHover: 'hover:bg-gray-100',
+          // Text
           text: 'text-gray-900',
           textSecondary: 'text-gray-600',
+          textMuted: 'text-gray-400',
+          // Borders
           border: 'border-gray-200',
+          borderLight: 'border-gray-100',
+          // Glass effects
           glass: 'bg-white/70 backdrop-blur-xl',
-          gradient: 'from-blue-500 to-purple-600'
+          glassLight: 'bg-white/50 backdrop-blur-lg',
+          // Gradients
+          gradient: 'from-blue-500 to-purple-600',
+          gradientAccent: 'from-indigo-400 via-purple-400 to-pink-400',
+          // Cards
+          cardGradient: 'from-white/90 via-gray-50/80 to-white/90',
+          cardHover: 'hover:from-white hover:to-gray-50',
+          // Shadows
+          shadow: 'shadow-gray-200/50',
+          shadowLg: 'shadow-2xl shadow-gray-300/60',
+          // Accents
+          primary: 'blue-600',
+          secondary: 'purple-600',
+          success: 'green-600',
+          warning: 'yellow-600',
+          danger: 'red-600'
         };
     }
   };
 
-  const themeColors = getThemeColors();
+  const themeColors = getThemeColors(currentTheme);
 
   const renderSidebar = () => (
     <motion.div 
@@ -930,7 +1169,7 @@ const OrganipoussV2 = () => {
             className="absolute w-32 h-32 rounded-full"
             style={{
               background: `radial-gradient(circle, ${
-                theme === 'cosmic' ? 'rgba(147, 51, 234, 0.1)' : 'rgba(59, 130, 246, 0.1)'
+                currentTheme === 'cosmic' ? 'rgba(147, 51, 234, 0.1)' : 'rgba(59, 130, 246, 0.1)'
               } 0%, transparent 70%)`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -1213,7 +1452,7 @@ const OrganipoussV2 = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setTheme(value)}
                 className={`p-2 rounded-lg transition-all ${
-                  theme === value 
+                  currentTheme === value 
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
                     : `${themeColors.text} hover:bg-white/20`
                 }`}
@@ -1418,56 +1657,65 @@ const OrganipoussV2 = () => {
       // Gestion des tabs dans Rappels
       switch (activeTab) {
         case 'Devis':
-          return <DevisPremium themeColors={themeColors} />;
+          return <DevisPremium />;
         case 'Factures':
-          return <FacturesPremium themeColors={themeColors} />;
+          return <FacturesPremium />;
         case 'Interventions':
-          return <InterventionsPremium themeColors={themeColors} />;
+          return <InterventionsPremium />;
         case 'Envoi des documents':
-          return <EnvoiDocumentsPremium themeColors={themeColors} />;
+          return <EnvoiDocumentsPremium />;
         case 'Demandes client':
-          return <DemandesClientPremium themeColors={themeColors} />;
+          return <DemandesClientPremium />;
+        case 'Affaires':
+          return <AffairesPremium />;
+        case 'Contrats':
+          return <ContratsPremium />;
+        case 'Produits ou services':
+          return <ProduitsServicesPremium />;
+        case 'Pointages':
+          return <PointagesPremium />;
         default:
           // Par défaut, afficher Interventions dans Rappels
-          return <InterventionsPremium themeColors={themeColors} />;
+          return <InterventionsPremium />;
       }
     }
     
     switch (activeTab) {
       case 'Dashboard':
-        return <DashboardPremium themeColors={themeColors} />;
+        return <DashboardPremium />;
       case 'Devis':
-        return <DevisPremium themeColors={themeColors} />;
+        return <DevisPremium />;
       case 'Factures':
-        return <FacturesPremium themeColors={themeColors} />;
+        return <FacturesPremium />;
       case 'Affaires':
-        return renderModernTable(affaires, [
-          { label: 'N°', field: 'numero' },
-          { label: 'Client', field: 'client' },
-          { label: 'Titre de l\'offre', field: 'titreOffre' },
-          { label: 'Catégorie', field: 'categorie' },
-          { label: 'Montant', field: 'montant', render: (row) => 
-            formatMontant(row.montant)
-          },
-          { label: 'Date de clôture', field: 'dateCloture' }
-        ], 'Affaires en cours');
+        return <AffairesPremium />;
       case 'Demandes client':
-        return renderModernTable(demandesClient, [
-          { label: 'N°', field: 'numero' },
-          { label: 'Statut', field: 'statut', render: (row) => (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutBadgeColor(row.statut)}`}>
-              {row.statut}
-            </span>
-          )},
-          { label: 'Priorité', field: 'priorite', render: (row) => (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPrioriteBadgeColor(row.priorite)}`}>
-              {row.priorite}
-            </span>
-          )},
-          { label: 'Titre', field: 'titre' },
-          { label: 'Client', field: 'client' },
-          { label: 'Date de début', field: 'dateDebut' }
-        ], 'Tickets non clôturés');
+        // Rendu de Demandes client avec composants Premium
+        switch (activeDemandesClientTab) {
+          case 'Tableau de bord':
+            return <TableauDeBordDemandesClientPremium />;
+          case 'Planning':
+            return <PlanningDemandesClientPremium />;
+          case 'Statistiques':
+            return <StatistiquesDemandesClientPremium />;
+          default:
+            return renderModernTable(demandesClient, [
+              { label: 'N°', field: 'numero' },
+              { label: 'Statut', field: 'statut', render: (row) => (
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutBadgeColor(row.statut)}`}>
+                  {row.statut}
+                </span>
+              )},
+              { label: 'Priorité', field: 'priorite', render: (row) => (
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPrioriteBadgeColor(row.priorite)}`}>
+                  {row.priorite}
+                </span>
+              )},
+              { label: 'Titre', field: 'titre' },
+              { label: 'Client', field: 'client' },
+              { label: 'Date de début', field: 'dateDebut' }
+            ], 'Tickets non clôturés');
+        }
       case 'Envoi des documents':
         return (
           <div className="space-y-6">
@@ -1518,39 +1766,49 @@ const OrganipoussV2 = () => {
           </div>
         );
       case 'Suivi clients':
-        // Rendu de Suivi clients
-        if (activeSuiviClientsTab === 'Clients' || activeSuiviClientsTab === 'Adresses') {
-          return <SuiviClientsTab initialActiveTab={activeSuiviClientsTab} />;
+        // Rendu de Suivi clients avec composants Premium
+        switch (activeSuiviClientsTab) {
+          case 'Clients':
+            return <ClientsPremium />;
+          case 'Adresses':
+            return <AdressesPremium />;
+          case 'Équipements':
+            return <EquipementsPremium />;
+          case 'Contrats':
+            return <ContratsPremium />;
+          case 'Affaires':
+            return <AffairesPremium />;
+          case 'Contacts':
+            return <ContactsPremium />;
+          case 'Fichiers':
+            return <FichiersPremium />;
+          default:
+            return (
+              <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
+                <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activeSuiviClientsTab}</h3>
+                <p className={themeColors.textSecondary}>Module en cours de développement</p>
+              </div>
+            );
         }
-        if (activeSuiviClientsTab === 'Équipements' || activeSuiviClientsTab === 'Contacts' || activeSuiviClientsTab === 'Fichiers') {
-          return <SuiviClientsTabSimple initialActiveTab={activeSuiviClientsTab} />;
-        }
-        return (
-          <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
-            <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activeSuiviClientsTab}</h3>
-            <p className={themeColors.textSecondary}>Module en cours de développement</p>
-          </div>
-        );
       case 'Planning':
-        // Rendu de Planning
-        if (activePlanningTab === 'Planning général') {
-          return <PlanningGeneralSimple />;
+        // Rendu de Planning avec composants Premium
+        switch (activePlanningTab) {
+          case 'Planning général':
+            return <PlanningGeneralPremium />;
+          case 'Mon planning':
+            return <MonPlanningPremium />;
+          case 'Semaine':
+            return <SemainePremium />;
+          case 'Mois':
+            return <MoisPremium />;
+          default:
+            return (
+              <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
+                <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activePlanningTab}</h3>
+                <p className={themeColors.textSecondary}>Module en cours de développement</p>
+              </div>
+            );
         }
-        if (activePlanningTab === 'Mon planning') {
-          return <MonPlanning />;
-        }
-        if (activePlanningTab === 'Semaine') {
-          return <PlanningSemaine />;
-        }
-        if (activePlanningTab === 'Mois') {
-          return <PlanningMois />;
-        }
-        return (
-          <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
-            <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activePlanningTab}</h3>
-            <p className={themeColors.textSecondary}>Module en cours de développement</p>
-          </div>
-        );
       case 'Contrats':
         return <ContratsEcheancesDepassees />;
       case 'Produits ou services':
@@ -1558,97 +1816,53 @@ const OrganipoussV2 = () => {
       case 'Pointages':
         return <PointagesEcheancesDepassees />;
       case 'Facturation':
-        if (activeFacturationTab === 'Devis') {
-          return renderDevisTable();
+        // Rendu de Facturation avec composants Premium
+        switch (activeFacturationTab) {
+          case 'Devis':
+            return <DevisFacturationPremium />;
+          case 'Factures':
+            return <FacturesFacturationPremium />;
+          case "Factures d'acompte":
+            return <FacturesAcomptePremium />;
+          case 'Avoirs':
+            return <AvoirsFacturationPremium />;
+          case 'Statistiques':
+            return <StatistiquesFacturationPremium />;
+          default:
+            return renderDevisTable();
         }
-        if (activeFacturationTab === 'Factures') {
-          return renderModernTable(factures, [
-            { label: 'Numéro', field: 'numero' },
-            { label: 'Date', field: 'dateFacture' },
-            { label: 'Client', field: 'client' },
-            { label: 'Montant TTC', field: 'totalTTC', render: (row) => 
-              formatMontant(row.totalTTC)
-            }
-          ], 'Factures en cours');
-        }
-        return (
-          <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
-            <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activeFacturationTab}</h3>
-            <p className={themeColors.textSecondary}>Module en cours de développement</p>
-          </div>
-        );
       case 'Interventions':
-        // Rendu de Interventions
-        if (activeInterventionsTab === 'Tableau de bord') {
-          return <InterventionsTableauDeBord />;
-        }
-        if (activeInterventionsTab === 'Journée') {
-          return <InterventionsJournee />;
-        }
-        if (activeInterventionsTab === 'Carte géographique') {
-          return <InterventionsCarteGeographique />;
-        }
-        if (activeInterventionsTab === 'Chantiers') {
-          return <InterventionsChantiers />;
-        }
-        if (activeInterventionsTab === 'Véhicules') {
-          return <InterventionsVehicules />;
-        }
-        if (activeInterventionsTab === 'Envoi en masse') {
-          return <MassMailDeliveryNotice />;
-        }
-        if (activeInterventionsTab === 'Récurrence') {
-          return (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Récurrence</h2>
-                  <p className="text-gray-600 mt-1">Gérez vos interventions récurrentes</p>
-                </div>
-                <button
-                  onClick={() => setIsRecurrenceModalOpen(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors"
-                >
-                  <PlusIcon className="w-5 h-5" />
-                  <span>Ajouter une récurrence</span>
-                </button>
+        // Rendu de Interventions avec composants Premium
+        switch (activeInterventionsTab) {
+          case 'Tableau de bord':
+            return <TableauDeBordInterventionsPremium />;
+          case 'Journée':
+            return <JourneePremium />;
+          case 'Carte géographique':
+            return <CarteGeographiquePremium />;
+          case 'Chantiers':
+            return <ChantiersPremium />;
+          case 'Véhicules':
+            return <VehiculesPremium />;
+          case 'Envoi en masse':
+            return <EnvoiMassePremium />;
+          case 'Récurrence':
+            return <RecurrencePremium />;
+          case 'Temps travaillé':
+            return <TempsTravaillePremium />;
+          case 'Statistiques':
+            return <StatistiquesInterventionsPremium />;
+          case 'Actions courantes':
+            return <ActionsCourantesPremium />;
+          default:
+            return (
+              <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
+                <RocketLaunchIcon className={`w-16 h-16 mx-auto mb-4 ${themeColors.textSecondary}`} />
+                <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activeInterventionsTab}</h3>
+                <p className={themeColors.textSecondary}>Module en cours de développement</p>
               </div>
-              
-              <div className="bg-white rounded-lg border border-gray-200 p-8">
-                <div className="text-center text-gray-500">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ClockIcon className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune récurrence configurée</h3>
-                  <p className="text-gray-500 mb-4">Créez votre première récurrence pour automatiser vos interventions répétitives.</p>
-                  <button
-                    onClick={() => setIsRecurrenceModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md inline-flex items-center space-x-2 transition-colors"
-                  >
-                    <PlusIcon className="w-5 h-5" />
-                    <span>Créer une récurrence</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
+            );
         }
-        if (activeInterventionsTab === 'Temps travaillé') {
-          return <WorkedTimeStats />;
-        }
-        if (activeInterventionsTab === 'Statistiques') {
-          return <InterventionStats />;
-        }
-        if (activeInterventionsTab === 'Actions courantes') {
-          return <ActionsCourantes />;
-        }
-        return (
-          <div className={`${themeColors.glass} rounded-2xl p-8 text-center`}>
-            <RocketLaunchIcon className={`w-16 h-16 mx-auto mb-4 ${themeColors.textSecondary}`} />
-            <h3 className={`text-xl font-bold ${themeColors.text} mb-2`}>{activeInterventionsTab}</h3>
-            <p className={themeColors.textSecondary}>Module en cours de développement</p>
-          </div>
-        );
       default:
         return renderDevisTable();
     }
