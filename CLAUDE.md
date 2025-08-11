@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## IMPORTANT RULES
+
+⚠️ **NEVER automatically run `npm run dev` or `npm start` commands** - The user will handle starting the development servers locally.
+
 ## Project Structure
 
 This is a full-stack application with separate frontend and backend:
