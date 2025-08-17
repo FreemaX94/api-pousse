@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useDragControls, Reorder } from 'framer-motion';
 import {
   CalendarDaysIcon,
   ClockIcon,
@@ -32,7 +32,20 @@ import {
   CloudIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  ArrowsRightLeftIcon,
+  Cog6ToothIcon,
+  CubeTransparentIcon,
+  CommandLineIcon,
+  RocketLaunchIcon,
+  ShareIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
+  SignalIcon,
+  WifiIcon,
+  CpuChipIcon
 } from '@heroicons/react/24/outline';
 import { Line, Bar, Doughnut, Radar } from 'react-chartjs-2';
 
@@ -42,6 +55,22 @@ const PlanningGeneralUltraPremium = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [filterType, setFilterType] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  // Nouvelles fonctionnalités avancées
+  const [draggedEvent, setDraggedEvent] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showMultiResourceView, setShowMultiResourceView] = useState(false);
+  const [showConflictDetection, setShowConflictDetection] = useState(true);
+  const [showRecurrenceModal, setShowRecurrenceModal] = useState(false);
+  const [showiCalModal, setShowiCalModal] = useState(false);
+  const [conflicts, setConflicts] = useState([]);
+  const [resources, setResources] = useState(['Marc L.', 'Paul M.', 'Luc B.', 'Jean D.', 'Pierre M.']);
+  const [selectedResources, setSelectedResources] = useState([]);
+  const [websocketStatus, setWebsocketStatus] = useState('connected');
+  const [liveUpdates, setLiveUpdates] = useState(true);
+  
+  const dragControls = useDragControls();
+  const calendarRef = useRef(null);
 
   // Données des événements enrichies
   const events = [
@@ -126,6 +155,157 @@ const PlanningGeneralUltraPremium = () => {
     teamUtilization: 87,
     weatherImpact: 12
   };
+
+  // Fonctions avancées pour les nouvelles fonctionnalités
+  const detectConflicts = useCallback(() => {
+    const detectedConflicts = [];
+    events.forEach((event, index) => {
+      events.slice(index + 1).forEach(otherEvent => {
+        // Vérifier les chevauchements temporels et de ressources
+        if (event.date.toDateString() === otherEvent.date.toDateString() &&
+            event.team.some(member => otherEvent.team.includes(member))) {
+          const eventStart = parseInt(event.time.replace(':', ''));
+          const eventEnd = parseInt(event.endTime.replace(':', ''));
+          const otherStart = parseInt(otherEvent.time.replace(':', ''));
+          const otherEnd = parseInt(otherEvent.endTime.replace(':', ''));
+          
+          if ((eventStart < otherEnd && eventEnd > otherStart)) {
+            detectedConflicts.push({
+              id: `conflict-${event.id}-${otherEvent.id}`,
+              event1: event,
+              event2: otherEvent,
+              type: 'overlap',
+              severity: 'high'
+            });
+          }
+        }
+      });
+    });
+    setConflicts(detectedConflicts);
+  }, [events]);
+
+  // Simulation WebSocket pour mises à jour temps réel
+  useEffect(() => {
+    if (!liveUpdates) return;
+    
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        // Simuler une mise à jour d'événement
+        console.log('Mise à jour temps réel reçue');
+        detectConflicts();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [liveUpdates, detectConflicts]);
+
+  // Détection initiale des conflits
+  useEffect(() => {
+    if (showConflictDetection) {
+      detectConflicts();
+    }
+  }, [showConflictDetection, detectConflicts]);
+
+  // Fonctions drag & drop
+  const handleDragStart = useCallback((event, eventData) => {
+    setDraggedEvent(eventData);
+    setIsDragging(true);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedEvent(null);
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((event, targetDate, targetHour) => {
+    event.preventDefault();
+    if (draggedEvent) {
+      // Logique de déplacement d'événement
+      console.log(`Déplacer ${draggedEvent.title} vers ${targetDate} à ${targetHour}h`);
+      // Ici vous pourriez mettre à jour l'état des événements
+      detectConflicts();
+    }
+  }, [draggedEvent, detectConflicts]);
+
+  // Génération iCal
+  const generateiCalData = useCallback(() => {
+    let icalData = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PousseApp//Planning//EN\n';
+    
+    events.forEach(event => {
+      const startDate = new Date(event.date);
+      const [hours, minutes] = event.time.split(':');
+      startDate.setHours(parseInt(hours), parseInt(minutes));
+      
+      const endDate = new Date(event.date);
+      const [endHours, endMinutes] = event.endTime.split(':');
+      endDate.setHours(parseInt(endHours), parseInt(endMinutes));
+      
+      icalData += 'BEGIN:VEVENT\n';
+      icalData += `UID:${event.id}@pousseapp.com\n`;
+      icalData += `DTSTART:${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
+      icalData += `DTEND:${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
+      icalData += `SUMMARY:${event.title}\n`;
+      icalData += `DESCRIPTION:Client: ${event.client}\\nTechnicien: ${event.technicien}\\nMontant: ${event.amount}€\n`;
+      icalData += `LOCATION:${event.location}\n`;
+      icalData += 'END:VEVENT\n';
+    });
+    
+    icalData += 'END:VCALENDAR';
+    return icalData;
+  }, [events]);
+
+  const exportiCal = useCallback(() => {
+    const icalData = generateiCalData();
+    const blob = new Blob([icalData], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'planning-pousse.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [generateiCalData]);
+
+  // Gestion des récurrences
+  const createRecurrentEvent = useCallback((baseEvent, recurrence) => {
+    const recurrentEvents = [];
+    const { frequency, interval, endDate, daysOfWeek } = recurrence;
+    
+    let currentDate = new Date(baseEvent.date);
+    const finalDate = new Date(endDate);
+    
+    while (currentDate <= finalDate) {
+      if (frequency === 'weekly' && daysOfWeek.includes(currentDate.getDay())) {
+        recurrentEvents.push({
+          ...baseEvent,
+          id: `${baseEvent.id}-${currentDate.getTime()}`,
+          date: new Date(currentDate),
+          isRecurrent: true,
+          recurrenceId: baseEvent.id
+        });
+      }
+      
+      // Avancer selon la fréquence
+      switch (frequency) {
+        case 'daily':
+          currentDate.setDate(currentDate.getDate() + interval);
+          break;
+        case 'weekly':
+          currentDate.setDate(currentDate.getDate() + 7 * interval);
+          break;
+        case 'monthly':
+          currentDate.setMonth(currentDate.getMonth() + interval);
+          break;
+        default:
+          return recurrentEvents;
+      }
+    }
+    
+    return recurrentEvents;
+  }, []);
 
   const getEventColor = (type) => {
     switch(type) {
@@ -250,7 +430,7 @@ const PlanningGeneralUltraPremium = () => {
         </div>
       </motion.div>
 
-      {/* Filtres et Vue */}
+      {/* Barre d'outils Ultra Premium avec nouvelles fonctionnalités */}
       <motion.div 
         className="mb-6 bg-white/90 backdrop-blur-lg rounded-xl shadow-lg p-4"
         initial={{ opacity: 0, y: 20 }}
@@ -258,6 +438,7 @@ const PlanningGeneralUltraPremium = () => {
         transition={{ delay: 0.1 }}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Filtres */}
           <div className="flex items-center space-x-2">
             {['all', 'urgent', 'installation', 'maintenance', 'creation'].map((type) => (
               <button
@@ -274,6 +455,7 @@ const PlanningGeneralUltraPremium = () => {
             ))}
           </div>
 
+          {/* Recherche et outils avancés */}
           <div className="flex items-center space-x-4">
             <div className="relative">
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -284,6 +466,75 @@ const PlanningGeneralUltraPremium = () => {
               />
             </div>
 
+            {/* Nouvelles fonctionnalités */}
+            <div className="flex items-center space-x-2">
+              {/* Multi-ressources */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowMultiResourceView(!showMultiResourceView)}
+                className={`p-2 rounded-lg transition-all duration-300 ${
+                  showMultiResourceView 
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Vue multi-ressources"
+              >
+                <UserGroupIcon className="w-5 h-5" />
+              </motion.button>
+
+              {/* Détection de conflits */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowConflictDetection(!showConflictDetection)}
+                className={`p-2 rounded-lg transition-all duration-300 ${
+                  showConflictDetection
+                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Détection de conflits"
+              >
+                <ExclamationTriangleIcon className="w-5 h-5" />
+                {conflicts.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {conflicts.length}
+                  </span>
+                )}
+              </motion.button>
+
+              {/* Import/Export iCal */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowiCalModal(true)}
+                className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all duration-300"
+                title="Import/Export iCal"
+              >
+                <ShareIcon className="w-5 h-5" />
+              </motion.button>
+
+              {/* Récurrences */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowRecurrenceModal(true)}
+                className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all duration-300"
+                title="Gestion des récurrences"
+              >
+                <ArrowPathIcon className="w-5 h-5" />
+              </motion.button>
+
+              {/* Status websocket */}
+              <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
+                websocketStatus === 'connected' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${websocketStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span>Live</span>
+              </div>
+            </div>
+
+            {/* Sélecteur de vue */}
             <div className="flex items-center bg-gray-100 rounded-lg p-1">
               {['month', 'week', 'day'].map((mode) => (
                 <button
@@ -299,6 +550,33 @@ const PlanningGeneralUltraPremium = () => {
             </div>
           </div>
         </div>
+
+        {/* Alertes de conflits */}
+        <AnimatePresence>
+          {conflicts.length > 0 && showConflictDetection && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 p-3 bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 rounded-lg"
+            >
+              <div className="flex items-center space-x-2 mb-2">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
+                <span className="font-semibold text-red-700">{conflicts.length} conflit(s) détecté(s)</span>
+              </div>
+              <div className="space-y-1">
+                {conflicts.slice(0, 3).map(conflict => (
+                  <div key={conflict.id} className="text-sm text-red-600">
+                    • {conflict.event1.title} et {conflict.event2.title} - {conflict.event1.date.toLocaleDateString()}
+                  </div>
+                ))}
+                {conflicts.length > 3 && (
+                  <div className="text-sm text-red-500">... et {conflicts.length - 3} autre(s)</div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -348,11 +626,12 @@ const PlanningGeneralUltraPremium = () => {
                   
                   return (
                     <motion.div
-                      key={index}
+                      key={day ? day.toISOString() : `empty-${index}`}
                       className={`min-h-[120px] p-2 rounded-lg border-2 ${
                         day ? 'bg-white hover:shadow-lg cursor-pointer' : 'bg-gray-50'
                       } ${isToday ? 'border-purple-500 bg-purple-50' : 'border-gray-200'}`}
                       whileHover={day ? { scale: 1.02 } : {}}
+                      transition={{ duration: 0.2 }}
                     >
                       {day && (
                         <>
@@ -363,15 +642,27 @@ const PlanningGeneralUltraPremium = () => {
                             {dayEvents.slice(0, 2).map((event) => (
                               <motion.div
                                 key={event.id}
-                                className={`p-1 rounded text-xs text-white bg-gradient-to-r ${getEventColor(event.type)} cursor-pointer`}
+                                className={`p-1 rounded text-xs text-white bg-gradient-to-r ${getEventColor(event.type)} cursor-pointer select-none`}
                                 onClick={() => setSelectedEvent(event)}
                                 whileHover={{ scale: 1.05 }}
+                                whileDrag={{ scale: 1.1, zIndex: 1000 }}
+                                drag={true}
+                                dragConstraints={calendarRef}
+                                onDragStart={(e) => handleDragStart(e, event)}
+                                onDragEnd={handleDragEnd}
+                                dragElastic={0.2}
+                                dragMomentum={false}
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="truncate font-medium">{event.time}</span>
                                   {getPriorityIcon(event.priority)}
                                 </div>
                                 <div className="truncate">{event.title}</div>
+                                {showMultiResourceView && (
+                                  <div className="text-xs opacity-80 truncate">
+                                    👥 {event.team.slice(0, 2).join(', ')}
+                                  </div>
+                                )}
                               </motion.div>
                             ))}
                             {dayEvents.length > 2 && (
@@ -570,6 +861,180 @@ const PlanningGeneralUltraPremium = () => {
                   </button>
                   <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300">
                     <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal iCal Import/Export */}
+      <AnimatePresence>
+        {showiCalModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowiCalModal(false)}
+          >
+            <motion.div
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+                <h3 className="text-xl font-bold flex items-center">
+                  <ShareIcon className="w-6 h-6 mr-2" />
+                  Import/Export iCal
+                </h3>
+                <p className="opacity-90 text-sm mt-1">Synchronisation avec calendriers externes</p>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={exportiCal}
+                    className="flex flex-col items-center justify-center p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+                  >
+                    <ArrowDownTrayIcon className="w-8 h-8 mb-2" />
+                    <span className="font-semibold">Exporter</span>
+                    <span className="text-xs opacity-80">Télécharger .ics</span>
+                  </button>
+                  
+                  <label className="flex flex-col items-center justify-center p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 cursor-pointer">
+                    <ArrowUpTrayIcon className="w-8 h-8 mb-2" />
+                    <span className="font-semibold">Importer</span>
+                    <span className="text-xs opacity-80">Fichier .ics</span>
+                    <input type="file" accept=".ics" className="hidden" />
+                  </label>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">Synchronisation automatique</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">G</div>
+                      <div className="flex-1">
+                        <div className="font-medium">Google Calendar</div>
+                        <div className="text-xs text-gray-500">Synchronisation bidirectionnelle</div>
+                      </div>
+                      <button className="px-3 py-1 bg-blue-500 text-white rounded-full text-xs">Connecter</button>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">O</div>
+                      <div className="flex-1">
+                        <div className="font-medium">Outlook</div>
+                        <div className="text-xs text-gray-500">Import/export manuel</div>
+                      </div>
+                      <button className="px-3 py-1 bg-gray-300 text-gray-700 rounded-full text-xs">Bientôt</button>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => setShowiCalModal(false)}
+                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                >
+                  Fermer
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Récurrences */}
+      <AnimatePresence>
+        {showRecurrenceModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowRecurrenceModal(false)}
+          >
+            <motion.div
+              className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
+                <h3 className="text-xl font-bold flex items-center">
+                  <ArrowPathIcon className="w-6 h-6 mr-2" />
+                  Gestion des Récurrences
+                </h3>
+                <p className="opacity-90 text-sm mt-1">Créer des événements répétitifs intelligents</p>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Fréquence</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                      <option value="daily">Quotidien</option>
+                      <option value="weekly">Hebdomadaire</option>
+                      <option value="monthly">Mensuel</option>
+                      <option value="yearly">Annuel</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Intervalle</label>
+                    <div className="flex items-center space-x-2">
+                      <input type="number" min="1" max="30" defaultValue="1" className="w-16 px-2 py-2 border border-gray-300 rounded-lg" />
+                      <span className="text-sm text-gray-600">semaine(s)</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Jours de la semaine</label>
+                    <div className="flex space-x-2">
+                      {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
+                        <button
+                          key={index}
+                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-purple-500 hover:text-white transition-colors text-sm font-medium"
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Jusqu'au</label>
+                    <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+                  </div>
+
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <LightBulbIcon className="w-5 h-5 text-purple-500" />
+                      <span className="font-medium text-purple-800">IA Suggérée</span>
+                    </div>
+                    <div className="text-sm text-purple-700">
+                      <p>• Entretiens: tous les 15 jours</p>
+                      <p>• Élagages: selon saison</p>
+                      <p>• Diagnostics: trimestriels</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                    <CheckCircleIcon className="w-5 h-5 inline mr-2" />
+                    Créer Récurrence
+                  </button>
+                  <button 
+                    onClick={() => setShowRecurrenceModal(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                  >
+                    Annuler
                   </button>
                 </div>
               </div>

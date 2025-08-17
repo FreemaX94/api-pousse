@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CalendarDaysIcon,
   ClockIcon,
   UserGroupIcon,
   MapPinIcon,
+  TruckIcon,
+  WrenchScrewdriverIcon,
   CurrencyEuroIcon,
   ChartBarIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
+  PlusIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   BellAlertIcon,
@@ -17,390 +20,401 @@ import {
   BoltIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  TruckIcon,
-  WrenchScrewdriverIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  SunIcon,
-  CloudIcon,
   ArrowPathIcon,
-  PlusIcon,
+  DocumentTextIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
-  DocumentTextIcon,
-  PhoneIcon,
-  VideoCameraIcon,
-  GlobeAltIcon,
-  Battery100Icon,
-  SignalIcon,
-  RocketLaunchIcon
+  ShareIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
+  RocketLaunchIcon,
+  CommandLineIcon,
+  CpuChipIcon,
+  BeakerIcon,
+  TrophyIcon,
+  StarIcon,
+  HeartIcon,
+  CloudIcon,
+  SunIcon,
+  BookmarkIcon,
+  FolderIcon,
+  DocumentDuplicateIcon,
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 import { Line, Bar, Doughnut, Radar } from 'react-chartjs-2';
 
 const SemaineUltraPremium = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [viewMode, setViewMode] = useState('grid');
-  const [filterTeam, setFilterTeam] = useState('all');
-  const [showTaskDetail, setShowTaskDetail] = useState(null);
-  const [liveUpdates, setLiveUpdates] = useState(true);
+  const [selectedTeam, setSelectedTeam] = useState('all');
+  const [viewMode, setViewMode] = useState('team');
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [draggedTask, setDraggedTask] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [workloadAnalysis, setWorkloadAnalysis] = useState(true);
 
-  // Animation des valeurs
-  useEffect(() => {
-    if (liveUpdates) {
-      const interval = setInterval(() => {
-        // Simulation de mises à jour en temps réel
-      }, 5000);
-      return () => clearInterval(interval);
+  // Équipes et membres
+  const teams = {
+    elagage: {
+      name: 'Équipe Élagage',
+      color: 'from-red-500 to-orange-500',
+      members: ['Marc L.', 'Paul M.'],
+      skills: ['Élagage', 'Abattage', 'Taille'],
+      capacity: 16, // heures/jour
+      utilization: 87
+    },
+    creation: {
+      name: 'Équipe Création',
+      color: 'from-purple-500 to-pink-500',
+      members: ['Luc B.', 'Jean D.', 'Pierre M.'],
+      skills: ['Aménagement', 'Plantation', 'Design'],
+      capacity: 24,
+      utilization: 92
+    },
+    maintenance: {
+      name: 'Équipe Entretien',
+      color: 'from-green-500 to-emerald-500',
+      members: ['Sophie T.', 'Alex R.'],
+      skills: ['Entretien', 'Tonte', 'Arrosage'],
+      capacity: 16,
+      utilization: 78
+    },
+    technique: {
+      name: 'Équipe Technique',
+      color: 'from-blue-500 to-indigo-500',
+      members: ['Thomas K.', 'Marine F.'],
+      skills: ['Installation', 'Réparation', 'Diagnostic'],
+      capacity: 16,
+      utilization: 85
     }
-  }, [liveUpdates]);
-
-  // Jours de la semaine
-  const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-  
-  // Planning hebdomadaire enrichi
-  const weekPlanning = {
-    lundi: [
-      {
-        id: 1,
-        time: '08:00-10:00',
-        title: 'Élagage Parc Central',
-        client: 'Mairie de Lyon',
-        team: ['Marc L.', 'Paul M.'],
-        priority: 'high',
-        status: 'confirmed',
-        revenue: 850,
-        progress: 100,
-        type: 'elagage',
-        weather: 'sunny',
-        equipment: ['Nacelle', 'Tronçonneuse'],
-        risk: 'medium'
-      },
-      {
-        id: 2,
-        time: '10:30-12:30',
-        title: 'Installation Arrosage',
-        client: 'Villa Horizon',
-        team: ['Luc B.'],
-        priority: 'normal',
-        status: 'confirmed',
-        revenue: 420,
-        progress: 100,
-        type: 'installation',
-        weather: 'sunny',
-        equipment: ['Kit arrosage'],
-        risk: 'low'
-      },
-      {
-        id: 3,
-        time: '14:00-17:00',
-        title: 'Création Jardin Zen',
-        client: 'Entreprise Tech',
-        team: ['Marc L.', 'Paul M.', 'Jean D.'],
-        priority: 'high',
-        status: 'in_progress',
-        revenue: 1200,
-        progress: 45,
-        type: 'creation',
-        weather: 'cloudy',
-        equipment: ['Matériaux', 'Outillage complet'],
-        risk: 'low'
-      }
-    ],
-    mardi: [
-      {
-        id: 4,
-        time: '09:00-11:00',
-        title: 'Entretien Résidence',
-        client: 'Résidence Harmony',
-        team: ['Paul M.'],
-        priority: 'normal',
-        status: 'confirmed',
-        revenue: 280,
-        progress: 0,
-        type: 'entretien',
-        weather: 'rainy',
-        equipment: ['Tondeuse', 'Taille-haie'],
-        risk: 'low'
-      },
-      {
-        id: 5,
-        time: '14:00-16:00',
-        title: 'Diagnostic Sanitaire',
-        client: 'Jardin Botanique',
-        team: ['Marc L.'],
-        priority: 'urgent',
-        status: 'pending',
-        revenue: 180,
-        progress: 0,
-        type: 'diagnostic',
-        weather: 'cloudy',
-        equipment: ['Kit diagnostic'],
-        risk: 'high'
-      }
-    ],
-    mercredi: [
-      {
-        id: 6,
-        time: '08:00-12:00',
-        title: 'Abattage Urgent',
-        client: 'Particulier',
-        team: ['Marc L.', 'Paul M.', 'Luc B.'],
-        priority: 'urgent',
-        status: 'confirmed',
-        revenue: 1500,
-        progress: 0,
-        type: 'abattage',
-        weather: 'sunny',
-        equipment: ['Nacelle', 'Tronçonneuse', 'Broyeur'],
-        risk: 'high'
-      },
-      {
-        id: 7,
-        time: '14:00-17:00',
-        title: 'Plantation Haie',
-        client: 'École Primaire',
-        team: ['Jean D.', 'Pierre M.'],
-        priority: 'normal',
-        status: 'confirmed',
-        revenue: 650,
-        progress: 0,
-        type: 'plantation',
-        weather: 'sunny',
-        equipment: ['Plants', 'Terreau'],
-        risk: 'low'
-      }
-    ],
-    jeudi: [
-      {
-        id: 8,
-        time: '09:00-12:00',
-        title: 'Taille Formation',
-        client: 'Château Versant',
-        team: ['Marc L.'],
-        priority: 'high',
-        status: 'confirmed',
-        revenue: 450,
-        progress: 0,
-        type: 'taille',
-        weather: 'cloudy',
-        equipment: ['Sécateur', 'Échelle'],
-        risk: 'medium'
-      }
-    ],
-    vendredi: [
-      {
-        id: 9,
-        time: '08:00-10:00',
-        title: 'Traitement Bio',
-        client: 'Verger Municipal',
-        team: ['Paul M.', 'Luc B.'],
-        priority: 'normal',
-        status: 'confirmed',
-        revenue: 320,
-        progress: 0,
-        type: 'traitement',
-        weather: 'sunny',
-        equipment: ['Pulvérisateur', 'Produits bio'],
-        risk: 'medium'
-      },
-      {
-        id: 10,
-        time: '11:00-17:00',
-        title: 'Aménagement Paysager',
-        client: 'Hotel Luxury',
-        team: ['Équipe complète'],
-        priority: 'high',
-        status: 'confirmed',
-        revenue: 2200,
-        progress: 0,
-        type: 'amenagement',
-        weather: 'sunny',
-        equipment: ['Tout équipement'],
-        risk: 'medium'
-      }
-    ],
-    samedi: [
-      {
-        id: 11,
-        time: '09:00-12:00',
-        title: 'Entretien Particuliers',
-        client: 'Divers',
-        team: ['Jean D.'],
-        priority: 'normal',
-        status: 'confirmed',
-        revenue: 450,
-        progress: 0,
-        type: 'entretien',
-        weather: 'sunny',
-        equipment: ['Matériel standard'],
-        risk: 'low'
-      }
-    ],
-    dimanche: []
   };
 
-  // Stats hebdomadaires
+  // Templates de semaine prédéfinis
+  const weekTemplates = [
+    {
+      id: 1,
+      name: 'Semaine Standard Été',
+      description: 'Répartition classique période estivale',
+      icon: '☀️',
+      usage: 42,
+      tasks: {
+        monday: [
+          { team: 'elagage', hours: 6, type: 'Élagage préventif' },
+          { team: 'maintenance', hours: 8, type: 'Entretien jardins' }
+        ],
+        tuesday: [
+          { team: 'creation', hours: 8, type: 'Aménagement paysager' },
+          { team: 'technique', hours: 6, type: 'Installation arrosage' }
+        ]
+      }
+    },
+    {
+      id: 2,
+      name: 'Semaine Urgence',
+      description: 'Optimisation pour interventions urgentes',
+      icon: '🚨',
+      usage: 18,
+      tasks: {
+        monday: [
+          { team: 'elagage', hours: 8, type: 'Interventions d\'urgence' },
+          { team: 'technique', hours: 8, type: 'Dépannage' }
+        ]
+      }
+    },
+    {
+      id: 3,
+      name: 'Semaine Création',
+      description: 'Focus sur projets d\'aménagement',
+      icon: '🌳',
+      usage: 23,
+      tasks: {
+        monday: [
+          { team: 'creation', hours: 8, type: 'Conception' },
+          { team: 'creation', hours: 8, type: 'Plantation' }
+        ]
+      }
+    }
+  ];
+
+  // Données de la semaine avec répartition par équipe
+  const weekData = [
+    {
+      date: new Date(2024, 7, 12), // Lundi
+      day: 'Lundi',
+      teams: {
+        elagage: [
+          { id: 1, time: '08:00-12:00', task: 'Élagage Parc Municipal', client: 'Mairie Lyon', priority: 'high', amount: 850 },
+          { id: 2, time: '14:00-17:00', task: 'Abattage Chêne Malade', client: 'Résidence Harmony', priority: 'high', amount: 450 }
+        ],
+        creation: [
+          { id: 3, time: '09:00-17:00', task: 'Création Jardin Japonais', client: 'Villa Moderne', priority: 'normal', amount: 2400 }
+        ],
+        maintenance: [
+          { id: 4, time: '08:00-12:00', task: 'Entretien Espaces Verts', client: 'Office HLM', priority: 'low', amount: 320 },
+          { id: 5, time: '14:00-16:00', task: 'Tonte Pelouses', client: 'Copropriété Soleil', priority: 'low', amount: 180 }
+        ],
+        technique: [
+          { id: 6, time: '10:00-15:00', task: 'Installation Système Arrosage', client: 'Jardin Botanique', priority: 'normal', amount: 680 }
+        ]
+      }
+    },
+    {
+      date: new Date(2024, 7, 13), // Mardi
+      day: 'Mardi',
+      teams: {
+        elagage: [
+          { id: 7, time: '08:00-11:00', task: 'Taille Haies Périmétriques', client: 'Entreprise TechCorp', priority: 'normal', amount: 280 }
+        ],
+        creation: [
+          { id: 8, time: '08:00-12:00', task: 'Plantation Massifs Saisonniers', client: 'Centre Commercial', priority: 'normal', amount: 1200 },
+          { id: 9, time: '14:00-18:00', task: 'Pose Éclairage Jardin', client: 'Villa Prestige', priority: 'high', amount: 950 }
+        ],
+        maintenance: [
+          { id: 10, time: '08:00-17:00', task: 'Maintenance Complète Parc', client: 'Château de Versant', priority: 'normal', amount: 750 }
+        ],
+        technique: [
+          { id: 11, time: '09:00-16:00', task: 'Diagnostic Phytosanitaire', client: 'Pépinière Locale', priority: 'high', amount: 420 }
+        ]
+      }
+    },
+    {
+      date: new Date(2024, 7, 14), // Mercredi
+      day: 'Mercredi',
+      teams: {
+        elagage: [
+          { id: 12, time: '08:00-16:00', task: 'Formation Sécurité EPI', client: 'Formation Interne', priority: 'high', amount: 0 }
+        ],
+        creation: [
+          { id: 13, time: '09:00-17:00', task: 'Aménagement Terrasse', client: 'Restaurant Le Jardin', priority: 'normal', amount: 1800 }
+        ],
+        maintenance: [
+          { id: 14, time: '08:00-12:00', task: 'Entretien Équipements', client: 'Maintenance Interne', priority: 'normal', amount: 0 },
+          { id: 15, time: '14:00-17:00', task: 'Traitement Anti-Parasites', client: 'Résidence Les Tilleuls', priority: 'high', amount: 380 }
+        ],
+        technique: [
+          { id: 16, time: '10:00-15:00', task: 'Réparation Système Irrigation', client: 'Golf Municipal', priority: 'high', amount: 650 }
+        ]
+      }
+    }
+  ];
+
+  // Calcul de la charge de travail par équipe
+  const calculateWorkload = useCallback((teamId, dayData) => {
+    const teamTasks = dayData.teams[teamId] || [];
+    const totalHours = teamTasks.reduce((sum, task) => {
+      const [start, end] = task.time.split('-');
+      const startTime = parseInt(start.replace(':', ''));
+      const endTime = parseInt(end.replace(':', ''));
+      const duration = (endTime - startTime) / 100;
+      return sum + duration;
+    }, 0);
+    
+    const capacity = teams[teamId]?.capacity || 8;
+    const utilization = Math.round((totalHours / capacity) * 100);
+    
+    return {
+      totalHours,
+      capacity,
+      utilization,
+      status: utilization > 100 ? 'overloaded' : utilization > 80 ? 'high' : utilization > 50 ? 'normal' : 'low'
+    };
+  }, []);
+
+  // Duplication de semaine intelligente
+  const duplicateWeek = useCallback((sourceWeek, targetWeek, options = {}) => {
+    const { adjustCapacity = true, skipWeekends = true, teamFilter = 'all' } = options;
+    
+    console.log(`Duplication semaine du ${sourceWeek.toLocaleDateString()} vers ${targetWeek.toLocaleDateString()}`);
+    
+    if (adjustCapacity) {
+      console.log('Ajustement automatique des capacités');
+    }
+    
+    return true;
+  }, []);
+
+  // Statistiques de la semaine
   const weekStats = {
-    totalRevenue: 9280,
-    totalInterventions: 11,
-    avgSatisfaction: 4.8,
-    teamUtilization: 87,
-    completionRate: 95,
-    weatherImpact: 15,
-    efficiency: 92,
-    newClients: 3
+    totalRevenue: weekData.reduce((sum, day) => 
+      sum + Object.values(day.teams).flat().reduce((daySum, task) => daySum + task.amount, 0), 0
+    ),
+    totalTasks: weekData.reduce((sum, day) => 
+      sum + Object.values(day.teams).flat().length, 0
+    ),
+    averageUtilization: Object.keys(teams).reduce((sum, teamId) => 
+      sum + teams[teamId].utilization, 0
+    ) / Object.keys(teams).length,
+    criticalTasks: weekData.reduce((sum, day) => 
+      sum + Object.values(day.teams).flat().filter(task => task.priority === 'high').length, 0
+    )
   };
 
-  // Performance par jour
-  const dailyPerformance = {
-    labels: weekDays,
+  // Données pour graphiques
+  const teamUtilizationData = {
+    labels: Object.values(teams).map(team => team.name),
     datasets: [{
-      label: 'Revenus',
-      data: [2490, 460, 2150, 450, 2520, 450, 0],
+      label: 'Utilisation (%)',
+      data: Object.values(teams).map(team => team.utilization),
+      backgroundColor: Object.values(teams).map(team => 
+        `rgba(${team.color.includes('red') ? '239, 68, 68' : 
+               team.color.includes('purple') ? '147, 51, 234' : 
+               team.color.includes('green') ? '34, 197, 94' : '59, 130, 246'}, 0.8)`
+      ),
+      borderWidth: 2,
+      borderRadius: 6
+    }]
+  };
+
+  const dailyRevenueData = {
+    labels: weekData.map(day => day.day),
+    datasets: [{
+      label: 'Revenus (€)',
+      data: weekData.map(day => 
+        Object.values(day.teams).flat().reduce((sum, task) => sum + task.amount, 0)
+      ),
       borderColor: 'rgb(147, 51, 234)',
       backgroundColor: 'rgba(147, 51, 234, 0.1)',
       tension: 0.4,
       fill: true
-    }, {
-      label: 'Heures travaillées',
-      data: [9, 4, 9, 3, 10, 3, 0],
-      borderColor: 'rgb(59, 130, 246)',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      tension: 0.4,
-      fill: true,
-      yAxisID: 'y1'
     }]
   };
 
-  const getTypeColor = (type) => {
-    const colors = {
-      elagage: 'from-red-500 to-orange-500',
-      installation: 'from-blue-500 to-indigo-500',
-      creation: 'from-purple-500 to-pink-500',
-      entretien: 'from-green-500 to-emerald-500',
-      diagnostic: 'from-yellow-500 to-amber-500',
-      abattage: 'from-red-600 to-red-800',
-      plantation: 'from-green-600 to-teal-600',
-      taille: 'from-indigo-500 to-purple-500',
-      traitement: 'from-cyan-500 to-blue-500',
-      amenagement: 'from-pink-500 to-rose-500'
-    };
-    return colors[type] || 'from-gray-500 to-gray-600';
+  const getWorkloadColor = (status) => {
+    switch(status) {
+      case 'overloaded': return 'bg-red-500 text-white';
+      case 'high': return 'bg-orange-500 text-white';
+      case 'normal': return 'bg-green-500 text-white';
+      case 'low': return 'bg-gray-400 text-white';
+      default: return 'bg-gray-300';
+    }
   };
 
-  const getWeatherIcon = (weather) => {
-    switch(weather) {
-      case 'sunny': return <SunIcon className="w-4 h-4 text-yellow-500" />;
-      case 'cloudy': return <CloudIcon className="w-4 h-4 text-gray-500" />;
-      case 'rainy': return '🌧️';
+  const getPriorityIcon = (priority) => {
+    switch(priority) {
+      case 'high': return <FireIcon className="w-4 h-4 text-red-500 animate-pulse" />;
+      case 'normal': return <BoltIcon className="w-4 h-4 text-yellow-500" />;
+      case 'low': return <SparklesIcon className="w-4 h-4 text-green-500" />;
       default: return null;
     }
   };
 
-  const getRiskColor = (risk) => {
-    switch(risk) {
-      case 'high': return 'text-red-500 bg-red-50';
-      case 'medium': return 'text-yellow-500 bg-yellow-50';
-      case 'low': return 'text-green-500 bg-green-50';
-      default: return 'text-gray-500 bg-gray-50';
-    }
-  };
-
-  const getTasksForDay = (day) => {
-    return weekPlanning[day.toLowerCase()] || [];
-  };
-
   return (
     <motion.div 
-      className="p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen"
+      className="p-6 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
       {/* Header Ultra Premium */}
       <motion.div 
-        className="mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-2xl"
+        className="mb-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl p-6 text-white shadow-2xl overflow-hidden relative"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 flex items-center">
-              <CalendarDaysIcon className="w-8 h-8 mr-3" />
-              Planning Hebdomadaire Intelligent
-            </h1>
-            <p className="text-purple-100">Vue d'ensemble optimisée avec IA prédictive</p>
-            
-            {/* Live Status */}
-            <div className="flex items-center space-x-6 mt-4">
-              <div className="flex items-center space-x-2">
-                <Battery100Icon className="w-5 h-5" />
-                <span className="text-sm">Charge: {weekStats.teamUtilization}%</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <SignalIcon className="w-5 h-5" />
-                <span className="text-sm">Performance: {weekStats.efficiency}%</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RocketLaunchIcon className="w-5 h-5" />
-                <span className="text-sm">Productivité: Excellente</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-sm">Live</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <div className="text-4xl font-bold mb-1">{weekStats.totalRevenue.toLocaleString()}€</div>
-            <div className="text-purple-100">Revenus prévus</div>
-            <div className="flex items-center justify-end mt-2 space-x-2">
-              <ArrowTrendingUpIcon className="w-5 h-5 text-green-300" />
-              <span className="text-green-300 font-semibold">+18%</span>
-            </div>
-          </div>
+        {/* Effet de background animé */}
+        <div className="absolute inset-0">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-white rounded-full opacity-30"
+              initial={{
+                x: Math.random() * 1000,
+                y: Math.random() * 200,
+              }}
+              animate={{
+                x: Math.random() * 1000,
+                y: Math.random() * 200,
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+          ))}
         </div>
 
-        {/* KPIs Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mt-6">
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">{weekStats.totalInterventions}</div>
-            <div className="text-xs text-purple-100">Interventions</div>
+        <div className="relative z-10">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold mb-2 flex items-center">
+                <UserGroupIcon className="w-8 h-8 mr-3" />
+                Planning Équipes Intelligence
+              </h1>
+              <p className="text-teal-100">Gestion collaborative avec IA prédictive</p>
+              
+              {/* Status IA */}
+              <div className="flex items-center space-x-6 mt-4">
+                <div className="flex items-center space-x-2">
+                  <CpuChipIcon className="w-5 h-5 text-green-300" />
+                  <span className="text-sm">IA Workload: Active</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RocketLaunchIcon className="w-5 h-5" />
+                  <span className="text-sm">Optimisation: {Math.round(weekStats.averageUtilization)}%</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <BeakerIcon className="w-5 h-5 text-yellow-300" />
+                  <span className="text-sm">Prédictions: ON</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-4xl font-bold mb-1">
+                {weekStats.totalRevenue.toLocaleString()}€
+              </div>
+              <div className="text-teal-100">Semaine prévue</div>
+              <div className="flex items-center justify-end mt-2 space-x-2">
+                <TrophyIcon className="w-5 h-5 text-yellow-300" />
+                <span className="text-yellow-300 font-semibold">+15% vs N-1</span>
+              </div>
+            </div>
           </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">⭐ {weekStats.avgSatisfaction}</div>
-            <div className="text-xs text-purple-100">Satisfaction</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">{weekStats.completionRate}%</div>
-            <div className="text-xs text-purple-100">Complétion</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">38h</div>
-            <div className="text-xs text-purple-100">Heures prévues</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">5</div>
-            <div className="text-xs text-purple-100">Équipes actives</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">{weekStats.newClients}</div>
-            <div className="text-xs text-purple-100">Nouveaux clients</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">☔ {weekStats.weatherImpact}%</div>
-            <div className="text-xs text-purple-100">Impact météo</div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
-            <div className="text-2xl font-bold">{weekStats.efficiency}%</div>
-            <div className="text-xs text-purple-100">Efficacité</div>
+
+          {/* KPIs Semaine */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mt-6">
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">{weekStats.totalTasks}</div>
+              <div className="text-xs text-teal-100">Tâches planifiées</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">{Object.keys(teams).length}</div>
+              <div className="text-xs text-teal-100">Équipes actives</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">{Math.round(weekStats.averageUtilization)}%</div>
+              <div className="text-xs text-teal-100">Utilisation moy.</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">{weekStats.criticalTasks}</div>
+              <div className="text-xs text-teal-100">Tâches critiques</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">
+                {Object.values(teams).reduce((sum, team) => sum + team.members.length, 0)}
+              </div>
+              <div className="text-xs text-teal-100">Techniciens</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">
+                {Object.values(teams).reduce((sum, team) => sum + team.capacity, 0)}h
+              </div>
+              <div className="text-xs text-teal-100">Capacité totale</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">4.9⭐</div>
+              <div className="text-xs text-teal-100">Satisfaction</div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+              <div className="text-2xl font-bold">98%</div>
+              <div className="text-xs text-teal-100">Taux succès</div>
+            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Controls Bar */}
+      {/* Barre d'outils avancée */}
       <motion.div 
         className="mb-6 bg-white/90 backdrop-blur-lg rounded-xl shadow-lg p-4"
         initial={{ opacity: 0, y: 20 }}
@@ -409,184 +423,241 @@ const SemaineUltraPremium = () => {
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setCurrentWeek(new Date(currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000))}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronLeftIcon className="w-5 h-5" />
-            </button>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Semaine du {currentWeek.toLocaleDateString('fr-FR')}
-            </h2>
-            <button 
-              onClick={() => setCurrentWeek(new Date(currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000))}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <select 
-              value={filterTeam}
-              onChange={(e) => setFilterTeam(e.target.value)}
-              className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"
-            >
-              <option value="all">Toutes les équipes</option>
-              <option value="marc">Marc L.</option>
-              <option value="paul">Paul M.</option>
-              <option value="luc">Luc B.</option>
-              <option value="jean">Jean D.</option>
-            </select>
-
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-1 rounded ${viewMode === 'grid' ? 'bg-white shadow' : ''}`}
+            {/* Navigation semaine */}
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  const newWeek = new Date(currentWeek);
+                  newWeek.setDate(newWeek.getDate() - 7);
+                  setCurrentWeek(newWeek);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Grille
+                <ChevronLeftIcon className="w-5 h-5" />
               </button>
-              <button
-                onClick={() => setViewMode('timeline')}
-                className={`px-3 py-1 rounded ${viewMode === 'timeline' ? 'bg-white shadow' : ''}`}
+              
+              <div className="font-semibold text-gray-900 min-w-48 text-center">
+                Semaine du {currentWeek.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })}
+              </div>
+              
+              <button 
+                onClick={() => {
+                  const newWeek = new Date(currentWeek);
+                  newWeek.setDate(newWeek.getDate() + 7);
+                  setCurrentWeek(newWeek);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Timeline
+                <ChevronRightIcon className="w-5 h-5" />
               </button>
             </div>
 
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <ArrowPathIcon className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
-              <PlusIcon className="w-5 h-5 inline mr-1" />
-              Nouvelle tâche
-            </button>
+            {/* Filtre équipe */}
+            <select 
+              value={selectedTeam}
+              onChange={(e) => setSelectedTeam(e.target.value)}
+              className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
+            >
+              <option value="all">Toutes les équipes</option>
+              {Object.entries(teams).map(([key, team]) => (
+                <option key={key} value={key}>{team.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            {/* Templates et duplication */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowTemplateModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+            >
+              <BookmarkIcon className="w-5 h-5 inline mr-2" />
+              Templates
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowDuplicateModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+            >
+              <DocumentDuplicateIcon className="w-5 h-5 inline mr-2" />
+              Dupliquer
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setWorkloadAnalysis(!workloadAnalysis)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                workloadAnalysis 
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              <AdjustmentsHorizontalIcon className="w-5 h-5 inline mr-2" />
+              Analyse IA {workloadAnalysis ? 'ON' : 'OFF'}
+            </motion.button>
           </div>
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Planning Grid */}
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        {/* Planning principal */}
+        <div className="xl:col-span-3">
           <motion.div 
             className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Days Header */}
-            <div className="grid grid-cols-7 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              {weekDays.map((day, index) => (
-                <div 
-                  key={day}
-                  className="p-3 text-center border-r border-purple-400 last:border-r-0 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => setSelectedDay(day)}
-                >
-                  <div className="font-semibold">{day}</div>
-                  <div className="text-xs opacity-80">
-                    {getTasksForDay(day).length} tâches
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Tasks Grid */}
-            <div className="grid grid-cols-7 min-h-[600px]">
-              {weekDays.map((day, dayIndex) => {
-                const tasks = getTasksForDay(day);
-                return (
-                  <div 
-                    key={day}
-                    className="border-r border-gray-200 last:border-r-0 p-2 bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="space-y-2">
-                      {tasks.map((task, taskIndex) => (
-                        <motion.div
-                          key={task.id}
-                          className={`p-2 rounded-lg bg-gradient-to-r ${getTypeColor(task.type)} text-white text-xs cursor-pointer hover:shadow-lg transition-all duration-300`}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: dayIndex * 0.05 + taskIndex * 0.05 }}
-                          whileHover={{ scale: 1.05 }}
-                          onClick={() => setShowTaskDetail(task)}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-semibold">{task.time}</span>
-                            {getWeatherIcon(task.weather)}
-                          </div>
-                          <div className="font-medium truncate">{task.title}</div>
-                          <div className="truncate opacity-90">{task.client}</div>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="font-bold">{task.revenue}€</span>
-                            {task.priority === 'urgent' && (
-                              <ExclamationTriangleIcon className="w-4 h-4 animate-pulse" />
-                            )}
-                          </div>
-                          {task.progress > 0 && (
-                            <div className="mt-2 w-full bg-white/30 rounded-full h-1">
-                              <div 
-                                className="bg-white h-1 rounded-full"
-                                style={{ width: `${task.progress}%` }}
-                              />
-                            </div>
-                          )}
-                        </motion.div>
-                      ))}
+            {/* Header avec jours de la semaine */}
+            <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white">
+              <div className="grid grid-cols-8 gap-px">
+                <div className="p-4 font-semibold">Équipe</div>
+                {weekData.slice(0, 7).map((day, index) => (
+                  <div key={index} className="p-4 text-center">
+                    <div className="font-semibold">{day.day}</div>
+                    <div className="text-xs opacity-80">
+                      {day.date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Grille équipes x jours */}
+            <div className="p-4">
+              {Object.entries(teams).map(([teamId, team]) => {
+                if (selectedTeam !== 'all' && selectedTeam !== teamId) return null;
+                
+                return (
+                  <motion.div 
+                    key={teamId}
+                    className="border-b border-gray-200 last:border-b-0"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <div className="grid grid-cols-8 gap-px min-h-32">
+                      {/* En-tête équipe */}
+                      <div className="p-4 bg-gray-50 flex flex-col justify-center">
+                        <div className={`text-sm font-bold text-white px-3 py-1 rounded-full bg-gradient-to-r ${team.color} mb-2`}>
+                          {team.name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <UserGroupIcon className="w-3 h-3" />
+                            <span>{team.members.length} membres</span>
+                          </div>
+                          <div className="flex items-center space-x-1 mt-1">
+                            <ClockIcon className="w-3 h-3" />
+                            <span>{team.capacity}h/jour</span>
+                          </div>
+                          <div className={`text-xs px-2 py-1 rounded mt-2 ${getWorkloadColor(
+                            team.utilization > 100 ? 'overloaded' : 
+                            team.utilization > 80 ? 'high' : 
+                            team.utilization > 50 ? 'normal' : 'low'
+                          )}`}>
+                            {team.utilization}%
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Colonnes par jour */}
+                      {weekData.slice(0, 7).map((day, dayIndex) => {
+                        const dayTasks = day.teams[teamId] || [];
+                        const workload = calculateWorkload(teamId, day);
+                        
+                        return (
+                          <div 
+                            key={dayIndex}
+                            className={`p-2 min-h-32 border-l border-gray-100 hover:bg-gray-50 transition-colors ${
+                              workloadAnalysis && workload.status === 'overloaded' ? 'bg-red-50 border-red-200' : ''
+                            }`}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              // Logique drop ici
+                            }}
+                            onDragOver={(e) => e.preventDefault()}
+                          >
+                            {/* Indicateur de charge */}
+                            {workloadAnalysis && (
+                              <div className={`text-xs px-2 py-1 rounded mb-2 ${getWorkloadColor(workload.status)}`}>
+                                {workload.totalHours}h/{workload.capacity}h
+                              </div>
+                            )}
+                            
+                            <div className="space-y-1">
+                              {dayTasks.map((task) => (
+                                <motion.div
+                                  key={task.id}
+                                  className={`p-2 rounded text-xs cursor-pointer bg-gradient-to-r ${team.color} text-white shadow-sm hover:shadow-md transition-all`}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileDrag={{ scale: 1.05, zIndex: 1000 }}
+                                  drag
+                                  dragMomentum={false}
+                                  onDragStart={() => setDraggedTask(task)}
+                                  onDragEnd={() => setDraggedTask(null)}
+                                >
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="font-medium truncate">{task.time}</span>
+                                    {getPriorityIcon(task.priority)}
+                                  </div>
+                                  <div className="font-semibold truncate">{task.task}</div>
+                                  <div className="opacity-90 truncate">{task.client}</div>
+                                  {task.amount > 0 && (
+                                    <div className="font-bold mt-1">{task.amount}€</div>
+                                  )}
+                                </motion.div>
+                              ))}
+                              
+                              {dayTasks.length === 0 && (
+                                <div className="text-xs text-gray-400 italic p-2">
+                                  Aucune tâche
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
                 );
               })}
             </div>
           </motion.div>
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar Analytics */}
         <div className="space-y-6">
-          {/* Performance Chart */}
+          {/* Utilisation équipes */}
           <motion.div 
             className="bg-white/90 backdrop-blur-lg rounded-xl shadow-lg p-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Semaine</h3>
-            <div className="h-64">
-              <Line
-                data={dailyPerformance}
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Utilisation Équipes</h3>
+            <div className="h-48">
+              <Bar
+                data={teamUtilizationData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
-                    legend: {
-                      position: 'bottom',
-                      labels: {
-                        padding: 10,
-                        usePointStyle: true,
-                        font: { size: 11 }
-                      }
-                    }
+                    legend: { display: false }
                   },
                   scales: {
                     y: {
-                      type: 'linear',
-                      display: true,
-                      position: 'left',
-                      title: {
-                        display: true,
-                        text: 'Revenus (€)'
-                      }
-                    },
-                    y1: {
-                      type: 'linear',
-                      display: true,
-                      position: 'right',
-                      title: {
-                        display: true,
-                        text: 'Heures'
-                      },
-                      grid: {
-                        drawOnChartArea: false
+                      beginAtZero: true,
+                      max: 120,
+                      ticks: {
+                        callback: function(value) {
+                          return value + '%';
+                        }
                       }
                     }
                   }
@@ -595,73 +666,85 @@ const SemaineUltraPremium = () => {
             </div>
           </motion.div>
 
-          {/* Team Status */}
+          {/* Revenus par jour */}
           <motion.div 
             className="bg-white/90 backdrop-blur-lg rounded-xl shadow-lg p-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <UserGroupIcon className="w-5 h-5 mr-2 text-purple-500" />
-              État des Équipes
-            </h3>
-            <div className="space-y-3">
-              {['Marc L.', 'Paul M.', 'Luc B.', 'Jean D.'].map((member, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                      {member.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{member}</div>
-                      <div className="text-xs text-gray-500">En intervention</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-xs text-gray-600">Actif</span>
-                  </div>
-                </div>
-              ))}
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenus par Jour</h3>
+            <div className="h-40">
+              <Line
+                data={dailyRevenueData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        callback: function(value) {
+                          return value + '€';
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           </motion.div>
 
-          {/* Quick Actions */}
+          {/* IA Insights */}
           <motion.div 
-            className="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-xl shadow-lg p-6"
+            className="bg-gradient-to-br from-emerald-500 to-cyan-500 text-white rounded-xl shadow-lg p-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <h3 className="text-lg font-semibold mb-4">Actions Rapides</h3>
-            <div className="space-y-2">
-              <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-lg rounded-lg font-medium hover:bg-white/30 transition-all duration-300">
-                <DocumentTextIcon className="w-5 h-5 inline mr-2" />
-                Rapport hebdo
-              </button>
-              <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-lg rounded-lg font-medium hover:bg-white/30 transition-all duration-300">
-                <PhoneIcon className="w-5 h-5 inline mr-2" />
-                Brief équipe
-              </button>
-              <button className="w-full px-4 py-3 bg-white/20 backdrop-blur-lg rounded-lg font-medium hover:bg-white/30 transition-all duration-300">
-                <VideoCameraIcon className="w-5 h-5 inline mr-2" />
-                Visio planning
-              </button>
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <BeakerIcon className="w-5 h-5 mr-2" />
+              IA Insights Équipes
+            </h3>
+            <div className="space-y-3">
+              <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+                <div className="flex items-center space-x-2 mb-1">
+                  <LightBulbIcon className="w-4 h-4 text-yellow-300" />
+                  <span className="text-sm font-semibold">Optimisation</span>
+                </div>
+                <p className="text-xs opacity-90">Répartir 2h de l'équipe Création vers Maintenance</p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+                <div className="flex items-center space-x-2 mb-1">
+                  <ExclamationTriangleIcon className="w-4 h-4 text-orange-300" />
+                  <span className="text-sm font-semibold">Alerte</span>
+                </div>
+                <p className="text-xs opacity-90">Équipe Élagage surchargée mercredi</p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-lg rounded-lg p-3">
+                <div className="flex items-center space-x-2 mb-1">
+                  <TrophyIcon className="w-4 h-4 text-yellow-300" />
+                  <span className="text-sm font-semibold">Performance</span>
+                </div>
+                <p className="text-xs opacity-90">Équipe Technique +12% efficacité</p>
+              </div>
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Task Detail Modal */}
+      {/* Modal Templates */}
       <AnimatePresence>
-        {showTaskDetail && (
+        {showTemplateModal && (
           <motion.div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowTaskDetail(null)}
+            onClick={() => setShowTemplateModal(false)}
           >
             <motion.div
               className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden"
@@ -670,67 +753,168 @@ const SemaineUltraPremium = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`bg-gradient-to-r ${getTypeColor(showTaskDetail.type)} p-6 text-white`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-2xl font-bold">{showTaskDetail.title}</h3>
-                    <p className="opacity-90 mt-1">{showTaskDetail.client}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold">{showTaskDetail.revenue}€</div>
-                    <div className={`mt-2 px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(showTaskDetail.risk)}`}>
-                      Risque: {showTaskDetail.risk}
-                    </div>
-                  </div>
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+                <h3 className="text-xl font-bold flex items-center">
+                  <BookmarkIcon className="w-6 h-6 mr-2" />
+                  Templates de Semaine
+                </h3>
+                <p className="opacity-90 text-sm mt-1">Modèles prédéfinis pour optimiser la planification</p>
+              </div>
+              
+              <div className="p-6">
+                <div className="grid gap-4">
+                  {weekTemplates.map((template) => (
+                    <motion.div
+                      key={template.id}
+                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        selectedTemplate === template.id 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => setSelectedTemplate(template.id)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-2xl">{template.icon}</span>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                            <p className="text-sm text-gray-600">{template.description}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-blue-600">{template.usage} fois</div>
+                          <div className="text-xs text-gray-500">utilisé</div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs text-gray-600 mb-2">Répartition type:</div>
+                        <div className="flex space-x-2">
+                          {Object.entries(teams).slice(0, 3).map(([teamId, team]) => (
+                            <div key={teamId} className={`px-2 py-1 rounded text-xs text-white bg-gradient-to-r ${team.color}`}>
+                              {team.name.split(' ')[1]}
+                            </div>
+                          ))}
+                          <div className="px-2 py-1 rounded text-xs bg-gray-300 text-gray-600">...</div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
+
+                <div className="flex space-x-3 pt-6 border-t mt-6">
+                  <button 
+                    disabled={!selectedTemplate}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                  >
+                    <CheckCircleIcon className="w-5 h-5 inline mr-2" />
+                    Appliquer Template
+                  </button>
+                  <button className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                    <PlusIcon className="w-5 h-5 inline mr-2" />
+                    Créer Template
+                  </button>
+                  <button 
+                    onClick={() => setShowTemplateModal(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Duplication */}
+      <AnimatePresence>
+        {showDuplicateModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDuplicateModal(false)}
+          >
+            <motion.div
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
+                <h3 className="text-xl font-bold flex items-center">
+                  <DocumentDuplicateIcon className="w-6 h-6 mr-2" />
+                  Duplication de Semaine
+                </h3>
+                <p className="opacity-90 text-sm mt-1">Copie intelligente avec optimisations</p>
               </div>
               
               <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <ClockIcon className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm">{showTaskDetail.time}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <UserGroupIcon className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm">{showTaskDetail.team.join(', ')}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <WrenchScrewdriverIcon className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm">{showTaskDetail.equipment.join(', ')}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {getWeatherIcon(showTaskDetail.weather)}
-                    <span className="text-sm capitalize">{showTaskDetail.weather}</span>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Semaine source</label>
+                  <input 
+                    type="week" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    defaultValue="2024-W33"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Semaine destination</label>
+                  <input 
+                    type="week" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Options avancées</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center space-x-2">
+                      <input type="checkbox" defaultChecked className="rounded" />
+                      <span className="text-sm">Ajuster selon capacité équipes</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input type="checkbox" defaultChecked className="rounded" />
+                      <span className="text-sm">Exclure weekends</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Optimiser trajets</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Vérifier conflits clients</span>
+                    </label>
                   </div>
                 </div>
 
-                {showTaskDetail.progress > 0 && (
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Progression</span>
-                      <span className="font-semibold">{showTaskDetail.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                        style={{ width: `${showTaskDetail.progress}%` }}
-                      />
-                    </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <RocketLaunchIcon className="w-5 h-5 text-blue-500" />
+                    <span className="font-medium text-blue-800">IA Suggestions</span>
                   </div>
-                )}
+                  <div className="text-sm text-blue-700">
+                    <p>• Réajustement automatique +15% efficacité</p>
+                    <p>• Détection 2 créneaux d'optimisation</p>
+                    <p>• Économie estimée: 3h de trajet</p>
+                  </div>
+                </div>
 
                 <div className="flex space-x-3 pt-4">
                   <button className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
-                    <EyeIcon className="w-5 h-5 inline mr-2" />
-                    Voir détails
+                    <DocumentDuplicateIcon className="w-5 h-5 inline mr-2" />
+                    Dupliquer avec IA
                   </button>
-                  <button className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300">
-                    <PencilIcon className="w-5 h-5 inline mr-2" />
-                    Modifier
-                  </button>
-                  <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300">
-                    <TrashIcon className="w-5 h-5" />
+                  <button 
+                    onClick={() => setShowDuplicateModal(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                  >
+                    Annuler
                   </button>
                 </div>
               </div>

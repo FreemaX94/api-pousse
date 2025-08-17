@@ -202,7 +202,7 @@ exports.getNieuwkoopItems = async (req, res) => {
         category: item.category || 'autre',
         // Image avec fallback
         image: imageUrl,
-        // Quantité disponible calculée
+        // Quantité disponible calculée AU NIVEAU RACINE pour le frontend
         availableQuantity,
         // Infos stock complètes pour debug
         stock: {
@@ -324,6 +324,74 @@ exports.updateNieuwkoopCategory = async (req, res) => {
   } catch (err) {
     console.error('❌ Erreur updateNieuwkoopCategory:', err.message);
     res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+exports.refreshNieuwkoopDimensions = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Récupérer l'article existant
+    const item = await NieuwkoopItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Article introuvable.' });
+    }
+    
+    console.log(`🔄 Rafraîchissement des dimensions pour ${item.reference}`);
+    
+    // Récupérer les détails depuis l'API Nieuwkoop
+    const apiUrl = `https://www.nieuwkoop-europe.com/api/json/getItemDetails.php`;
+    const response = await axios.get(apiUrl, {
+      params: {
+        key: process.env.NIEUWKOOP_API_KEY || 'Z_GKBQCOumTjsZlQQQKBQgSO',
+        item_code: item.reference,
+        lang: 'EN'
+      }
+    });
+    
+    if (response.data && response.data.item) {
+      const apiData = response.data.item;
+      
+      // Extraire les dimensions avec tous les champs possibles
+      const diameter = 
+        apiData.DiameterCulturePot || 
+        apiData.Diameter || 
+        apiData.Opening || 
+        (apiData.PotSize ? parseInt(apiData.PotSize) : 0) || 
+        item.dimensions?.diameter || 
+        0;
+      
+      const height = apiData.Height || item.dimensions?.height || 0;
+      
+      // Mettre à jour les dimensions
+      item.dimensions = {
+        ...item.dimensions,
+        height: height,
+        diameter: diameter
+      };
+      
+      await item.save();
+      
+      console.log(`✅ Dimensions mises à jour: hauteur=${height}cm, diamètre=${diameter}cm`);
+      
+      // Retourner l'article mis à jour avec le format attendu par le frontend
+      res.json({
+        _id: item._id,
+        reference: item.reference,
+        name: item.name,
+        height: height,
+        diameter: diameter,
+        dimensions: item.dimensions,
+        message: `Dimensions mises à jour: H=${height}cm, Ø=${diameter}cm`
+      });
+    } else {
+      return res.status(404).json({ 
+        message: 'Impossible de récupérer les données depuis l\'API Nieuwkoop' 
+      });
+    }
+  } catch (err) {
+    console.error('❌ Erreur rafraîchissement dimensions:', err.message);
+    res.status(500).json({ error: 'Erreur lors du rafraîchissement des dimensions.' });
   }
 };
 

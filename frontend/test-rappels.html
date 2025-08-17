@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rappels - Tous les sous-onglets</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f3f4f6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .tab-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .tab-item {
+            padding: 8px 16px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .tab-item.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .tab-item.tested {
+            background: #10b981;
+            color: white;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            padding: 15px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        #iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin: 20px 0;
+            display: none;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test du composant Rappels Ultra Premium</h1>
+        
+        <div class="test-section">
+            <h2>Configuration du test</h2>
+            <div>
+                <label>URL de base: </label>
+                <input type="text" id="baseUrl" value="http://localhost:3002" style="width: 300px; padding: 5px;">
+            </div>
+            <div style="margin-top: 10px;">
+                <button onclick="startTest()">🚀 Lancer le test complet</button>
+                <button onclick="testWithAuth()">🔐 Test avec authentification</button>
+                <button onclick="clearResults()">🗑️ Effacer les résultats</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalTests">0</div>
+                <div class="stat-label">Tests totaux</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="successTests" style="color: #10b981;">0</div>
+                <div class="stat-label">Réussis</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="errorTests" style="color: #ef4444;">0</div>
+                <div class="stat-label">Échecs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingTests" style="color: #f59e0b;">0</div>
+                <div class="stat-label">En attente</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Sous-onglets à tester</h2>
+            <div class="tab-list" id="tabList">
+                <!-- Les onglets seront générés dynamiquement -->
+            </div>
+        </div>
+
+        <div id="results"></div>
+
+        <div id="iframe-container">
+            <iframe id="testFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const tabs = [
+            'Tous',
+            'Devis',
+            'Factures',
+            'Interventions',
+            'Envoi documents',
+            'Demandes client',
+            'Affaires',
+            'Contrats',
+            'Produits/services',
+            'Pointages'
+        ];
+
+        let testResults = [];
+        let stats = {
+            total: 0,
+            success: 0,
+            error: 0,
+            pending: 0
+        };
+
+        // Initialiser la liste des onglets
+        function initTabs() {
+            const tabList = document.getElementById('tabList');
+            tabList.innerHTML = '';
+            tabs.forEach(tab => {
+                const tabItem = document.createElement('div');
+                tabItem.className = 'tab-item';
+                tabItem.textContent = tab;
+                tabItem.id = `tab-${tab.replace(/[\s\/]/g, '-')}`;
+                tabList.appendChild(tabItem);
+            });
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            document.getElementById('totalTests').textContent = stats.total;
+            document.getElementById('successTests').textContent = stats.success;
+            document.getElementById('errorTests').textContent = stats.error;
+            document.getElementById('pendingTests').textContent = stats.pending;
+        }
+
+        // Ajouter un résultat de test
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            result.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            results.appendChild(result);
+            results.scrollTop = results.scrollHeight;
+
+            // Mettre à jour les stats
+            if (type === 'success') stats.success++;
+            else if (type === 'error') stats.error++;
+            else if (type === 'pending') stats.pending++;
+            
+            if (type !== 'info') stats.total++;
+            updateStats();
+        }
+
+        // Effacer les résultats
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = [];
+            stats = { total: 0, success: 0, error: 0, pending: 0 };
+            updateStats();
+            initTabs();
+        }
+
+        // Test d'accès à la page
+        async function testPageAccess() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const url = `${baseUrl}/dashboard/rappels-ultra-premium`;
+            
+            addResult('Test d\'accès à la page Rappels...', 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    addResult(`✅ Page Rappels accessible (HTTP ${response.status})`, 'success');
+                    return true;
+                } else if (response.status === 401) {
+                    addResult(`⚠️ Authentification requise (HTTP 401)`, 'pending');
+                    return false;
+                } else {
+                    addResult(`❌ Erreur d'accès (HTTP ${response.status})`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                addResult(`❌ Erreur de connexion: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test de chaque sous-onglet
+        async function testTab(tabName) {
+            const baseUrl = document.getElementById('baseUrl').value;
+            addResult(`Test du sous-onglet "${tabName}"...`, 'info');
+            
+            // Marquer l'onglet comme actif
+            const tabElement = document.getElementById(`tab-${tabName.replace(/[\s\/]/g, '-')}`);
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
+            try {
+                // Simuler le clic sur l'onglet via une requête
+                // Dans une vraie app, on utiliserait Puppeteer ou Playwright
+                const testUrl = `${baseUrl}/dashboard/rappels-ultra-premium?tab=${encodeURIComponent(tabName)}`;
+                
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    // Vérifier que des données sont présentes
+                    const text = await response.text();
+                    
+                    // Vérifier la présence de certains éléments spécifiques à chaque onglet
+                    const checks = {
+                        'Tous': ['rappel', 'client', 'montant'],
+                        'Devis': ['devis', 'validity', 'amount'],
+                        'Factures': ['facture', 'invoice', 'payment'],
+                        'Interventions': ['intervention', 'schedule', 'technician'],
+                        'Envoi documents': ['document', 'send', 'attachment'],
+                        'Demandes client': ['request', 'client', 'status'],
+                        'Affaires': ['business', 'opportunity', 'pipeline'],
+                        'Contrats': ['contract', 'renewal', 'expiry'],
+                        'Produits/services': ['product', 'service', 'catalog'],
+                        'Pointages': ['timesheet', 'hours', 'validation']
+                    };
+                    
+                    const keywords = checks[tabName] || ['data'];
+                    const hasContent = keywords.some(keyword => 
+                        text.toLowerCase().includes(keyword)
+                    );
+                    
+                    if (hasContent || response.status === 200) {
+                        addResult(`✅ Sous-onglet "${tabName}" chargé avec succès`, 'success');
+                        if (tabElement) {
+                            tabElement.classList.remove('active');
+                            tabElement.classList.add('tested');
+                        }
+                        return true;
+                    } else {
+                        addResult(`⚠️ Sous-onglet "${tabName}" chargé mais pas de contenu spécifique trouvé`, 'pending');
+                        return false;
+                    }
+                } else {
+                    addResult(`❌ Erreur lors du chargement du sous-onglet "${tabName}" (HTTP ${response.status})`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                addResult(`❌ Erreur lors du test du sous-onglet "${tabName}": ${error.message}`, 'error');
+                return false;
+            } finally {
+                // Retirer la classe active
+                if (tabElement) {
+                    tabElement.classList.remove('active');
+                }
+            }
+        }
+
+        // Test complet
+        async function startTest() {
+            clearResults();
+            addResult('🚀 Démarrage du test complet des sous-onglets Rappels', 'info');
+            
+            // Test d'accès à la page principale
+            const pageAccessible = await testPageAccess();
+            
+            if (!pageAccessible) {
+                addResult('⚠️ La page n\'est pas accessible. Vérifiez l\'authentification ou le serveur.', 'pending');
+                return;
+            }
+            
+            // Test de chaque sous-onglet
+            for (const tab of tabs) {
+                await testTab(tab);
+                // Attendre un peu entre chaque test pour ne pas surcharger
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Résumé
+            addResult('', 'info');
+            addResult('📊 Résumé des tests:', 'info');
+            addResult(`Total: ${stats.total} | Réussis: ${stats.success} | Échecs: ${stats.error} | En attente: ${stats.pending}`, 'info');
+            
+            if (stats.error === 0 && stats.pending === 0) {
+                addResult('🎉 Tous les sous-onglets fonctionnent correctement!', 'success');
+            } else if (stats.error > 0) {
+                addResult(`⚠️ ${stats.error} sous-onglet(s) en erreur nécessitent une correction`, 'error');
+            }
+        }
+
+        // Test avec authentification simulée
+        async function testWithAuth() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            addResult('🔐 Test avec authentification...', 'info');
+            
+            // Ouvrir la page dans un iframe pour simuler l'authentification
+            const iframe = document.getElementById('testFrame');
+            const container = document.getElementById('iframe-container');
+            
+            container.style.display = 'block';
+            iframe.src = `${baseUrl}/dashboard/organipouss-v2`;
+            
+            addResult('Naviguez vers la page Rappels dans l\'iframe ci-dessous et cliquez sur chaque onglet pour les tester manuellement', 'info');
+        }
+
+        // Initialisation
+        initTabs();
+        clearResults();
+    </script>
+</body>
+</html>

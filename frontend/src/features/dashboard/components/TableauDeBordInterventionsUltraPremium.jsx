@@ -313,14 +313,13 @@ const TableauDeBordInterventionsUltraPremium = () => {
           { label: 'Techniciens', value: liveMetrics.techsOnField || 15, icon: '👷', color: 'from-purple-500 to-violet-500' },
           { label: 'Satisfaction', value: `⭐ ${currentKpis.satisfaction}`, icon: '', color: 'from-yellow-400 to-yellow-600' },
           { label: 'Efficacité', value: `${currentKpis.efficiency}%`, icon: '⚡', color: 'from-cyan-500 to-blue-500' }
-        ].map((kpi, index) => (
+        ].map((kpi) => (
           <motion.div
-            key={index}
+            key={kpi.label}
             className={`bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300`}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: index * 0.05, type: "spring" }}
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             <div className={`h-1 bg-gradient-to-r ${kpi.color}`} />
             <div className="p-4">

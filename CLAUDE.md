@@ -6,6 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ⚠️ **NEVER automatically run `npm run dev` or `npm start` commands** - The user will handle starting the development servers locally.
 
+📝 **ALWAYS automatically update `CONVERSATION_HISTORY.md`** - After completing significant tasks, modifications, or important discussions, proactively update the conversation history file without being asked. Include:
+- Date and time
+- Main topics discussed
+- Code changes made
+- Decisions taken
+- Problems solved
+- Next steps if applicable
+
 ## Project Structure
 
 This is a full-stack application with separate frontend and backend:

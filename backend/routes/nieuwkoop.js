@@ -30,6 +30,7 @@ router.get('/stock', businessMetricsMiddleware('nieuwkoop_search'), controller.g
 router.put('/stock/:id', controller.updateNieuwkoopQuantity);
 router.put('/stock/:id/note', controller.updateNieuwkoopNote);
 router.put('/stock/:id/category', controller.updateNieuwkoopCategory); // ✅ Route de MAJ catégorie
+router.put('/stock/:id/refresh-dimensions', controller.refreshNieuwkoopDimensions); // ✅ Route pour rafraîchir les dimensions depuis l'API
 router.delete('/stock/:id', controller.deleteNieuwkoopItem);
 router.delete('/stock/all', controller.deleteAllNieuwkoopItems);
 

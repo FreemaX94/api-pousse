@@ -1,8 +1,9 @@
-// Export du nouveau composant ultra premium pour les Statistiques
-import DemandesClientStatsPremium from './DemandesClientStatsPremium';
+import React from 'react';
+import StatistiquesDemandesClientUltraPremium from './StatistiquesDemandesClientUltraPremium';
 
+// StatistiquesDemandesClientPremium redirige vers la version UltraPremium standardisée
 const StatistiquesDemandesClientPremium = () => {
-  return <DemandesClientStatsPremium />;
+  return <StatistiquesDemandesClientUltraPremium />;
 };
 
 export default StatistiquesDemandesClientPremium;

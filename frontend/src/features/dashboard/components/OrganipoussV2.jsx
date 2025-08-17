@@ -136,6 +136,7 @@ import AffairesPremium from './AffairesPremium';
 import ContratsPremium from './ContratsPremium';
 import ProduitsServicesPremium from './ProduitsServicesPremium';
 import PointagesPremium from './PointagesPremium';
+import RappelsUltraPremium from './RappelsUltraPremium';
 import ClientsPremium from './ClientsPremium';
 import AdressesPremium from './AdressesPremium';
 import EquipementsPremium from './EquipementsPremium';
@@ -1249,10 +1250,10 @@ const OrganipoussV2 = () => {
                   // Clic sur menu principal
                   if (item.hasSubmenu) {
                     setActiveMenuItem(activeMenuItem === item.name ? '' : item.name);
-                    // Si on clique sur Rappels, définir un tab par défaut
-                    if (item.name === 'Rappels' && activeMenuItem !== item.name) {
-                      setActiveTab('Interventions'); // Tab par défaut pour Rappels
-                    }
+                    // Ne pas définir de tab par défaut pour Rappels car il a ses propres onglets
+                    // if (item.name === 'Rappels' && activeMenuItem !== item.name) {
+                    //   setActiveTab('Interventions'); // Tab par défaut pour Rappels
+                    // }
                   } else {
                     setActiveMenuItem(item.name);
                     setActiveTab(item.name);
@@ -1654,30 +1655,8 @@ const OrganipoussV2 = () => {
     // renderMainContent - onglet actif
     // Cas spécial pour Rappels qui utilise activeMenuItem et activeTab
     if (activeMenuItem === 'Rappels') {
-      // Gestion des tabs dans Rappels
-      switch (activeTab) {
-        case 'Devis':
-          return <DevisPremium />;
-        case 'Factures':
-          return <FacturesPremium />;
-        case 'Interventions':
-          return <InterventionsPremium />;
-        case 'Envoi des documents':
-          return <EnvoiDocumentsPremium />;
-        case 'Demandes client':
-          return <DemandesClientPremium />;
-        case 'Affaires':
-          return <AffairesPremium />;
-        case 'Contrats':
-          return <ContratsPremium />;
-        case 'Produits ou services':
-          return <ProduitsServicesPremium />;
-        case 'Pointages':
-          return <PointagesPremium />;
-        default:
-          // Par défaut, afficher Interventions dans Rappels
-          return <InterventionsPremium />;
-      }
+      // Utilisation du nouveau module RappelsUltraPremium qui gère tous les onglets
+      return <RappelsUltraPremium />;
     }
     
     switch (activeTab) {
@@ -1923,7 +1902,8 @@ const OrganipoussV2 = () => {
           </div>
         )}
         
-        {activeMenuItem === 'Rappels' && renderTabs()}
+        {/* Désactivé pour Rappels car RappelsUltraPremium a ses propres onglets */}
+        {/* activeMenuItem === 'Rappels' && renderTabs() */}
         
         <div className="flex-1 overflow-y-auto p-6">
           <AnimatePresence mode="wait">

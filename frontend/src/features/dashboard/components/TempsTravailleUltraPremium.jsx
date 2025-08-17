@@ -306,14 +306,13 @@ const TempsTravailleUltraPremium = () => {
           { label: 'CA généré', value: `${globalStats.totalRevenue}€`, icon: '💰', color: 'from-yellow-500 to-amber-500' },
           { label: 'Tâches', value: globalStats.totalTasks, icon: '✅', color: 'from-indigo-500 to-purple-500' },
           { label: 'Équipe', value: `${globalStats.activeEmployees}/${employeesTime.length}`, icon: '👥', color: 'from-gray-500 to-gray-600' }
-        ].map((kpi, index) => (
+        ].map((kpi) => (
           <motion.div
-            key={index}
+            key={kpi.label}
             className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: index * 0.05, type: "spring" }}
             whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             <div className={`h-1 bg-gradient-to-r ${kpi.color}`} />
             <div className="p-3">

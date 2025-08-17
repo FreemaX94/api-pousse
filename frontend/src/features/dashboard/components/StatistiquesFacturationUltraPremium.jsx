@@ -43,7 +43,7 @@ import {
   BellAlertIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { Line, Bar, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs.js';
+import { Line, Bar, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs-2';
 
 const StatistiquesFacturationUltraPremium = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
@@ -464,14 +464,13 @@ const StatistiquesFacturationUltraPremium = () => {
 
       {/* KPIs temps réel */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {realtimeKPIs.map((kpi, index) => (
+        {realtimeKPIs.map((kpi) => (
           <motion.div
-            key={index}
+            key={kpi.label}
             className="bg-white rounded-xl shadow-lg p-4 hover:shadow-2xl transition-all duration-300"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: index * 0.05, type: "spring" }}
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             <div className="flex justify-between items-start mb-2">
               <div>

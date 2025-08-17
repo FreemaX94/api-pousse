@@ -331,14 +331,13 @@ const MoisUltraPremium = () => {
               { label: 'Marge', value: `${monthStats.profitMargin}%`, icon: '💰' },
               { label: 'En cours', value: animatedStats.liveInterventions || 15, icon: '🔴' },
               { label: 'Activité', value: `${animatedStats.teamActivity || 85}%`, icon: '📊' }
-            ].map((kpi, index) => (
+            ].map((kpi) => (
               <motion.div 
-                key={index}
+                key={kpi.label}
                 className="bg-white/20 backdrop-blur-lg rounded-lg p-3"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 }}
                 whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 <div className="text-xl font-bold">
                   {kpi.icon} {kpi.value}
@@ -465,7 +464,7 @@ const MoisUltraPremium = () => {
                 
                 return (
                   <motion.div
-                    key={index}
+                    key={dayInfo.date.toISOString()}
                     className={`
                       bg-white min-h-[120px] p-2 cursor-pointer transition-all duration-300
                       ${!dayInfo.isCurrentMonth ? 'opacity-40' : ''}
@@ -473,10 +472,9 @@ const MoisUltraPremium = () => {
                       ${dayIsWeekend && dayInfo.isCurrentMonth ? 'bg-gray-50' : ''}
                       hover:shadow-lg hover:z-10
                     `}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.01 }}
                     whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
                     onClick={() => setSelectedDate(dayInfo.date)}
                   >
                     <div className={`text-sm font-semibold mb-1 ${dayIsToday ? 'text-purple-600' : 'text-gray-700'}`}>

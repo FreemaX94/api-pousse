@@ -73,6 +73,8 @@ const Nieuwkoop = () => {
 
   const [activeSection, setActiveSection] = useState("Stock");
   const [activeCategory, setActiveCategory] = useState("");
+  const [activeEntryTab, setActiveEntryTab] = useState("formulaire"); // Nouveau state pour les sous-onglets de Entrée
+  const [activeExitTab, setActiveExitTab] = useState("formulaire"); // Nouveau state pour les sous-onglets de Sortie
   const [productId, setProductId] = useState("4HOFOBX12");
   const [error, setError] = useState(null);
   const [item, setItem] = useState(null);
@@ -1216,147 +1218,335 @@ return (
 
         {activeSection === "Entrée" && (
           <motion.div 
-            className="nieuwkoop-container"
+            className="nieuwkoop-section"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              padding: '1rem'
+            }}
           >
-            <div className="panel panel-left">
-              <h2>📥 Formulaire d'Entrée</h2>
-              <Suspense fallback={
-                <motion.div 
-                  className="loading"
-                  animate={{
-                    background: [
-                      'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                      'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
-                    ]
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  style={{
-                    borderRadius: '8px',
-                    height: '200px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.1rem',
-                    color: '#666'
-                  }}
-                >
-                  Chargement du formulaire...
-                </motion.div>
-              }>
-                <EntryForm onSaved={handleEntrySaved} currentUser={currentUser} />
-              </Suspense>
+            {/* Sous-onglets pour Entrée */}
+            <div style={{
+              display: 'flex',
+              gap: '0.5rem',
+              borderBottom: '2px solid var(--color-border)',
+              paddingBottom: '0.5rem',
+              marginBottom: '1rem'
+            }}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveEntryTab('formulaire')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: activeEntryTab === 'formulaire' ? 'var(--color-primary)' : 'transparent',
+                  color: activeEntryTab === 'formulaire' ? 'white' : 'var(--color-text-secondary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+                  fontWeight: activeEntryTab === 'formulaire' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '0.95rem'
+                }}
+              >
+                📥 Formulaire d'Entrée
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveEntryTab('historique')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: activeEntryTab === 'historique' ? 'var(--color-primary)' : 'transparent',
+                  color: activeEntryTab === 'historique' ? 'white' : 'var(--color-text-secondary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+                  fontWeight: activeEntryTab === 'historique' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '0.95rem'
+                }}
+              >
+                📋 Historique des Entrées
+              </motion.button>
             </div>
 
-            <div className="divider" />
-
-            <div className="panel panel-right">
-              <h2>📋 Historique des Entrées</h2>
-              <Suspense fallback={
-                <motion.div 
-                  className="loading"
-                  animate={{
-                    background: [
-                      'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                      'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
-                    ]
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+            {/* Contenu des sous-onglets */}
+            <AnimatePresence mode="wait">
+              {activeEntryTab === 'formulaire' && (
+                <motion.div
+                  key="formulaire"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
                   style={{
-                    borderRadius: '8px',
-                    height: '150px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.1rem',
-                    color: '#666'
+                    background: 'var(--color-bg-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.5rem',
+                    boxShadow: 'var(--shadow-md)'
                   }}
                 >
-                  Chargement de la liste...
+                  <h2 style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}>📥 Formulaire d'Entrée</h2>
+                  <Suspense fallback={
+                    <motion.div 
+                      className="loading"
+                      animate={{
+                        background: [
+                          'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                          'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
+                        ]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{
+                        borderRadius: '8px',
+                        height: '200px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.1rem',
+                        color: '#666'
+                      }}
+                    >
+                      Chargement du formulaire...
+                    </motion.div>
+                  }>
+                    <EntryForm onSaved={handleEntrySaved} currentUser={currentUser} />
+                  </Suspense>
                 </motion.div>
-              }>
-                <EntryList refreshFlag={refreshEntries} />
-              </Suspense>
-            </div>
+              )}
+
+              {activeEntryTab === 'historique' && (
+                <motion.div
+                  key="historique"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    background: 'var(--color-bg-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.5rem',
+                    boxShadow: 'var(--shadow-md)'
+                  }}
+                >
+                  <h2 style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}>📋 Historique des Entrées</h2>
+                  <Suspense fallback={
+                    <motion.div 
+                      className="loading"
+                      animate={{
+                        background: [
+                          'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                          'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
+                        ]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{
+                        borderRadius: '8px',
+                        height: '150px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.1rem',
+                        color: '#666'
+                      }}
+                    >
+                      Chargement de la liste...
+                    </motion.div>
+                  }>
+                    <EntryList refreshFlag={refreshEntries} />
+                  </Suspense>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
         {activeSection === "Sortie" && (
           <motion.div 
-            className="nieuwkoop-container"
+            className="nieuwkoop-section"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              padding: '1rem'
+            }}
           >
-            <div className="panel panel-left">
-              <h2>📤 Formulaires de Sortie</h2>
-              <div className="exit-buttons" style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                <button type="button" onClick={() => setExitVariant('definitive')} className={exitVariant === 'definitive' ? 'tab-button active' : 'tab-button'}>
-                  Sortie définitive
-                </button>
-                <button type="button" onClick={() => setExitVariant('locative')} className={exitVariant === 'locative' ? 'tab-button active' : 'tab-button'}>
-                  Sortie locative
-                </button>
-              </div>
-              <Suspense fallback={
-                <motion.div 
-                  className="loading"
-                  animate={{
-                    background: [
-                      'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                      'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
-                    ]
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  style={{
-                    borderRadius: '8px',
-                    height: '200px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.1rem',
-                    color: '#666'
-                  }}
-                >
-                  Chargement du formulaire...
-                </motion.div>
-              }>
-                <ExitForm onSaved={handleExitSaved} currentUser={currentUser} variant={exitVariant} />
-              </Suspense>
+            {/* Sous-onglets pour Sortie */}
+            <div style={{
+              display: 'flex',
+              gap: '0.5rem',
+              borderBottom: '2px solid var(--color-border)',
+              paddingBottom: '0.5rem',
+              marginBottom: '1rem'
+            }}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveExitTab('formulaire')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: activeExitTab === 'formulaire' ? 'var(--color-primary)' : 'transparent',
+                  color: activeExitTab === 'formulaire' ? 'white' : 'var(--color-text-secondary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+                  fontWeight: activeExitTab === 'formulaire' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '0.95rem'
+                }}
+              >
+                📤 Formulaires de Sortie
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveExitTab('historique')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: activeExitTab === 'historique' ? 'var(--color-primary)' : 'transparent',
+                  color: activeExitTab === 'historique' ? 'white' : 'var(--color-text-secondary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+                  fontWeight: activeExitTab === 'historique' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '0.95rem'
+                }}
+              >
+                📋 Historique des Sorties
+              </motion.button>
             </div>
 
-            <div className="divider" />
-
-            <div className="panel panel-right">
-              <h2>📤 Historique des Sorties</h2>
-              <Suspense fallback={
-                <motion.div 
-                  className="loading"
-                  animate={{
-                    background: [
-                      'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                      'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
-                    ]
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+            {/* Contenu des sous-onglets */}
+            <AnimatePresence mode="wait">
+              {activeExitTab === 'formulaire' && (
+                <motion.div
+                  key="formulaire-sortie"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
                   style={{
-                    borderRadius: '8px',
-                    height: '150px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.1rem',
-                    color: '#666'
+                    background: 'var(--color-bg-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.5rem',
+                    boxShadow: 'var(--shadow-md)'
                   }}
                 >
-                  Chargement de la liste...
+                  <h2 style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}>📤 Formulaires de Sortie</h2>
+                  <div className="exit-buttons" style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => setExitVariant('definitive')} 
+                      className={exitVariant === 'definitive' ? 'tab-button active' : 'tab-button'}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid var(--color-border)',
+                        background: exitVariant === 'definitive' ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: exitVariant === 'definitive' ? 'white' : 'var(--color-text-secondary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      Sortie définitive
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setExitVariant('locative')} 
+                      className={exitVariant === 'locative' ? 'tab-button active' : 'tab-button'}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid var(--color-border)',
+                        background: exitVariant === 'locative' ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: exitVariant === 'locative' ? 'white' : 'var(--color-text-secondary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      Sortie locative
+                    </button>
+                  </div>
+                  <Suspense fallback={
+                    <motion.div 
+                      className="loading"
+                      animate={{
+                        background: [
+                          'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                          'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
+                        ]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{
+                        borderRadius: '8px',
+                        height: '200px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.1rem',
+                        color: '#666'
+                      }}
+                    >
+                      Chargement du formulaire...
+                    </motion.div>
+                  }>
+                    <ExitForm onSaved={handleExitSaved} currentUser={currentUser} variant={exitVariant} />
+                  </Suspense>
                 </motion.div>
-              }>
-                <ExitList refreshFlag={refreshExits} />
-              </Suspense>
-            </div>
+              )}
+
+              {activeExitTab === 'historique' && (
+                <motion.div
+                  key="historique-sortie"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    background: 'var(--color-bg-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.5rem',
+                    boxShadow: 'var(--shadow-md)'
+                  }}
+                >
+                  <h2 style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}>📋 Historique des Sorties</h2>
+                  <Suspense fallback={
+                    <motion.div 
+                      className="loading"
+                      animate={{
+                        background: [
+                          'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                          'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)'
+                        ]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{
+                        borderRadius: '8px',
+                        height: '150px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.1rem',
+                        color: '#666'
+                      }}
+                    >
+                      Chargement de la liste...
+                    </motion.div>
+                  }>
+                    <ExitList refreshFlag={refreshExits} />
+                  </Suspense>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 

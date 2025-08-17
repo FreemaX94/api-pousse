@@ -1,8 +1,9 @@
-// Export du nouveau composant ultra premium pour le Tableau de bord
-import DemandesClientTableauPremium from './DemandesClientTableauPremium';
+import React from 'react';
+import TableauDeBordDemandesClientUltraPremium from './TableauDeBordDemandesClientUltraPremium';
 
+// TableauDeBordDemandesClientPremium redirige vers la version UltraPremium standardisée
 const TableauDeBordDemandesClientPremium = () => {
-  return <DemandesClientTableauPremium />;
+  return <TableauDeBordDemandesClientUltraPremium />;
 };
 
 export default TableauDeBordDemandesClientPremium;

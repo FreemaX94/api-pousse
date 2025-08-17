@@ -198,14 +198,13 @@ const JourneeUltraPremium = () => {
           { label: 'CA journée', value: `${dayStats.totalRevenue}€`, icon: '💰', color: 'from-purple-500 to-pink-500' },
           { label: 'Distance', value: `${dayStats.totalDistance}km`, icon: '🚗', color: 'from-cyan-500 to-blue-500' },
           { label: 'Satisfaction', value: `⭐ ${dayStats.satisfaction}`, icon: '', color: 'from-yellow-400 to-orange-400' }
-        ].map((kpi, index) => (
+        ].map((kpi) => (
           <motion.div
-            key={index}
+            key={kpi.label}
             className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: index * 0.05, type: "spring" }}
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             <div className={`h-1 bg-gradient-to-r ${kpi.color}`} />
             <div className="p-4">
@@ -243,15 +242,15 @@ const JourneeUltraPremium = () => {
                   
                   return (
                     <motion.div
-                      key={index}
+                      key={slot.hour}
                       className={`relative p-4 rounded-lg border-2 ${
                         isCurrent ? 'border-orange-500 bg-orange-50' : 
                         isPast ? 'border-gray-300 bg-gray-50 opacity-60' : 
                         'border-gray-200 bg-white'
                       } hover:shadow-lg transition-all duration-300 cursor-pointer`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ y: -2, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
                       onClick={() => setSelectedHour(slot)}
                     >
                       {isCurrent && (

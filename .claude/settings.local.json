@@ -97,8 +97,16 @@
       "Bash(do if grep -q \"ArrowArrowTrending\" \"$file\")",
       "Bash(then sed -i \"s/ArrowArrowTrendingUpIcon/ArrowTrendingUpIcon/g; s/ArrowArrowTrendingDownIcon/ArrowTrendingDownIcon/g\" \"$file\")",
       "Bash(for:*)",
-      "Bash(do echo \"Creating $comp.jsx\")"
+      "Bash(do echo \"Creating $comp.jsx\")",
+      "Bash(git remote add:*)",
+      "Bash(del temp_compare.js)",
+      "Bash(C:UsersFreemaX94Desktopapi-pousse-maintest-api-simple.bat)",
+      "Bash(test-api-simple.bat)",
+      "Bash(./test-api-simple.bat)",
+      "Bash(./test-organipoussv2-local.bat)",
+      "Bash(./test-rappels-tabs.bat)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }
