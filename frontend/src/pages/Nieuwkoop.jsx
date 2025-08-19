@@ -105,6 +105,10 @@ const Nieuwkoop = () => {
   // États pour les sous-onglets
   const [entrySubTab, setEntrySubTab] = useState('formulaire'); // 'formulaire' ou 'historique'
   const [exitSubTab, setExitSubTab] = useState('formulaire'); // 'formulaire' ou 'historique'
+  
+  // Debug pour vérifier les états
+  console.log('🔍 DEBUG entrySubTab:', entrySubTab);
+  console.log('🔍 DEBUG exitSubTab:', exitSubTab);
 
   const handleEntrySaved = () => setRefreshEntries(f => !f);
   const handleExitSaved  = () => setRefreshExits(f => !f);
@@ -1221,6 +1225,15 @@ return (
         {activeSection === "Entrée" && (
           <motion.div 
             className="nieuwkoop-container-single"
+            style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              padding: 'var(--space-xl)',
+              gap: 'var(--space-xl)',
+              minHeight: '100vh',
+              position: 'relative'
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -1229,7 +1242,11 @@ return (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h2>{entrySubTab === 'formulaire' ? '📥 Formulaire d\'Entrée' : '📋 Historique des Entrées'}</h2>
                 <button
-                  onClick={() => setEntrySubTab(entrySubTab === 'formulaire' ? 'historique' : 'formulaire')}
+                  onClick={() => {
+                    const newValue = entrySubTab === 'formulaire' ? 'historique' : 'formulaire';
+                    console.log('🔄 Clic bouton Entrée:', entrySubTab, '→', newValue);
+                    setEntrySubTab(newValue);
+                  }}
                   style={{
                     padding: '8px 16px',
                     backgroundColor: '#059669',
@@ -1305,6 +1322,15 @@ return (
         {activeSection === "Sortie" && (
           <motion.div 
             className="nieuwkoop-container-single"
+            style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              padding: 'var(--space-xl)',
+              gap: 'var(--space-xl)',
+              minHeight: '100vh',
+              position: 'relative'
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -1313,7 +1339,11 @@ return (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h2>{exitSubTab === 'formulaire' ? '📤 Formulaires de Sortie' : '📤 Historique des Sorties'}</h2>
                 <button
-                  onClick={() => setExitSubTab(exitSubTab === 'formulaire' ? 'historique' : 'formulaire')}
+                  onClick={() => {
+                    const newValue = exitSubTab === 'formulaire' ? 'historique' : 'formulaire';
+                    console.log('🔄 Clic bouton Sortie:', exitSubTab, '→', newValue);
+                    setExitSubTab(newValue);
+                  }}
                   style={{
                     padding: '8px 16px',
                     backgroundColor: '#059669',
