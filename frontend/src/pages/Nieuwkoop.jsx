@@ -1220,7 +1220,7 @@ return (
 
         {activeSection === "Entrée" && (
           <motion.div 
-            className="nieuwkoop-container"
+            className="nieuwkoop-container-single"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -1304,7 +1304,7 @@ return (
 
         {activeSection === "Sortie" && (
           <motion.div 
-            className="nieuwkoop-container"
+            className="nieuwkoop-container-single"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}

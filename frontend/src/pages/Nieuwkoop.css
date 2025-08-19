@@ -233,8 +233,21 @@ body {
   position: relative;
 }
 
+/* =========== Container Single - Full Width Layout =========== */
+.nieuwkoop-container-single {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+  min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
 /* Background Pattern */
-.nieuwkoop-container::before {
+.nieuwkoop-container::before,
+.nieuwkoop-container-single::before {
   content: '';
   position: fixed;
   top: 0;
@@ -1345,6 +1358,11 @@ body {
     padding: var(--space-lg);
   }
   
+  .nieuwkoop-container-single {
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+  }
+  
   .divider {
     display: none;
   }
@@ -1363,6 +1381,11 @@ body {
 
 @media (max-width: 768px) {
   .nieuwkoop-container {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+  
+  .nieuwkoop-container-single {
     padding: var(--space-md);
     gap: var(--space-md);
   }
@@ -1452,7 +1475,8 @@ body {
 
 /* =========== Print Styles =========== */
 @media print {
-  .nieuwkoop-container {
+  .nieuwkoop-container,
+  .nieuwkoop-container-single {
     display: block;
     padding: 0;
   }
