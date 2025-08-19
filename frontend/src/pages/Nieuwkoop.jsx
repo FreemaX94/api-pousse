@@ -61,7 +61,6 @@ const AssignModal = lazy(() => import('../components/AssignModal'));
 
 
 const Nieuwkoop = () => {
-
   // ─── Récupération de l'utilisateur via API (même méthode que PrivateRoute) ───
   const [currentUser, setCurrentUser] = useState('inconnu');
   
