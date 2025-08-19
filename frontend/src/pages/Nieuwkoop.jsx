@@ -2605,14 +2605,6 @@ return (
                     >
                       <span style={{fontSize: '1.2rem'}}>📊</span> Exporter
                     </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleClearAll}
-                      className="btn btn-danger"
-                    >
-                      <span style={{fontSize: '1.2rem'}}>🗑️</span> Tout vider
-                    </motion.button>
 
 {showPartnerForm && (
   <div className="p-4 mt-4 space-y-4 bg-white rounded shadow">
@@ -3134,7 +3126,7 @@ return (
                                 fontWeight: '700',
                                 color: 'var(--color-primary)',
                                 marginBottom: '0.25rem'
-                              }}>{prod.diameter || prod.DiameterCulturePot || prod.Diameter || prod.Opening || (prod.PotSize ? parseInt(prod.PotSize) : 0) || 0} cm</div>
+                              }}>{prod.diameter || 0} cm</div>
                               <div style={{
                                 fontSize: '0.75rem',
                                 color: 'var(--color-secondary)',

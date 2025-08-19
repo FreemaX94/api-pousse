@@ -101,7 +101,7 @@ export default function EntryForm({ onSaved, currentUser }) {
       reference: extItem.Itemcode,
       name: extItem.ItemDescription_EN || extItem.ItemDescription_FR,
       height: extItem.Height,
-      diameter: extItem.DiameterCulturePot || extItem.PotSize,
+      diameter: extItem.DiameterCulturePot || extItem.PotSize || extItem.Diameter || extItem.Opening || 0,
       price: extPrice.PriceNett,
       image: extImageUrl,
     };
@@ -619,7 +619,7 @@ export default function EntryForm({ onSaved, currentUser }) {
                     marginBottom: '0.5rem',
                     fontWeight: '800'
                   }}>⭕ Diamètre</strong>
-                  <p style={{margin: 0, fontWeight: '700', fontSize: '1.2rem', color: 'var(--color-primary, #0d9488)'}}>{extItem.DiameterCulturePot || extItem.PotSize} cm</p>
+                  <p style={{margin: 0, fontWeight: '700', fontSize: '1.2rem', color: 'var(--color-primary, #0d9488)'}}>{extItem.DiameterCulturePot || extItem.PotSize || extItem.Diameter || extItem.Opening || 0} cm</p>
                 </div>
                 <div style={{
                   padding: '1.25rem', 
