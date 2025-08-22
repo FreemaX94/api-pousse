@@ -46,7 +46,7 @@ import {
   api,
 } from "../api/clientApi";
 import axiosApi, { handleApiError } from "../api/axios";
-import { ThemeProvider, useTheme, THEMES } from "../contexts/ThemeContext";
+import { useTheme, ThemeProvider } from "../contexts/ThemeContext";
 
 // 🚀 Lazy loading des composants lourds pour le code splitting
 const EntryForm = lazy(() => import('../components/EntryForm'));
@@ -58,7 +58,552 @@ const ProjetForm = lazy(() => import('../components/ProjetForm'));
 const ProjetList = lazy(() => import('../components/ProjetList'));
 const AssignModal = lazy(() => import('../components/AssignModal'));
 
+// Composant pour le formulaire d'entrée externe
+function ExternalEntryForm({ onSaved, currentUser }) {
+  const { isDark, theme, isBeige, isNeon, isOcean, isTropical, isLavender, isGalaxy, isAutumn, isGlacier, isSakura, isMidnight, isLava } = useTheme();
+  
+  // Fonction pour obtenir les styles adaptatifs selon le thème
+  const getThemeStyles = () => {
+    const baseStyles = {
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      cardBackground: 'linear-gradient(135deg, #ffffff, #f8fafc)',
+      textPrimary: '#1e293b',
+      textSecondary: '#64748b',
+      inputBackground: 'rgba(255,255,255,0.9)',
+      inputBorder: 'rgba(148,163,184,0.3)',
+      inputFocus: '#10b981',
+      buttonGradient: 'linear-gradient(135deg, #10b981, #059669)',
+      errorBackground: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
+      errorBorder: '#fca5a5',
+      errorText: '#dc2626'
+    };
 
+    if (isDark) {
+      return {
+        background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+        cardBackground: 'linear-gradient(135deg, #334155, #475569)',
+        textPrimary: '#f1f5f9',
+        textSecondary: '#cbd5e1',
+        inputBackground: 'rgba(51,65,85,0.9)',
+        inputBorder: 'rgba(100,116,139,0.3)',
+        inputFocus: '#10b981',
+        buttonGradient: 'linear-gradient(135deg, #10b981, #059669)',
+        errorBackground: 'linear-gradient(135deg, #431a1a, #562626)',
+        errorBorder: '#dc2626',
+        errorText: '#fca5a5'
+      };
+    }
+
+    if (isBeige) {
+      return {
+        background: 'linear-gradient(135deg, #f5f5dc 0%, #f0e68c 100%)',
+        cardBackground: 'linear-gradient(135deg, #fffef7, #faf8f0)',
+        textPrimary: '#8b5a2b',
+        textSecondary: '#a0702a',
+        inputBackground: 'rgba(255,254,247,0.9)',
+        inputBorder: 'rgba(160,112,42,0.3)',
+        inputFocus: '#d2691e',
+        buttonGradient: 'linear-gradient(135deg, #d2691e, #cd853f)',
+        errorBackground: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
+        errorBorder: '#fca5a5',
+        errorText: '#dc2626'
+      };
+    }
+
+    if (isNeon) {
+      return {
+        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)',
+        cardBackground: 'linear-gradient(135deg, #16213e, #0f3460)',
+        textPrimary: '#00ffff',
+        textSecondary: '#ff00ff',
+        inputBackground: 'rgba(22,33,62,0.9)',
+        inputBorder: 'rgba(0,255,255,0.3)',
+        inputFocus: '#00ffff',
+        buttonGradient: 'linear-gradient(135deg, #ff00ff, #00ffff)',
+        errorBackground: 'linear-gradient(135deg, #2d1b1b, #3d2626)',
+        errorBorder: '#ff0080',
+        errorText: '#ff0080'
+      };
+    }
+
+    // Autres thèmes peuvent être ajoutés ici selon les besoins
+    return baseStyles;
+  };
+
+  const themeStyles = getThemeStyles();
+
+  // Styles communs pour les inputs
+  const getInputStyle = (disabled = false) => ({
+    width: '100%',
+    padding: '1rem 1.5rem',
+    border: `2px solid ${themeStyles.inputBorder}`,
+    borderRadius: '16px',
+    fontSize: '1rem',
+    fontWeight: '500',
+    background: disabled ? (isDark ? 'rgba(51,65,85,0.5)' : 'rgba(248,250,252,0.9)') : themeStyles.inputBackground,
+    transition: 'all 0.3s ease',
+    outline: 'none',
+    color: disabled ? themeStyles.textSecondary : themeStyles.textPrimary,
+    cursor: disabled ? 'not-allowed' : 'text'
+  });
+
+  // Styles communs pour les labels
+  const getLabelStyle = () => ({
+    display: 'block',
+    marginBottom: '0.5rem',
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: themeStyles.textPrimary
+  });
+
+  const [formData, setFormData] = useState({
+    type: 'entrée',
+    reference: '',
+    name: '',
+    quantity: 1,
+    price: 0,
+    image: null,
+    coef: 1,
+    height: 0,
+    diameter: 0,
+    eventDate: new Date().toISOString().substr(0, 10),
+    project: '',
+    note: '',
+    createdBy: currentUser,
+  });
+
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Charger projets
+  useEffect(() => {
+    fetch('/api/projets')
+      .then(res => res.json())
+      .then(data => setProjects(Array.isArray(data) ? data : []))
+      .catch(() => setError('Impossible de charger la liste des projets.'));
+  }, []);
+
+  const handleChange = e => {
+    const { name, value, files } = e.target;
+    
+    if (name === 'image' && files && files[0]) {
+      const file = files[0];
+      setFormData(fd => ({ ...fd, image: file }));
+      
+      // Créer une prévisualisation de l'image
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    let finalValue = value;
+    if (name === 'quantity') finalValue = Math.max(1, parseInt(value, 10) || 1);
+    if (name === 'coef') finalValue = parseFloat(value);
+    if (name === 'price') finalValue = parseFloat(value) || 0;
+    if (name === 'height') finalValue = Math.max(0, parseFloat(value) || 0);
+    if (name === 'diameter') finalValue = Math.max(0, parseFloat(value) || 0);
+
+    setFormData(fd => ({ ...fd, [name]: finalValue }));
+    setError('');
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'image' && formData[key]) {
+          formDataToSend.append('image', formData[key]);
+        } else if (formData[key] !== null && formData[key] !== '') {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      const response = await fetch('/api/mouvements', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création de l\'entrée');
+      }
+
+      onSaved();
+      setFormData({
+        type: 'entrée',
+        reference: '',
+        name: '',
+        quantity: 1,
+        price: 0,
+        image: null,
+        coef: 1,
+        height: 0,
+        diameter: 0,
+        eventDate: new Date().toISOString().substr(0, 10),
+        project: '',
+        note: '',
+        createdBy: currentUser,
+      });
+      setImagePreview(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      background: themeStyles.background,
+      borderRadius: '32px',
+      padding: '3rem',
+      boxShadow: '0 25px 60px rgba(0, 0, 0, 0.08), 0 8px 25px rgba(0, 0, 0, 0.05)',
+      border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
+      backdropFilter: 'blur(20px)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {error && (
+        <div style={{
+          background: themeStyles.errorBackground,
+          border: `2px solid ${themeStyles.errorBorder}`,
+          borderRadius: '16px',
+          padding: '1rem 1.5rem',
+          marginBottom: '2rem',
+          color: themeStyles.errorText,
+          fontWeight: '600',
+          boxShadow: '0 8px 25px rgba(239, 68, 68, 0.15)'
+        }}>
+          {error}
+        </div>
+      )}
+      
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '3rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <h2 style={{
+          fontSize: '3rem', 
+          fontWeight: '900',
+          background: 'linear-gradient(135deg, #10b981, #059669, #3b82f6)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          marginBottom: '0.5rem',
+          textShadow: '0 4px 20px rgba(16,185,129,0.3)'
+        }}>
+          📤 Entrée externe
+        </h2>
+        <p style={{
+          color: themeStyles.textSecondary,
+          fontSize: '1.1rem',
+          fontWeight: '500',
+          margin: 0
+        }}>
+          Ajoutez des articles avec vos propres images
+        </p>
+      </div>
+      
+      <form onSubmit={handleSubmit} style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '2rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        {/* Sélection d'image */}
+        <div style={{gridColumn: '1 / -1', marginBottom: '1rem'}}>
+          <div style={{
+            background: themeStyles.cardBackground,
+            borderRadius: '24px',
+            padding: '2rem',
+            border: `2px solid ${isDark ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.1)'}`,
+            boxShadow: '0 8px 25px rgba(0,0,0,0.05)',
+            backdropFilter: 'blur(10px)',
+            textAlign: 'center'
+          }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '1rem',
+              fontSize: '1.2rem',
+              fontWeight: '700',
+              color: themeStyles.textPrimary
+            }}>
+              📸 Image du produit
+            </label>
+            
+            {imagePreview ? (
+              <div style={{ marginBottom: '1rem' }}>
+                <img 
+                  src={imagePreview} 
+                  alt="Prévisualisation" 
+                  style={{
+                    width: '150px', 
+                    height: '150px', 
+                    objectFit: 'cover', 
+                    borderRadius: '20px', 
+                    boxShadow: '0 15px 35px rgba(0,0,0,0.15)', 
+                    border: '4px solid white',
+                    marginBottom: '1rem'
+                  }}
+                />
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImagePreview(null);
+                      setFormData(fd => ({ ...fd, image: null }));
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🗑️ Supprimer
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{
+                border: `3px dashed ${themeStyles.inputFocus}`,
+                borderRadius: '20px',
+                padding: '3rem',
+                marginBottom: '1rem',
+                background: isDark ? 'rgba(16,185,129,0.1)' : 'rgba(16,185,129,0.05)'
+              }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📷</div>
+                <p style={{ color: themeStyles.textSecondary, marginBottom: '1rem' }}>
+                  Cliquez pour sélectionner une image ou glissez-déposez
+                </p>
+              </div>
+            )}
+            
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: `2px solid ${isDark ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.2)'}`,
+                borderRadius: '16px',
+                fontSize: '1rem',
+                background: themeStyles.inputBackground,
+                cursor: 'pointer',
+                color: themeStyles.textPrimary
+              }}
+            />
+          </div>
+        </div>
+
+
+        {/* Nom du produit */}
+        <div>
+          <label htmlFor="name" style={getLabelStyle()}>🏷️ Nom du produit *</label>
+          <input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Nom du produit"
+            required
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Quantité */}
+        <div>
+          <label htmlFor="quantity" style={getLabelStyle()}>📦 Quantité</label>
+          <input
+            id="quantity"
+            name="quantity"
+            type="number"
+            value={formData.quantity}
+            onChange={handleChange}
+            min="1"
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Prix unitaire */}
+        <div>
+          <label htmlFor="price" style={getLabelStyle()}>💰 Prix unitaire</label>
+          <input
+            id="price"
+            name="price"
+            type="number"
+            step="0.01"
+            value={formData.price}
+            onChange={handleChange}
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Hauteur */}
+        <div>
+          <label htmlFor="height" style={getLabelStyle()}>📏 Hauteur (cm)</label>
+          <input
+            id="height"
+            name="height"
+            type="number"
+            step="0.1"
+            min="0"
+            value={formData.height}
+            onChange={handleChange}
+            placeholder="Hauteur en cm"
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Diamètre */}
+        <div>
+          <label htmlFor="diameter" style={getLabelStyle()}>⭕ Diamètre (cm)</label>
+          <input
+            id="diameter"
+            name="diameter"
+            type="number"
+            step="0.1"
+            min="0"
+            value={formData.diameter}
+            onChange={handleChange}
+            placeholder="Diamètre en cm"
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Coefficient */}
+        <div>
+          <label htmlFor="coef" style={getLabelStyle()}>⚖️ Coefficient</label>
+          <select
+            id="coef"
+            name="coef"
+            value={formData.coef}
+            onChange={handleChange}
+            style={{...getInputStyle(), cursor: 'pointer'}}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          >
+            <option value={1}>1</option>
+            <option value={0.5}>0.5</option>
+            <option value={0.25}>0.25</option>
+          </select>
+        </div>
+
+        {/* Date */}
+        <div>
+          <label htmlFor="eventDate" style={getLabelStyle()}>📅 Date</label>
+          <input
+            id="eventDate"
+            name="eventDate"
+            type="date"
+            value={formData.eventDate}
+            onChange={handleChange}
+            max={new Date().toISOString().substr(0, 10)}
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Projet */}
+        <div>
+          <label htmlFor="project" style={getLabelStyle()}>🎯 Projet / Événement</label>
+          <select
+            id="project"
+            name="project"
+            value={formData.project}
+            onChange={handleChange}
+            style={{...getInputStyle(), cursor: 'pointer'}}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          >
+            <option value="">-- Sélectionnez un projet --</option>
+            {projects.map(p => (
+              <option key={p._id} value={p._id}>
+                {p.client?.name || p.title || p.name || 'Projet sans titre'}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Note */}
+        <div style={{gridColumn: '1 / -1'}}>
+          <label htmlFor="note" style={getLabelStyle()}>📝 Note</label>
+          <textarea
+            id="note"
+            name="note"
+            value={formData.note}
+            onChange={handleChange}
+            placeholder="Note optionnelle..."
+            style={{
+              ...getInputStyle(),
+              minHeight: '120px',
+              resize: 'vertical'
+            }}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Bouton validation */}
+        <div style={{gridColumn: '1 / -1', marginTop: '1rem'}}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '1.5rem 2rem',
+              fontSize: '1.2rem',
+              fontWeight: '700',
+              background: loading ? 'linear-gradient(135deg, #9ca3af, #6b7280)' : themeStyles.buttonGradient,
+              color: 'white',
+              border: 'none',
+              borderRadius: '20px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: `0 15px 35px ${isDark ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.3)'}`,
+              transform: loading ? 'scale(0.98)' : 'scale(1)'
+            }}
+            onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px) scale(1.02)')}
+            onMouseLeave={(e) => !loading && (e.target.style.transform = 'translateY(0) scale(1)')}
+          >
+            {loading ? '⏳ Création en cours...' : '📤 Ajouter Entrée Externe'}
+          </button>
+        </div>
+
+        <input type="hidden" name="type" value={formData.type} />
+        <input type="hidden" name="createdBy" value={formData.createdBy} />
+      </form>
+    </div>
+  );
+}
 
 const Nieuwkoop = () => {
   // ─── Récupération de l'utilisateur via API (même méthode que PrivateRoute) ───
@@ -102,12 +647,9 @@ const Nieuwkoop = () => {
   const [exitVariant, setExitVariant] = useState('definitive');
   
   // États pour les sous-onglets
-  const [entrySubTab, setEntrySubTab] = useState('formulaire'); // 'formulaire' ou 'historique'
+  const [entrySubTab, setEntrySubTab] = useState('formulaire'); // 'formulaire', 'historique' ou 'externe'
   const [exitSubTab, setExitSubTab] = useState('formulaire'); // 'formulaire' ou 'historique'
   
-  // Debug pour vérifier les états
-  console.log('🔍 DEBUG entrySubTab:', entrySubTab);
-  console.log('🔍 DEBUG exitSubTab:', exitSubTab);
 
   const handleEntrySaved = () => setRefreshEntries(f => !f);
   const handleExitSaved  = () => setRefreshExits(f => !f);
@@ -164,7 +706,6 @@ const Nieuwkoop = () => {
   useEffect(() => {
     // Charger les projets pour les onglets Projets, Stock, Entrée et Sortie
     if (activeSection === "Projets" || activeSection === "Stock" || activeSection === "Entrée" || activeSection === "Sortie") {
-      console.log(`🔄 Chargement des projets pour l'onglet ${activeSection}`);
       fetchProjects();
     }
   }, [activeSection]);
@@ -172,19 +713,6 @@ const Nieuwkoop = () => {
   const fetchProjects = async () => {
     try {
       const data = await getProjects();
-      console.log('📊 Fetched projects:', data);
-      console.log('🌱 Projects with materials:', data.filter(p => p.materials && p.materials.length > 0).length);
-      
-      // Debug détaillé de chaque projet
-      data.forEach(project => {
-        console.log(`📦 Projet: ${project.title || project.client?.name || project._id}`, {
-          dates: project.dates,
-          dateDebut: project.dateDebut,
-          dateFin: project.dateFin,
-          materials: project.materials?.length || 0,
-          materialsDetails: project.materials
-        });
-      });
       
       setProjects(data);
     } catch (err) {
@@ -225,49 +753,25 @@ const Nieuwkoop = () => {
           
           // Compter les materials du projet comme réservés
           if (project.materials && project.materials.length > 0) {
+            console.log(`🔍 PROJET "${project.client?.name || project.title}" - Matériaux:`, project.materials);
             project.materials.forEach(material => {
               const ref = material.reference || material.ItemCode || '';
               if (ref) {
                 if (!stockAdjustments[ref]) {
                   stockAdjustments[ref] = 0;
                 }
+                console.log(`  🔍 AVANT: ${ref} = ${stockAdjustments[ref]}, ajout de -${material.quantity}`);
                 // Soustraire la quantité réservée pour ce projet
                 stockAdjustments[ref] -= (material.quantity || 0);
-                console.log(`  🌱 ${material.name}: -${material.quantity} (réservé)`);
+                console.log(`  🔍 APRÈS: ${ref} = ${stockAdjustments[ref]}`);
+                console.log(`  🌱 ${material.name} (${ref}): -${material.quantity} (réservé)`);
               }
             });
           }
         }
       });
       
-      // Ensuite, traiter les sorties définitives et locations non retournées
-      movements.forEach(movement => {
-        const movementDate = new Date(movement.eventDate || movement.createdAt).getTime();
-        
-        if (movementDate <= targetTime) {
-          const ref = movement.reference;
-          if (!stockAdjustments[ref]) {
-            stockAdjustments[ref] = 0;
-          }
-          
-          if (movement.type === 'sortie') {
-            if (movement.variant === 'definitive') {
-              // Sortie définitive - soustraire la quantité
-              stockAdjustments[ref] -= (movement.quantity || 0);
-            } else if (movement.variant === 'location') {
-              // Location - vérifier si retournée avant la date cible
-              if (!movement.isReturned || (movement.returnDate && new Date(movement.returnDate).getTime() > targetTime)) {
-                stockAdjustments[ref] -= (movement.quantity || 0);
-              }
-            }
-          } else if (movement.type === 'entrée' && movementDate <= targetTime) {
-            // Entrée - ajouter la quantité
-            stockAdjustments[ref] += (movement.quantity || 0);
-          }
-        }
-      });
-
-      // Traiter les projets et leurs réservations
+      // Calculer uniquement les réservations des projets (pas les mouvements de stock)
       projectsData.forEach(project => {
         if (project.date && new Date(project.date).getTime() <= targetTime) {
           if (project.items && Array.isArray(project.items)) {
@@ -284,14 +788,6 @@ const Nieuwkoop = () => {
       });
 
       setStockProjections(stockAdjustments);
-      console.log('📊 Projections calculées:', stockAdjustments);
-      console.log('📊 Résumé des réservations:');
-      Object.entries(stockAdjustments).forEach(([ref, adjustment]) => {
-        if (adjustment !== 0) {
-          console.log(`  ${ref}: ${adjustment > 0 ? '+' : ''}${adjustment}`);
-        }
-      });
-      console.log('🔑 Clés dans stockProjections:', Object.keys(stockAdjustments));
       return stockAdjustments;
     } catch (error) {
       console.error("Erreur calcul projection stock:", error);
@@ -311,7 +807,6 @@ const Nieuwkoop = () => {
   // Recalculer les projections quand les projets changent
   useEffect(() => {
     if (selectedStockDate) {
-      console.log('🔄 Recalcul des projections suite au changement de projets');
       calculateProjectedStock(selectedStockDate);
     }
   }, [projects]);
@@ -319,7 +814,6 @@ const Nieuwkoop = () => {
   // Calculer les projections pour aujourd'hui au chargement
   useEffect(() => {
     if (activeSection === "Stock" && projects.length > 0) {
-      console.log('📅 Initialisation des projections pour aujourd\'hui');
       calculateProjectedStock(today);
     }
   }, [activeSection, projects.length]);
@@ -1239,26 +1733,46 @@ return (
           >
             <div className="panel" style={{ width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h2>{entrySubTab === 'formulaire' ? '📥 Formulaire d\'Entrée' : '📋 Historique des Entrées'}</h2>
-                <button
-                  onClick={() => {
-                    const newValue = entrySubTab === 'formulaire' ? 'historique' : 'formulaire';
-                    console.log('🔄 Clic bouton Entrée:', entrySubTab, '→', newValue);
-                    setEntrySubTab(newValue);
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#059669',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}
-                >
-                  {entrySubTab === 'formulaire' ? 'Historique' : 'Formulaire'}
-                </button>
+                <h2>{entrySubTab === 'formulaire' ? '📥 Formulaire d\'Entrée' : entrySubTab === 'historique' ? '📋 Historique des Entrées' : '📤 Entrée externe'}</h2>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => {
+                      console.log('🔄 Clic bouton Entrée externe');
+                      setEntrySubTab('externe');
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: entrySubTab === 'externe' ? '#059669' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Entrée externe
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newValue = entrySubTab === 'formulaire' ? 'historique' : 'formulaire';
+                      console.log('🔄 Clic bouton Entrée:', entrySubTab, '→', newValue);
+                      setEntrySubTab(newValue);
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#059669',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    {entrySubTab === 'formulaire' ? 'Historique' : 'Formulaire'}
+                  </button>
+                </div>
               </div>
               
               {entrySubTab === 'formulaire' ? (
@@ -1287,6 +1801,8 @@ return (
                 }>
                   <EntryForm onSaved={handleEntrySaved} currentUser={currentUser} />
                 </Suspense>
+              ) : entrySubTab === 'externe' ? (
+                <ExternalEntryForm onSaved={handleEntrySaved} currentUser={currentUser} />
               ) : (
                 <Suspense fallback={
                   <motion.div 
@@ -1918,8 +2434,6 @@ return (
                   <>
                     {/* Encadré des projets à cette date */}
                     {(() => {
-                      console.log('🔍 Recherche de projets pour la date:', selectedStockDate.toLocaleDateString('fr-FR'));
-                      console.log('📋 Projets disponibles:', projects);
                       
                       const projectsAtDate = projects.filter(project => {
                         // Vérifier d'abord la structure
@@ -2042,31 +2556,36 @@ return (
                                       console.log('🔍 Clés disponibles:', Object.keys(project));
                                       
                                       // Chercher le bon nom dans tous les champs possibles
+                                      // PRIORISER LE NOM DU CLIENT PLUTÔT QUE LA DESCRIPTION
                                       let name = '';
                                       
-                                      // Si client est une string directe (comme "Mikado")
-                                      if (typeof project.client === 'string' && project.client !== 'ok') {
+                                      // Si client est une string directe (comme "Mikado") - PRIORITÉ 1
+                                      if (typeof project.client === 'string' && project.client !== 'ok' && project.client.trim() !== '') {
                                         name = project.client;
                                       }
-                                      // Si description existe et n'est pas "ok"
-                                      else if (project.description && project.description !== 'ok') {
-                                        name = project.description;
-                                      }
-                                      // Si client.name existe
-                                      else if (project.client?.name && project.client.name !== 'ok') {
+                                      // Si client.name existe - PRIORITÉ 2
+                                      else if (project.client?.name && project.client.name !== 'ok' && project.client.name.trim() !== '') {
                                         name = project.client.name;
                                       }
-                                      // Si address existe (peut contenir le nom du client)
-                                      else if (project.address) {
+                                      // Si title existe et n'est pas "ok" - PRIORITÉ 3
+                                      else if (project.title && project.title !== 'ok' && project.title.trim() !== '') {
+                                        name = project.title;
+                                      }
+                                      // Si address existe (peut contenir le nom du client) - PRIORITÉ 4
+                                      else if (project.address && project.address.trim() !== '') {
                                         name = project.address;
                                       }
-                                      // Sinon prendre title mais éviter "ok"
-                                      else if (project.title && project.title !== 'ok') {
-                                        name = project.title;
+                                      // DESCRIPTION EN DERNIER RECOURS car elle contient souvent des commentaires - PRIORITÉ 5
+                                      else if (project.description && project.description !== 'ok' && project.description.trim() !== '') {
+                                        // Prendre seulement les 50 premiers caractères de la description si elle est longue
+                                        const desc = project.description.length > 50 
+                                          ? project.description.substring(0, 50) + '...'
+                                          : project.description;
+                                        name = desc;
                                       }
                                       // En dernier recours
                                       else {
-                                        name = project.title || 'Projet';
+                                        name = 'Projet sans nom';
                                       }
                                       
                                       console.log(`✅ Nom final affiché: "${name}"`);
@@ -2108,27 +2627,114 @@ return (
                                       <div style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '0.5rem',
+                                        gap: '0.75rem',
                                         flex: 1
                                       }}>
-                                        <span style={{ fontSize: '1.2rem' }}>🌿</span>
-                                        <span style={{
-                                          color: 'var(--color-text-primary)',
-                                          fontWeight: '500'
+                                        {/* Image de l'article basée sur la référence */}
+                                        {(() => {
+                                          // Construire l'URL de l'image basée sur la référence
+                                          const imageUrl = material.reference ? 
+                                            `/api/catalog/nieuwkoop/items/${material.reference}/image` : 
+                                            null;
+                                          
+                                          // Utiliser soit l'image stockée soit l'image générée
+                                          const finalImageUrl = material.image || imageUrl;
+                                          
+                                          console.log(`🖼️ Image pour ${material.name} (${material.reference}):`, finalImageUrl);
+                                          
+                                          return finalImageUrl ? (
+                                            <div style={{
+                                              width: '45px',
+                                              height: '45px',
+                                              borderRadius: 'var(--radius-md)',
+                                              overflow: 'hidden',
+                                              border: '2px solid var(--glass-border)',
+                                              boxShadow: 'var(--shadow-sm)',
+                                              background: 'var(--color-surface)',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              flexShrink: 0
+                                            }}>
+                                              <img
+                                                src={finalImageUrl}
+                                                alt={material.name}
+                                                style={{
+                                                  width: '100%',
+                                                  height: '100%',
+                                                  objectFit: 'cover',
+                                                  transition: 'transform 0.3s ease'
+                                                }}
+                                                onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                                                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                                                onError={(e) => {
+                                                  console.log(`❌ Erreur chargement image pour ${material.name}: ${finalImageUrl}`);
+                                                  e.target.style.display = 'none';
+                                                  e.target.nextElementSibling.style.display = 'flex';
+                                                }}
+                                              />
+                                              <div style={{
+                                                display: 'none',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                width: '100%',
+                                                height: '100%',
+                                                fontSize: '1.5rem',
+                                                color: 'var(--color-text-secondary)'
+                                              }}>
+                                                🌿
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div style={{
+                                              width: '45px',
+                                              height: '45px',
+                                              borderRadius: 'var(--radius-md)',
+                                              background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              fontSize: '1.5rem',
+                                              boxShadow: 'var(--shadow-sm)',
+                                              flexShrink: 0
+                                            }}>
+                                              🌿
+                                            </div>
+                                          );
+                                        })()}
+                                        
+                                        <div style={{
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          gap: '0.25rem',
+                                          flex: 1,
+                                          minWidth: 0 // pour permettre le text overflow
                                         }}>
-                                          {material.name}
-                                        </span>
-                                        {material.reference && (
                                           <span style={{
-                                            fontSize: '0.8rem',
-                                            color: 'var(--color-text-secondary)',
-                                            background: 'var(--color-surface)',
-                                            padding: '0.1rem 0.5rem',
-                                            borderRadius: 'var(--radius-sm)'
+                                            color: 'var(--color-text-primary)',
+                                            fontWeight: '600',
+                                            fontSize: '0.95rem',
+                                            lineHeight: '1.2',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
                                           }}>
-                                            {material.reference}
+                                            {material.name}
                                           </span>
-                                        )}
+                                          {material.reference && (
+                                            <span style={{
+                                              fontSize: '0.75rem',
+                                              color: 'var(--color-text-secondary)',
+                                              background: 'var(--color-surface)',
+                                              padding: '0.1rem 0.5rem',
+                                              borderRadius: 'var(--radius-sm)',
+                                              alignSelf: 'flex-start',
+                                              fontWeight: '500'
+                                            }}>
+                                              {material.reference}
+                                            </span>
+                                          )}
+                                        </div>
                                       </div>
                                       <div style={{
                                         display: 'flex',
@@ -2801,17 +3407,6 @@ return (
                     const available = selectedStockDate ? baseQuantity - projectedReserved : baseAvailable;
                     const isOutOfStock = available <= 0;
                     
-                    // Debug: vérifier les données
-                    if (selectedStockDate || projection !== 0) {
-                      console.log(`📊 Carte ${prod.name} (${prod.reference}):`, {
-                        baseQuantity,
-                        baseReserved,
-                        baseAvailable,
-                        projection,
-                        projectedReserved,
-                        available
-                      });
-                    }
                     const isLowStock = available > 0 && available <= 5;
                     const recentlyModified = isRecentlyModified(prod);
 
@@ -3216,6 +3811,7 @@ return (
                               alignItems: 'center',
                               gap: '1rem'
                             }}>
+                              {/* Stock Total */}
                               <div style={{ textAlign: 'center' }}>
                                 <div style={{
                                   fontSize: '0.7rem',
@@ -3223,34 +3819,18 @@ return (
                                   marginBottom: '0.25rem',
                                   fontWeight: '600'
                                 }}>
-                                  {selectedStockDate ? 'Stock projeté' : 'Stock'}
+                                  Stock
                                 </div>
                                 <div style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
-                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : 'var(--color-primary)',
-                                  position: 'relative'
+                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : 'var(--color-primary)'
                                 }}>
                                   {available}
-                                  {selectedStockDate && projection !== 0 && (
-                                    <div style={{
-                                      position: 'absolute',
-                                      top: '-8px',
-                                      right: '-20px',
-                                      fontSize: '0.65rem',
-                                      fontWeight: '600',
-                                      color: projection > 0 ? 'var(--color-success)' : 'var(--color-danger)',
-                                      background: projection > 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-                                      padding: '2px 6px',
-                                      borderRadius: 'var(--radius-sm)',
-                                      border: `1px solid ${projection > 0 ? 'var(--color-success)' : 'var(--color-danger)'}`,
-                                      backdropFilter: 'blur(4px)'
-                                    }}>
-                                      {projection > 0 ? '+' : ''}{projection}
-                                    </div>
-                                  )}
                                 </div>
                               </div>
+                              
+                              {/* Réservés */}
                               <div style={{ textAlign: 'center' }}>
                                 <div style={{
                                   fontSize: '0.7rem',
@@ -3267,16 +3847,39 @@ return (
                                 }}>
                                   {(() => {
                                     const projectedQty = stockProjections[prod.reference];
-                                    console.log(`🔍 Vérification affichage pour ${prod.reference}:`, {
-                                      projectedQty,
-                                      stockProjections,
-                                      selectedStockDate: selectedStockDate ? selectedStockDate.toISOString() : null
-                                    });
                                     if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
-                                      console.log(`🎯 Affichage réservé pour ${prod.reference}: ${Math.abs(projectedQty)}`);
                                       return Math.abs(projectedQty);
                                     }
                                     return prod.reservedQuantity || 0;
+                                  })()}
+                                </div>
+                              </div>
+                              
+                              {/* Disponible */}
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{
+                                  fontSize: '0.7rem',
+                                  color: 'var(--color-success)',
+                                  marginBottom: '0.25rem',
+                                  fontWeight: '600'
+                                }}>
+                                  Disponible
+                                </div>
+                                <div style={{
+                                  fontSize: '1rem',
+                                  fontWeight: '700',
+                                  color: 'var(--color-success)'
+                                }}>
+                                  {(() => {
+                                    const reserved = (() => {
+                                      const projectedQty = stockProjections[prod.reference];
+                                      if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
+                                        return Math.abs(projectedQty);
+                                      }
+                                      return prod.reservedQuantity || 0;
+                                    })();
+                                    const disponible = Math.max(0, available - reserved);
+                                    return disponible;
                                   })()}
                                 </div>
                               </div>

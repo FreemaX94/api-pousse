@@ -59,7 +59,7 @@ module.exports = {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ['\'self\''],
-        imgSrc: ['\'self\'', 'data:', 'https:'],
+        imgSrc: ['\'self\'', 'data:', 'https:', 'http://localhost:3001'],
         scriptSrc: ['\'self\'', 'https://www.google.com', 'https://www.gstatic.com'],
         styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
         connectSrc: ['\'self\'', 'https://www.google.com'],

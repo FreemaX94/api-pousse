@@ -165,7 +165,7 @@ const nieuwkoopItemSchema = new Schema({
     type: String,
     required: [true, 'La catégorie est requise'],
     enum: {
-      values: ['plante', 'contenant', 'noel', 'artificiel', 'seche', 'entretien', 'decoration', 'outil', 'autre'],
+      values: ['plante', 'contenant', 'noel', 'artificiel', 'seche', 'entretien', 'decoration', 'outil', 'externe', 'autre'],
       message: 'Catégorie invalide : {VALUE}'
     },
     default: 'autre',
@@ -332,8 +332,13 @@ const nieuwkoopItemSchema = new Schema({
     },
     source: {
       type: String,
-      enum: ['manual', 'import', 'api'],
+      enum: ['manual', 'import', 'api', 'external'],
       default: 'import'
+    },
+    isExternal: {
+      type: Boolean,
+      default: false,
+      index: true
     }
   }
 }, {

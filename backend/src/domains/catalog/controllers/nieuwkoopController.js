@@ -129,18 +129,55 @@ exports.getNieuwkoopItems = async (req, res) => {
   try {
     const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
     
-    // Debug: afficher la structure des données
-    if (items.length > 0) {
-      console.log('🔍 Debug - Premier item structure:', {
-        id: items[0]._id,
-        name: items[0].name,
-        images: items[0].images,
-        hasImages: !!items[0].images && items[0].images.length > 0,
-        firstImageUrl: items[0].images?.[0]?.url
+    // Formater les données pour le frontend
+    const formattedItems = items.map(item => {
+      const formattedItem = {
+        _id: item._id,
+        reference: item.reference,
+        name: item.name,
+        description: item.description,
+        // Extraire le prix de pricing.price pour le frontend
+        price: item.pricing?.price || 0,
+        // Extraire l'image primaire pour le frontend avec URL complète
+        image: (() => {
+          const imageUrl = item.images?.find(img => img.isPrimary)?.url || item.images?.[0]?.url || null;
+          if (imageUrl && imageUrl.startsWith('/movements/')) {
+            // Pour les images externes, construire l'URL complète vers le backend
+            return `http://localhost:3001${imageUrl}`;
+          }
+          return imageUrl;
+        })(),
+        // Conserver la structure stock
+        stock: {
+          quantity: item.stock?.quantity || 0,
+          reservedQuantity: item.stock?.reservedQuantity || 0,
+          minimumAlert: item.stock?.minimumAlert || 0
+        },
+        // Ajouter availableQuantity pour cohérence
+        availableQuantity: Math.max(0, (item.stock?.quantity || 0) - (item.stock?.reservedQuantity || 0)),
+        category: item.category,
+        // Conserver d'autres champs utiles
+        dimensions: item.dimensions,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
+      };
+      
+      return formattedItem;
+    });
+    
+    // Debug: afficher la structure des données formatées
+    if (formattedItems.length > 0) {
+      console.log('🔍 Debug - Premier item formaté:', {
+        id: formattedItems[0]._id,
+        name: formattedItems[0].name,
+        price: formattedItems[0].price,
+        image: formattedItems[0].image,
+        hasImage: !!formattedItems[0].image,
+        stock: formattedItems[0].stock
       });
     }
     
-    res.json(items);
+    res.json(formattedItems);
   } catch (err) {
     console.error('❌ Erreur récupération des items Nieuwkoop:', err.message);
     res.status(500).json({ error: 'Erreur lors de la récupération.' });

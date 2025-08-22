@@ -1,0 +1,546 @@
+📦 SAUVEGARDE STOCK NIEUWKOOP - 21/08/2025 23:41:44
+================================================================
+Nombre total d'articles: 73
+================================================================
+
+RÉSUMÉ STATISTIQUES:
+- Articles en stock: 73
+- Articles en rupture: 0
+- Stock total (toutes unités): 1102 unités
+- Valeur totale estimée: 31466.95€
+
+================================================================
+DÉTAIL PAR ARTICLE (Trié par quantité décroissante):
+================================================================
+
+  1. [6TS171705] Palermo
+     📊 Stock: 349 unités | Prix: 1.75€ | Valeur: 610.75€
+     📏 Dimensions: H:12cm × Ø:13cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  2. [6TS171710] Palermo
+     📊 Stock: 85 unités | Prix: 6.75€ | Valeur: 573.75€
+     📏 Dimensions: H:25cm × Ø:27cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  3. [6TERKT037] Terra Cotta Kevin
+     📊 Stock: 47 unités | Prix: 16.06€ | Valeur: 754.82€
+     📏 Dimensions: H:34cm × Ø:37cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  4. [6TS171711] Palermo
+     📊 Stock: 41 unités | Prix: 10€ | Valeur: 410.00€
+     📏 Dimensions: H:28cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  5. [6TERCX300] Terra Cotta
+     📊 Stock: 34 unités | Prix: 11.6€ | Valeur: 394.40€
+     📏 Dimensions: H:26cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  6. [6TS171723] Palermo
+     📊 Stock: 30 unités | Prix: 18.25€ | Valeur: 547.50€
+     📏 Dimensions: H:36cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  7. [6BST1270X] B-straight
+     📊 Stock: 27 unités | Prix: 75.65€ | Valeur: 2042.55€
+     📏 Dimensions: H:40cm × Ø:29cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  8. [6PPNECBXL] Rough
+     📊 Stock: 23 unités | Prix: 26.77€ | Valeur: 615.71€
+     📏 Dimensions: H:31cm × Ø:32cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+  9. [6TS171712] Palermo
+     📊 Stock: 23 unités | Prix: 13€ | Valeur: 299.00€
+     📏 Dimensions: H:32cm × Ø:35cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 10. [6TEROC038] Terra Cotta Omar
+     📊 Stock: 20 unités | Prix: 20.53€ | Valeur: 410.60€
+     📏 Dimensions: H:34cm × Ø:38cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 11. [6TS171721] Palermo
+     📊 Stock: 20 unités | Prix: 10€ | Valeur: 200.00€
+     📏 Dimensions: H:28cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 12. [6TERKC055] Terra Cotta Kevin
+     📊 Stock: 20 unités | Prix: 71.4€ | Valeur: 1428.00€
+     📏 Dimensions: H:50cm × Ø:55cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 13. [6DLIAB967] Argento
+     📊 Stock: 20 unités | Prix: 94.3€ | Valeur: 1886.00€
+     📏 Dimensions: H:64cm × Ø:26cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 14. [6BRDC115W] B-round
+     📊 Stock: 19 unités | Prix: 25.5€ | Valeur: 484.50€
+     📏 Dimensions: H:31cm × Ø:33cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 15. [6FSTGWBU3] Fiberstone
+     📊 Stock: 19 unités | Prix: 71.4€ | Valeur: 1356.60€
+     📏 Dimensions: H:35cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 16. [6ARTBOG29] Artstone
+     📊 Stock: 14 unités | Prix: 14.7€ | Valeur: 205.80€
+     📏 Dimensions: H:29cm × Ø:33cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 17. [6FSTGWJE4] Fiberstone
+     📊 Stock: 14 unités | Prix: 128.78€ | Valeur: 1802.92€
+     📏 Dimensions: H:44cm × Ø:50cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 18. [6DLIAB812] Argento
+     📊 Stock: 14 unités | Prix: 144.32€ | Valeur: 2020.48€
+     📏 Dimensions: H:68cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 19. [6TDB21180] Terra Cotta
+     📊 Stock: 13 unités | Prix: 1.61€ | Valeur: 20.93€
+     📏 Dimensions: H:17cm × Ø:21cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 20. [1KEFOTU08] Kentia (Howea) forsteriana
+     📊 Stock: 11 unités | Prix: 121.55€ | Valeur: 1337.05€
+     📏 Dimensions: H:160cm × Ø:28cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 21. [6TERKT047] Terra Cotta Kevin
+     📊 Stock: 11 unités | Prix: 34.81€ | Valeur: 382.91€
+     📏 Dimensions: H:42cm × Ø:47cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 22. [6FSTRMB43] Fiberstone
+     📊 Stock: 11 unités | Prix: 65.02€ | Valeur: 715.22€
+     📏 Dimensions: H:43cm × Ø:43cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 23. [1KEFO5T30] Kentia (Howea) forsteriana
+     📊 Stock: 10 unités | Prix: 48.02€ | Valeur: 480.20€
+     📏 Dimensions: H:140cm × Ø:18cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 24. [6TDB47400] Terra Cotta
+     📊 Stock: 10 unités | Prix: 24.86€ | Valeur: 248.60€
+     📏 Dimensions: H:40cm × Ø:45cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 25. [6FSTRMB30] Fiberstone
+     📊 Stock: 10 unités | Prix: 31.88€ | Valeur: 318.80€
+     📏 Dimensions: H:30cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 26. [6FSTMWBO2] Fiberstone
+     📊 Stock: 10 unités | Prix: 66.3€ | Valeur: 663.00€
+     📏 Dimensions: H:45cm × Ø:35cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 27. [6FSTBO002] Natural
+     📊 Stock: 10 unités | Prix: 51€ | Valeur: 510.00€
+     📏 Dimensions: H:33cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 28. [6PURR80LW] Pure®
+     📊 Stock: 10 unités | Prix: 123.5€ | Valeur: 1235.00€
+     📏 Dimensions: H:70cm × Ø:78cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 29. [6TCWC3326] Terra Antica
+     📊 Stock: 9 unités | Prix: 11.47€ | Valeur: 103.23€
+     📏 Dimensions: H:26cm × Ø:33cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 30. [6TCWC4233] Terra Antica
+     📊 Stock: 9 unités | Prix: 16.15€ | Valeur: 145.35€
+     📏 Dimensions: H:33cm × Ø:42cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 31. [6PTR62356] Jip
+     📊 Stock: 9 unités | Prix: 9.31€ | Valeur: 83.79€
+     📏 Dimensions: H:31cm × Ø:37cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 32. [6BSTC4040] B-round
+     📊 Stock: 9 unités | Prix: 45.9€ | Valeur: 413.10€
+     📏 Dimensions: H:40cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 33. [6FSTBWJ08] Cement & Stone
+     📊 Stock: 9 unités | Prix: 68€ | Valeur: 612.00€
+     📏 Dimensions: H:45cm × Ø:50cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 34. [6BSTD3842] B-round
+     📊 Stock: 7 unités | Prix: 44.2€ | Valeur: 309.40€
+     📏 Dimensions: H:42cm × Ø:38cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 35. [6TERPA700] Terra Cotta
+     📊 Stock: 7 unités | Prix: 38.38€ | Valeur: 268.66€
+     📏 Dimensions: H:70cm × Ø:36cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 36. [6FSTGWBO62] Fiberstone
+     📊 Stock: 7 unités | Prix: 147.05€ | Valeur: 1029.35€
+     📏 Dimensions: H:61cm × Ø:48cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 37. [4FILY2T08] Ficus lyrata
+     📊 Stock: 6 unités | Prix: 34.76€ | Valeur: 208.56€
+     📏 Dimensions: H:160cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 38. [6FSTMWMA4] Fiberstone
+     📊 Stock: 6 unités | Prix: 90.95€ | Valeur: 545.70€
+     📏 Dimensions: H:43cm × Ø:43cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 39. [6TEROC045] Terra Cotta Omar
+     📊 Stock: 6 unités | Prix: 40.16€ | Valeur: 240.96€
+     📏 Dimensions: H:40cm × Ø:45cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 40. [6CILGR040] Cylinder
+     📊 Stock: 5 unités | Prix: 59.5€ | Valeur: 297.50€
+     📏 Dimensions: H:40cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 41. [6TDB40340] Terra Cotta
+     📊 Stock: 5 unités | Prix: 9.82€ | Valeur: 49.10€
+     📏 Dimensions: H:34cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 42. [6TERDT033] Terra Cotta Doppio
+     📊 Stock: 5 unités | Prix: 10.25€ | Valeur: 51.25€
+     📏 Dimensions: H:29cm × Ø:33cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 43. [6PPNB36BB] Bohemian
+     📊 Stock: 5 unités | Prix: 44.2€ | Valeur: 221.00€
+     📏 Dimensions: H:36cm × Ø:37cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 44. [6FSTGWB55] Fiberstone
+     📊 Stock: 5 unités | Prix: 93.92€ | Valeur: 469.60€
+     📏 Dimensions: H:55cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 45. [4FILY3T10] Ficus lyrata
+     📊 Stock: 4 unités | Prix: 52.36€ | Valeur: 209.44€
+     📏 Dimensions: H:170cm × Ø:34cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 46. [1FILYRS57] Ficus lyrata
+     📊 Stock: 4 unités | Prix: 63.75€ | Valeur: 255.00€
+     📏 Dimensions: H:180cm × Ø:32cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 47. [F00004556] Strelitzia nicolai
+     📊 Stock: 4 unités | Prix: 129.36€ | Valeur: 517.44€
+     📏 Dimensions: H:190cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 48. [6CILC4040] Cylinder
+     📊 Stock: 4 unités | Prix: 54.4€ | Valeur: 217.60€
+     📏 Dimensions: H:40cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 49. [6TERDT043] Terra Cotta Doppio
+     📊 Stock: 4 unités | Prix: 21.42€ | Valeur: 85.68€
+     📏 Dimensions: H:36cm × Ø:43cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 50. [6RDPBE079] Baq Raindrop
+     📊 Stock: 4 unités | Prix: 91.8€ | Valeur: 367.20€
+     📏 Dimensions: H:79cm × Ø:42cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 51. [6FSTRD030] Fiberstone
+     📊 Stock: 4 unités | Prix: 47.6€ | Valeur: 190.40€
+     📏 Dimensions: H:44cm × Ø:34cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 52. [6TDBA3532] Terra Cotta
+     📊 Stock: 4 unités | Prix: 15.68€ | Valeur: 62.72€
+     📏 Dimensions: H:32cm × Ø:35cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 53. [6FSTSBG40] Fiberstone
+     📊 Stock: 3 unités | Prix: 70.97€ | Valeur: 212.91€
+     📏 Dimensions: H:40cm × Ø:38cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 54. [6FSTRMG30] Fiberstone
+     📊 Stock: 3 unités | Prix: 31.88€ | Valeur: 95.64€
+     📏 Dimensions: H:30cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 55. [6FSTBWJ06] Cement & Stone
+     📊 Stock: 3 unités | Prix: 40.38€ | Valeur: 121.14€
+     📏 Dimensions: H:36cm × Ø:42cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 56. [6CILH4040] Cylinder
+     📊 Stock: 3 unités | Prix: 56.95€ | Valeur: 170.85€
+     📏 Dimensions: H:40cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 57. [4FILYR023] Ficus lyrata
+     📊 Stock: 2 unités | Prix: 51.92€ | Valeur: 103.84€
+     📏 Dimensions: H:140cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 58. [6FSTMWMA2] Fiberstone
+     📊 Stock: 2 unités | Prix: 42.07€ | Valeur: 84.14€
+     📏 Dimensions: H:29cm × Ø:29cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 59. [6FSTSBG50] Fiberstone
+     📊 Stock: 2 unités | Prix: 108.38€ | Valeur: 216.76€
+     📏 Dimensions: H:50cm × Ø:45cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 60. [6LIMHUPT6] Humus
+     📊 Stock: 2 unités | Prix: 89.25€ | Valeur: 178.50€
+     📏 Dimensions: H:43cm × Ø:37cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 61. [6DLIAB804] Argento
+     📊 Stock: 2 unités | Prix: 187.78€ | Valeur: 375.56€
+     📏 Dimensions: H:50cm × Ø:50cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 62. [6ARTBOZ29] Artstone
+     📊 Stock: 2 unités | Prix: 14.7€ | Valeur: 29.40€
+     📏 Dimensions: H:29cm × Ø:33cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 63. [6DLIAW417] Grigio
+     📊 Stock: 2 unités | Prix: 148.42€ | Valeur: 296.84€
+     📏 Dimensions: H:68cm × Ø:30cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 64. [1KEFOTU18] Kentia (Howea) forsteriana
+     📊 Stock: 1 unités | Prix: 72.25€ | Valeur: 72.25€
+     📏 Dimensions: H:120cm × Ø:25cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 65. [4FILYSV51] Ficus lyrata
+     📊 Stock: 1 unités | Prix: 131.12€ | Valeur: 131.12€
+     📏 Dimensions: H:165cm × Ø:38cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 66. [F00004555] Strelitzia nicolai
+     📊 Stock: 1 unités | Prix: 112.64€ | Valeur: 112.64€
+     📏 Dimensions: H:160cm × Ø:38cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 67. [4STNIT062] Strelitzia nicolai
+     📊 Stock: 1 unités | Prix: 70.62€ | Valeur: 70.62€
+     📏 Dimensions: H:180cm × Ø:27cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 68. [6TDBA3127] Terra Cotta
+     📊 Stock: 1 unités | Prix: 5.99€ | Valeur: 5.99€
+     📏 Dimensions: H:26cm × Ø:31cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 69. [6TERKT055] Terra Cotta Kevin
+     📊 Stock: 1 unités | Prix: 57.12€ | Valeur: 57.12€
+     📏 Dimensions: H:50cm × Ø:55cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 70. [6DLINC200] Grigio
+     📊 Stock: 1 unités | Prix: 74.62€ | Valeur: 74.62€
+     📏 Dimensions: H:30cm × Ø:0cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 21/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 71. [6FSTRBOB5] Fiberstone
+     📊 Stock: 1 unités | Prix: 47.17€ | Valeur: 47.17€
+     📏 Dimensions: H:45cm × Ø:35cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 72. [6PPNERC24] Rough
+     📊 Stock: 1 unités | Prix: 22.95€ | Valeur: 22.95€
+     📏 Dimensions: H:28cm × Ø:32cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+ 73. [6FSTRBG03] Fiberstone
+     📊 Stock: 1 unités | Prix: 77.77€ | Valeur: 77.77€
+     📏 Dimensions: H:55cm × Ø:40cm
+     🏷️ Catégorie: autre | Statut: ✅ OK
+     📅 Créé: 14/08/2025
+     🖼️ Image: Disponible
+     ----------------------------------------------------------------
+
+================================================================
+ARTICLES PAR CATÉGORIE:
+================================================================
+🏷️ AUTRE:
+   - Articles: 73
+   - Stock total: 1102 unités
+   - Valeur: 31466.95€
+   
+================================================================
+ALERTES ET RUPTURES:
+================================================================
+
+ARTICLES EN RUPTURE (0 unités):
+
+ARTICLES EN ALERTE (stock faible):
+
+================================================================
+FIN DE LA SAUVEGARDE - 21/08/2025 23:41:44
+================================================================

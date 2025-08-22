@@ -5,9 +5,10 @@ const Movement      = require('../models/movementModel');
 const NieuwkoopItem = require('../../catalog/models/nieuwkoopItemModel');
 const Project       = require('../../projects/models/Projet');
 
-// Création d’un mouvement (entrée ou sortie), project optionnel
+// Création d'un mouvement (entrée ou sortie), project optionnel
 exports.createMovement = async (req, res) => {
   try {
+
     const {
       type,       // "entrée" ou "sortie"
       subType,    // "definitive" ou "locative" (pour sorties)
@@ -25,14 +26,28 @@ exports.createMovement = async (req, res) => {
       category    // catégorie de la plante (mode multiple)
     } = req.body;
 
+    // Convertir les valeurs numériques car FormData envoie tout en string
+    const parsedQuantity = parseInt(quantity, 10);
+    const parsedCoef = coef ? parseInt(coef, 10) : 1;
+    const parsedHeight = height ? parseFloat(height) : 0;
+    const parsedDiameter = diameter ? parseFloat(diameter) : 0;
+
+    // Pour les entrées externes sans référence, générer une référence unique
+    const finalReference = reference || `EXT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     // Date de l’événement : soit fournie, soit maintenant
     const eventDate = req.body.eventDate
       ? new Date(req.body.eventDate)
       : new Date();
 
     // Validation minimale (project n'est plus obligatoire)
-    if (!type || !reference || !name || !quantity || !createdBy) {
+    if (!type || !name || !parsedQuantity || !createdBy) {
       return res.status(400).json({ error: 'Champs requis manquants' });
+    }
+
+    // Validation de la quantité
+    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+      return res.status(400).json({ error: 'Quantité invalide' });
     }
 
     // Si un project est passé, on peut l'accepter comme chaîne ou ObjectId
@@ -55,23 +70,80 @@ exports.createMovement = async (req, res) => {
       }
     }
 
-    // Récupérer l'article pour obtenir le prix
-    const item = await NieuwkoopItem.findOne({ reference });
-    if (!item) {
-      return res.status(404).json({ error: 'Article introuvable' });
-    }
+    // Récupérer l'article pour obtenir le prix (pour les articles du catalogue uniquement)
+    let item = null;
+    let itemPrice = 0;
     
-    // Récupérer le prix de l'article
-    const itemPrice = item.pricing?.price || 0;
+    // Si c'est une référence d'origine (pas générée automatiquement), chercher dans le catalogue
+    if (reference && !reference.startsWith('EXT-')) {
+      item = await NieuwkoopItem.findOne({ reference: finalReference });
+      if (!item) {
+        return res.status(404).json({ error: 'Article introuvable' });
+      }
+      itemPrice = item.pricing?.price || 0;
+    } else {
+      // Pour les entrées externes, utiliser le prix fourni par l'utilisateur
+      itemPrice = req.body.price ? parseFloat(req.body.price) : 0;
+      
+      // Pour les entrées externes de type "entrée", créer automatiquement un article dans le catalogue
+      if (type === 'entrée') {
+        try {
+          // Créer un nouvel article dans le catalogue Nieuwkoop
+          const newItem = await NieuwkoopItem.create({
+            reference: finalReference,
+            name: name,
+            description: note || `Article externe: ${name}`,
+            category: 'externe',
+            dimensions: {
+              height: parsedHeight || 0,
+              diameter: parsedDiameter || 0,
+              unit: 'cm'
+            },
+            pricing: {
+              price: itemPrice,
+              currency: 'EUR'
+            },
+            stock: {
+              quantity: parsedQuantity,
+              reservedQuantity: 0,
+              minimumAlert: 0
+            },
+            images: req.file ? [{
+              url: `/movements/${req.file.filename}`,
+              isPrimary: true,
+              alt: name
+            }] : [],
+            metadata: {
+              isExternal: true,
+              source: 'external'
+            },
+            availability: {
+              status: 'available',
+              isActive: true
+            },
+            supplier: {
+              name: 'Externe',
+              code: 'EXT'
+            }
+          });
+          
+          item = newItem;
+          console.log('✅ Article externe créé dans le catalogue:', finalReference);
+        } catch (error) {
+          console.error('❌ Erreur création article externe:', error);
+          // Continuer même si la création de l'article échoue
+        }
+      }
+    }
 
-    // Si sortie, vérifier et réserver la quantité
-    if (type === 'sortie') {
+    // Si sortie, vérifier et réserver la quantité (seulement pour les articles du catalogue)
+    if (type === 'sortie' && item) {
       
       // Debug: afficher les valeurs
       console.log('🔍 Article trouvé:', item.name);
       console.log('📦 Stock total:', item.stock?.quantity || 0);
       console.log('🔒 Stock réservé:', item.stock?.reservedQuantity || 0);
-      console.log('📤 Quantité demandée:', quantity);
+      console.log('📤 Quantité demandée:', parsedQuantity);
       
       const stockTotal = item.stock?.quantity || 0;
       const stockReserve = item.stock?.reservedQuantity || 0;
@@ -79,19 +151,19 @@ exports.createMovement = async (req, res) => {
       
       console.log('✅ Stock disponible:', disponible);
       
-      if (disponible < quantity) {
+      if (disponible < parsedQuantity) {
         return res.status(400).json({ 
           error: 'Stock insuffisant',
           details: {
             stockTotal,
             stockReserve,
             disponible,
-            demande: quantity
+            demande: parsedQuantity
           }
         });
       }
       
-      item.stock.reservedQuantity = stockReserve + quantity;
+      item.stock.reservedQuantity = stockReserve + parsedQuantity;
       await item.save();
     }
 
@@ -99,21 +171,21 @@ exports.createMovement = async (req, res) => {
     const movementData = {
       type,
       subType: subType || 'definitive',  // Sous-type pour les sorties
-      reference,
+      reference: finalReference,
       name,
-      quantity,
-      price: itemPrice,  // Prix récupéré de l'article
+      quantity: parsedQuantity,
+      price: itemPrice,  // Prix récupéré de l'article ou fourni par l'utilisateur
       eventDate,
       project: projId,  // pourra être null
       note,
       createdBy,
       concepteur: concepteur || null,  // Concepteur responsable
-      image: req.body.image || '',
+      image: req.file ? `/movements/${req.file.filename}` : (req.body.image || ''),
       // Champs pour le mode multiple
-      coef: coef || 1,
-      isNewPlant: isNewPlant || false,
-      height: height || 0,
-      diameter: diameter || 0,
+      coef: parsedCoef,
+      isNewPlant: isNewPlant === 'true' || isNewPlant === true,
+      height: parsedHeight,
+      diameter: parsedDiameter,
       category: category || 'autre'
     };
 

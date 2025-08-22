@@ -143,6 +143,12 @@ function setupDomains() {
       inventoryDomain.routes(req, res, next);
     });
     
+    // Rediriger /api/mouvements vers le domaine inventory
+    app.use('/api/mouvements', (req, res, next) => {
+      req.url = '/movements' + req.url;
+      inventoryDomain.routes(req, res, next);
+    });
+    
     // Rediriger /api/stock-items vers nieuwkoop/stock
     app.get('/api/stock-items', async (req, res, next) => {
       try {
