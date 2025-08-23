@@ -636,6 +636,7 @@ const Nieuwkoop = () => {
   
   const [mouvements, setMouvements] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Option A : assignation stock → projet
   const [isAssignOpen, setIsAssignOpen] = useState(false);
@@ -4119,6 +4120,44 @@ return (
             }>
               <ProjetForm onSubmit={handleSubmitProject} />
             </Suspense>
+            
+            {/* Bouton Historique */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              margin: '2rem 0'
+            }}>
+              <motion.button
+                onClick={() => setShowHistory(!showHistory)}
+                whileHover={{ scale: 1.05, boxShadow: 'var(--shadow-2xl)' }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: showHistory 
+                    ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' 
+                    : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))',
+                  color: 'var(--color-text-inverse)',
+                  border: 'none',
+                  borderRadius: '20px',
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'var(--shadow-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                <span style={{ fontSize: '1.3rem' }}>
+                  {showHistory ? '📚' : '📖'}
+                </span>
+                {showHistory ? 'Masquer l\'historique' : 'Afficher l\'historique'}
+              </motion.button>
+            </div>
+            
             <Suspense fallback={
               <motion.div 
                 className="loading"
@@ -4142,7 +4181,12 @@ return (
                 Chargement de la liste des projets...
               </motion.div>
             }>
-              <ProjetList projects={projects} onUpdate={handleUpdateProject} onDelete={handleDeleteProject} />
+              <ProjetList 
+                projects={showHistory ? projects : projects.filter(p => p.status !== 'completed' && p.status !== 'archived')} 
+                onUpdate={handleUpdateProject} 
+                onDelete={handleDeleteProject} 
+                showHistory={showHistory}
+              />
             </Suspense>
           </motion.section>
         )}

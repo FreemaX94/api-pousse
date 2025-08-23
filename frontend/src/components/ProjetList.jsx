@@ -54,7 +54,7 @@ const TrashIcon = (props) => (
   </svg>
 );
 
-export default function ProjetList({ projects, onUpdate, onDelete }) {
+export default function ProjetList({ projects, onUpdate, onDelete, showHistory }) {
   if (!projects?.length) {
     return (
       <div style={{
@@ -78,6 +78,52 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
   const now = Date.now();
 
   return (
+    <>
+      {/* Titre dynamique */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          textAlign: 'center',
+          marginBottom: '2rem',
+          padding: '1.5rem',
+          background: showHistory 
+            ? 'linear-gradient(135deg, var(--color-warning), var(--color-warning-dark))' 
+            : 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+          borderRadius: '20px',
+          boxShadow: 'var(--shadow-xl)',
+          color: 'var(--color-text-inverse)'
+        }}
+      >
+        <h2 style={{
+          margin: 0,
+          fontSize: '1.8rem',
+          fontWeight: '800',
+          textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem'
+        }}>
+          <span style={{ fontSize: '2rem' }}>
+            {showHistory ? '📚' : '🏗️'}
+          </span>
+          {showHistory ? 'Historique complet des projets' : 'Projets actifs'}
+        </h2>
+        <p style={{
+          margin: '0.5rem 0 0 0',
+          fontSize: '1rem',
+          opacity: 0.9,
+          fontWeight: '500'
+        }}>
+          {showHistory 
+            ? `${projects.length} projet${projects.length > 1 ? 's' : ''} au total (tous statuts confondus)`
+            : `${projects.length} projet${projects.length > 1 ? 's' : ''} en cours`
+          }
+        </p>
+      </motion.div>
+
     <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
@@ -580,5 +626,6 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
         );
       })}
     </div>
+    </>
   );
 }

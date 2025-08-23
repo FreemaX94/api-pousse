@@ -2,13 +2,26 @@ const rateLimit = require('express-rate-limit');
 const csrf = require('csurf');
 const helmet = require('helmet');
 
-// Rate limiting global
+// Rate limiting global - Optimisé pour équipes multiples utilisateurs
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requêtes
+  max: 5000, // 5000 requêtes (adapté pour plusieurs utilisateurs simultanés)
   message: 'Trop de requêtes, veuillez réessayer plus tard',
   standardHeaders: true,
   legacyHeaders: false,
+  // Clé personnalisée : par utilisateur si connecté, sinon par IP
+  keyGenerator: (req) => {
+    // Si utilisateur connecté, rate limit par utilisateur
+    if (req.user && req.user.id) {
+      return `user:${req.user.id}`;
+    }
+    // Sinon par IP (pour les non-connectés)
+    return `ip:${req.ip}`;
+  },
+  // Skip pour les environnements de développement
+  skip: (req) => {
+    return process.env.NODE_ENV === 'development';
+  }
 });
 
 // Rate limiting strict pour auth

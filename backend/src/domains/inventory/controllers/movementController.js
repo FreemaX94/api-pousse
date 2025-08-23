@@ -136,7 +136,7 @@ exports.createMovement = async (req, res) => {
       }
     }
 
-    // Si sortie, vérifier et réserver la quantité (seulement pour les articles du catalogue)
+    // Si sortie, gérer le stock selon le sous-type (seulement pour les articles du catalogue)
     if (type === 'sortie' && item) {
       
       // Debug: afficher les valeurs
@@ -144,6 +144,7 @@ exports.createMovement = async (req, res) => {
       console.log('📦 Stock total:', item.stock?.quantity || 0);
       console.log('🔒 Stock réservé:', item.stock?.reservedQuantity || 0);
       console.log('📤 Quantité demandée:', parsedQuantity);
+      console.log('🎯 Type de sortie:', subType || 'definitive');
       
       const stockTotal = item.stock?.quantity || 0;
       const stockReserve = item.stock?.reservedQuantity || 0;
@@ -163,7 +164,17 @@ exports.createMovement = async (req, res) => {
         });
       }
       
-      item.stock.reservedQuantity = stockReserve + parsedQuantity;
+      // Gestion différenciée selon le sous-type de sortie
+      if (subType === 'locative') {
+        // Sortie locative : réserver le stock (les plantes reviendront)
+        item.stock.reservedQuantity = stockReserve + parsedQuantity;
+        console.log('🔄 Sortie locative : stock réservé');
+      } else {
+        // Sortie définitive : décrémenter définitivement le stock total
+        item.stock.quantity = stockTotal - parsedQuantity;
+        console.log('🗑️ Sortie définitive : stock décrémenté définitivement');
+      }
+      
       await item.save();
     }
 
@@ -270,11 +281,43 @@ exports.markAsReturned = async (req, res) => {
     if (!m || m.type !== 'sortie') {
       return res.status(400).json({ error: 'Mouvement non valide pour retour' });
     }
+
+    // Vérifier si le mouvement est déjà marqué comme retourné
+    if (m.returned) {
+      return res.status(400).json({ error: 'Ce mouvement est déjà marqué comme retourné' });
+    }
+
     const item = await NieuwkoopItem.findOne({ reference: m.reference });
     if (item) {
-      item.stock.reservedQuantity = Math.max(0, (item.stock.reservedQuantity || 0) - m.quantity);
+      console.log('🔄 Retour de marchandise:', {
+        reference: m.reference,
+        quantity: m.quantity,
+        subType: m.subType,
+        stockAvant: item.stock?.quantity || 0,
+        reserveAvant: item.stock?.reservedQuantity || 0
+      });
+
+      if (m.subType === 'locative') {
+        // Sortie locative : libérer les réservations et remettre en stock
+        const currentReserved = item.stock?.reservedQuantity || 0;
+        item.stock.reservedQuantity = Math.max(0, currentReserved - m.quantity);
+        item.stock.quantity = (item.stock?.quantity || 0) + m.quantity;
+        console.log('✅ Retour sortie locative : stock libéré et réintégré');
+      } else {
+        // Sortie définitive : en théorie, pas de retour possible, mais si ça arrive...
+        // On peut choisir de remettre en stock ou d'ignorer
+        console.log('⚠️ Tentative de retour d\'une sortie définitive - remise en stock');
+        item.stock.quantity = (item.stock?.quantity || 0) + m.quantity;
+      }
+
+      console.log('📊 Nouvel état stock:', {
+        stockTotal: item.stock.quantity,
+        stockReserve: item.stock.reservedQuantity
+      });
+
       await item.save();
     }
+
     m.returned = true;
     m.returnedAt = new Date();
     await m.save();
@@ -293,11 +336,33 @@ exports.deleteMovement = async (req, res) => {
       return res.status(404).json({ error: 'Mouvement introuvable' });
     }
 
-    // Si c'est une sortie et qu'elle n'est pas retournée, libérer le stock réservé
+    // Si c'est une sortie et qu'elle n'est pas retournée, restaurer le stock
     if (movement.type === 'sortie' && !movement.returned) {
       const item = await NieuwkoopItem.findOne({ reference: movement.reference });
       if (item && item.stock) {
-        item.stock.reservedQuantity = Math.max(0, (item.stock.reservedQuantity || 0) - movement.quantity);
+        console.log('🗑️ Suppression mouvement de sortie:', {
+          reference: movement.reference,
+          quantity: movement.quantity,
+          subType: movement.subType,
+          stockAvant: item.stock?.quantity || 0,
+          reserveAvant: item.stock?.reservedQuantity || 0
+        });
+
+        if (movement.subType === 'locative') {
+          // Sortie locative : libérer les réservations (le stock total n'avait pas été touché)
+          item.stock.reservedQuantity = Math.max(0, (item.stock.reservedQuantity || 0) - movement.quantity);
+          console.log('✅ Suppression sortie locative : réservation libérée');
+        } else {
+          // Sortie définitive : remettre en stock (annuler la décrémentation)
+          item.stock.quantity = (item.stock?.quantity || 0) + movement.quantity;
+          console.log('✅ Suppression sortie définitive : stock restauré');
+        }
+
+        console.log('📊 Nouvel état stock après suppression:', {
+          stockTotal: item.stock.quantity,
+          stockReserve: item.stock.reservedQuantity
+        });
+
         await item.save();
       }
     }

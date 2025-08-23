@@ -99,7 +99,9 @@
       "Bash(for:*)",
       "Bash(do echo \"Creating $comp.jsx\")",
       "Bash(del \"C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\frontend\\src\\pages\\NieuwkoopTest.jsx\")",
-      "Bash(do mv \"$f\" \"terra_cotta_image.jpeg\")"
+      "Bash(do mv \"$f\" \"terra_cotta_image.jpeg\")",
+      "WebSearch",
+      "WebFetch(domain:pousse.fr)"
     ],
     "deny": []
   }

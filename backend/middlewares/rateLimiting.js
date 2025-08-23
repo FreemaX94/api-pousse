@@ -35,18 +35,18 @@ const rateLimitConfigs = {
     refreshToken: { window: 5 * 60 * 1000, max: 10, message: 'Trop de rafraîchissements de token' }
   },
 
-  // API externes - Limites modérées
+  // API externes - Limites adaptées pour usage intensif
   external: {
-    nieuwkoop: { window: 60 * 1000, max: 100, message: 'Limite API Nieuwkoop atteinte' },
-    email: { window: 60 * 1000, max: 10, message: 'Trop d\'emails envoyés' },
-    upload: { window: 60 * 1000, max: 20, message: 'Trop d\'uploads' }
+    nieuwkoop: { window: 60 * 1000, max: 500, message: 'Limite API Nieuwkoop atteinte' },
+    email: { window: 60 * 1000, max: 50, message: 'Trop d\'emails envoyés' },
+    upload: { window: 60 * 1000, max: 100, message: 'Trop d\'uploads' }
   },
 
-  // API standard - Limites normales
+  // API standard - Limites adaptées pour usage professionnel
   api: {
-    general: { window: 15 * 60 * 1000, max: 1000, message: 'Limite API générale atteinte' },
-    search: { window: 60 * 1000, max: 200, message: 'Trop de recherches' },
-    crud: { window: 60 * 1000, max: 300, message: 'Trop d\'opérations CRUD' }
+    general: { window: 15 * 60 * 1000, max: 5000, message: 'Limite API générale atteinte' },
+    search: { window: 60 * 1000, max: 1000, message: 'Trop de recherches' },
+    crud: { window: 60 * 1000, max: 1500, message: 'Trop d\'opérations CRUD' }
   },
 
   // Admin - Limites élevées mais surveillées
