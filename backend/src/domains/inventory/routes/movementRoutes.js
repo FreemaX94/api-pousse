@@ -17,7 +17,13 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext).replace(/\s+/g, '_');
+    // Nettoyer complètement le nom : garder seulement lettres, chiffres, tirets et underscores
+    const name = path.basename(file.originalname, ext)
+      .normalize('NFD') // Décomposer les caractères accentués
+      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+      .replace(/[^a-zA-Z0-9\-_]/g, '_') // Remplacer tout caractère spécial par _
+      .replace(/_+/g, '_') // Remplacer les _ multiples par un seul
+      .replace(/^_|_$/g, ''); // Supprimer les _ en début/fin
     const timestamp = Date.now();
     cb(null, `movement_${name}_${timestamp}${ext}`);
   }

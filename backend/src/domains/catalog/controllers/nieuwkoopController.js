@@ -138,13 +138,10 @@ exports.getNieuwkoopItems = async (req, res) => {
         description: item.description,
         // Extraire le prix de pricing.price pour le frontend
         price: item.pricing?.price || 0,
-        // Extraire l'image primaire pour le frontend avec URL complète
+        // Extraire l'image primaire pour le frontend avec URL relative
         image: (() => {
           const imageUrl = item.images?.find(img => img.isPrimary)?.url || item.images?.[0]?.url || null;
-          if (imageUrl && imageUrl.startsWith('/movements/')) {
-            // Pour les images externes, construire l'URL complète vers le backend
-            return `http://localhost:3001${imageUrl}`;
-          }
+          // Garder l'URL relative pour que le frontend gère l'URL de base
           return imageUrl;
         })(),
         // Conserver la structure stock
