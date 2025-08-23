@@ -173,7 +173,13 @@ export const deleteProject = async (id) => {
   await api.delete(`/projets/${id}`);
 };
 
-// ─── Assignation d’un article du stock à un projet ──────────────────────────
+// Nouvelle fonction pour terminer un projet et finaliser les stocks
+export const completeProject = async (id) => {
+  const res = await api.put(`/projets/${id}/complete`);
+  return res.data;
+};
+
+// ─── Assignation d'un article du stock à un projet ──────────────────────────
 export const assignItemToProject = async ({
   itemId,
   projectId,

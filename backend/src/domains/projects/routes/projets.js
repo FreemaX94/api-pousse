@@ -5,6 +5,7 @@ const {
   getProjetById,
   createProjet,
   updateProjet,
+  completeProjet,
   deleteProjet
 } = require('../controllers/projetController');
 const {
@@ -37,6 +38,8 @@ router.put(
   updateProjetValidator,
   updateProjet
 );
+// Route pour terminer un projet et finaliser les stocks
+router.put('/:id/complete', idParamValidator, completeProjet);
 router.delete('/:id', idParamValidator, deleteProjet);
 
 module.exports = router;

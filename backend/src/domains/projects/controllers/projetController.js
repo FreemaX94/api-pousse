@@ -167,12 +167,110 @@ const updateProjet = async (req, res, next) => {
   }
 };
 
+// Nouvelle fonction pour terminer un projet et libérer les stocks
+const completeProjet = async (req, res, next) => {
+  try {
+    const projet = await Projet.findById(req.params.id);
+    if (!projet) return res.status(404).json({ message: 'Projet non trouvé' });
+
+    // Libérer les stocks réservés des mouvements liés à ce projet
+    const Movement = require('../../inventory/models/movementModel');
+    const NieuwkoopItem = require('../../catalog/models/nieuwkoopItemModel');
+    
+    console.log(`✅ Finalisation du projet "${projet.title}" - Libération des stocks réservés...`);
+    
+    // Trouver tous les mouvements de sortie liés à ce projet
+    const movements = await Movement.find({ 
+      project: req.params.id,
+      type: 'sortie',
+      returned: { $ne: true } // Seulement les sorties non retournées
+    });
+    
+    console.log(`📦 ${movements.length} mouvements de sortie trouvés pour libération`);
+    
+    // Libérer le stock réservé pour chaque mouvement et marquer comme définitif
+    for (const movement of movements) {
+      const item = await NieuwkoopItem.findOne({ reference: movement.reference });
+      if (item && item.stock) {
+        const oldReserved = item.stock.reservedQuantity || 0;
+        const oldTotal = item.stock.quantity || 0;
+        
+        // Libérer les réservations et diminuer le stock total (sortie définitive)
+        const newReserved = Math.max(0, oldReserved - movement.quantity);
+        const newTotal = Math.max(0, oldTotal - movement.quantity);
+        
+        item.stock.reservedQuantity = newReserved;
+        item.stock.quantity = newTotal;
+        await item.save();
+        
+        // Marquer le mouvement comme retourné pour éviter de le retraiter
+        movement.returned = true;
+        movement.returnedAt = new Date();
+        await movement.save();
+        
+        console.log(`📈 ${movement.reference}: Stock ${oldTotal} → ${newTotal}, Réservé ${oldReserved} → ${newReserved}`);
+      }
+    }
+    
+    // Marquer le projet comme terminé
+    const updated = await Projet.findByIdAndUpdate(
+      req.params.id,
+      { 
+        status: 'completed',
+        'dates.end': new Date()
+      },
+      { new: true }
+    );
+    
+    console.log(`✅ Projet "${projet.title}" terminé avec succès. ${movements.length} articles finalisés.`);
+    res.json(updated);
+  } catch (err) {
+    console.error('❌ Erreur finalisation projet:', err);
+    next(err);
+  }
+};
+
 const deleteProjet = async (req, res, next) => {
   try {
-    const deleted = await Projet.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Projet non trouvé' });
+    const projet = await Projet.findById(req.params.id);
+    if (!projet) return res.status(404).json({ message: 'Projet non trouvé' });
+
+    // Libérer les stocks réservés des mouvements liés à ce projet
+    const Movement = require('../../inventory/models/movementModel');
+    const NieuwkoopItem = require('../../catalog/models/nieuwkoopItemModel');
+    
+    console.log(`🗑️ Suppression du projet "${projet.title}" - Libération des stocks réservés...`);
+    
+    // Trouver tous les mouvements de sortie liés à ce projet
+    const movements = await Movement.find({ 
+      project: req.params.id,
+      type: 'sortie',
+      returned: { $ne: true } // Seulement les sorties non retournées
+    });
+    
+    console.log(`📦 ${movements.length} mouvements de sortie trouvés pour libération`);
+    
+    // Libérer le stock réservé pour chaque mouvement
+    for (const movement of movements) {
+      const item = await NieuwkoopItem.findOne({ reference: movement.reference });
+      if (item && item.stock) {
+        const oldReserved = item.stock.reservedQuantity || 0;
+        const newReserved = Math.max(0, oldReserved - movement.quantity);
+        
+        item.stock.reservedQuantity = newReserved;
+        await item.save();
+        
+        console.log(`📈 ${movement.reference}: Stock réservé ${oldReserved} → ${newReserved} (libéré: ${movement.quantity})`);
+      }
+    }
+    
+    // Supprimer le projet
+    await Projet.findByIdAndDelete(req.params.id);
+    
+    console.log(`✅ Projet "${projet.title}" supprimé avec succès. Stocks libérés.`);
     res.status(204).end();
   } catch (err) {
+    console.error('❌ Erreur suppression projet:', err);
     next(err);
   }
 };
@@ -182,5 +280,6 @@ module.exports = {
   getProjetById,
   createProjet,
   updateProjet,
+  completeProjet,
   deleteProjet
 };
