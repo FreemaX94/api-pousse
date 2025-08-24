@@ -118,6 +118,9 @@ function setupDomains() {
     // Route Nieuwkoop legacy pour compatibilité avec l'ancien système
     app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
     
+    // Route Opérations diverses pour ventes inter-pôles
+    app.use('/api/internal-operations', require('../routes/internalOperations'));
+    
     // Routes legacy pour compatibilité avec l'ancien frontend
     // Rediriger /api/projets vers le domaine projects
     app.use('/api/projets', (req, res, next) => {
