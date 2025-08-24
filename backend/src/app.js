@@ -217,6 +217,10 @@ app.get('/test-route', (req, res) => {
   });
 });
 
+// Servir les fichiers statiques AVANT les routes
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../dist')));
+
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
   res.json({
@@ -228,10 +232,6 @@ app.get('/debug/architecture', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-
-// Servir les fichiers statiques
-app.use(express.static(path.join(__dirname, '../dist')));
-app.use(express.static(path.join(__dirname, '../public')));
 
 // Validation et gestion d'erreurs
 app.use(errors());
@@ -272,7 +272,7 @@ function initializeDomains() {
   }
 }
 
-// L'initialisation des domaines se fait dans index.js
-// initializeDomains();
+// Initialiser les domaines immédiatement
+initializeDomains();
 
 module.exports = { app, setupDomains, initializeDomains };
