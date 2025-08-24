@@ -5159,10 +5159,22 @@ return (
                                 <div style={{ 
                                   fontSize: '0.85rem', 
                                   color: 'var(--color-text-secondary)', 
-                                  marginBottom: '0.5rem' 
+                                  marginBottom: '0.25rem' 
                                 }}>
                                   Réf: {item.reference}
                                 </div>
+                                {(item.height || item.diameter) && (
+                                  <div style={{ 
+                                    fontSize: '0.8rem', 
+                                    color: 'var(--color-text-secondary)', 
+                                    marginBottom: '0.5rem',
+                                    display: 'flex',
+                                    gap: '1rem'
+                                  }}>
+                                    {item.height && <span>H: {item.height}cm</span>}
+                                    {item.diameter && <span>Ø: {item.diameter}cm</span>}
+                                  </div>
+                                )}
                                 <div style={{ 
                                   display: 'flex', 
                                   gap: '1rem', 
