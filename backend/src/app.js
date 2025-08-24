@@ -177,16 +177,24 @@ function setupDomains() {
         return res.status(404).json({ error: 'Route API non trouvée' });
       }
       
+      console.log(`🌍 SPA Fallback requested for: ${req.path}`);
       let indexPath = path.join(__dirname, '../public', 'index.html');
+      console.log(`🔍 Checking path: ${indexPath}`);
+      console.log(`📁 File exists: ${fs.existsSync(indexPath)}`);
+      
       if (!fs.existsSync(indexPath)) {
         indexPath = path.join(__dirname, '../dist', 'index.html');
+        console.log(`🔍 Fallback path: ${indexPath}`);
+        console.log(`📁 Fallback exists: ${fs.existsSync(indexPath)}`);
       }
       
       if (!fs.existsSync(indexPath)) {
         logger.error(`Fichier index.html non trouvé: ${indexPath}`);
+        console.error(`❌ Frontend non trouvé: ${indexPath}`);
         return res.status(404).json({ error: 'Frontend non trouvé' });
       }
       
+      console.log(`✅ Serving index.html from: ${indexPath}`);
       res.sendFile(indexPath);
     });
     
