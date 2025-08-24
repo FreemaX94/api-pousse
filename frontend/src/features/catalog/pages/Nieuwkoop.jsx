@@ -683,7 +683,7 @@ const Nieuwkoop = () => {
     e.preventDefault();
     
     if (!selectedOperationArticle || !operationBuyingDepartment || !operationQuantity || !operationCoefficient) {
-      addNotification('Veuillez remplir tous les champs obligatoires', 'error');
+      console.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -692,7 +692,7 @@ const Nieuwkoop = () => {
     const availableQuantity = (selectedOperationArticle.quantity || 0) - (selectedOperationArticle.reservedQuantity || 0);
     
     if (availableQuantity < requestedQuantity) {
-      addNotification(`Stock insuffisant. Disponible: ${availableQuantity}, Demandé: ${requestedQuantity}`, 'error');
+      console.error(`Stock insuffisant. Disponible: ${availableQuantity}, Demandé: ${requestedQuantity}`);
       return;
     }
 
@@ -719,7 +719,7 @@ const Nieuwkoop = () => {
       const response = await axiosApi.post('/api/internal-operations', operationData);
 
       if (response.data.success) {
-        addNotification(`✅ Opération créée: ${response.data.operation.operationId}`, 'success');
+        console.log(`✅ Opération créée: ${response.data.operation.operationId}`);
         
         // Réinitialiser le formulaire
         setOperationBuyingDepartment('');
@@ -745,7 +745,7 @@ const Nieuwkoop = () => {
     } catch (error) {
       console.error('Erreur soumission opération:', error);
       const message = error.response?.data?.message || 'Erreur lors de la création de l\'opération';
-      addNotification(message, 'error');
+      console.error(message);
     } finally {
       setOperationSubmitting(false);
     }
@@ -761,7 +761,7 @@ const Nieuwkoop = () => {
       }
     } catch (error) {
       console.error('Erreur chargement historique:', error);
-      addNotification('Erreur lors du chargement de l\'historique', 'error');
+      console.error('Erreur lors du chargement de l\'historique');
     } finally {
       setOperationsLoading(false);
     }
