@@ -1,5 +1,5 @@
-# API routes should go to backend
-/api/*  https://api-pousse-backend-fd98bbbd8c-2wzxh:3001/api/:splat  200!
+# API routes should go to backend (DigitalOcean backend service)
+/api/*  https://api-pousse-app-5y2wo.ondigitalocean.app/api/:splat  200!
 
-# Handle client-side routing
+# Handle client-side routing - all non-API routes serve index.html
 /*    /index.html   200
