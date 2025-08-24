@@ -1057,8 +1057,10 @@ const Nieuwkoop = () => {
 
   useEffect(() => {
     if (activeSection === "Stock" || activeSection === "Opérations diverses") {
+      console.log('🔄 Loading stock data for section:', activeSection);
       axiosApi.get("/catalog/nieuwkoop/stock")
         .then(response => {
+          console.log('📦 Stock API response:', response.data?.length || 0, 'items');
           const data = response.data;
           if (Array.isArray(data)) {
             const cleaned = data.map(item => ({
@@ -1080,6 +1082,7 @@ const Nieuwkoop = () => {
             //   generatedImageUrl: item.image
             // })));
             
+            console.log('✅ Processed', cleaned.length, 'items for', activeSection);
             setAddedItems(cleaned);
             console.log('📦 Stock items loaded with references:', cleaned.map(item => ({
               name: item.name,
