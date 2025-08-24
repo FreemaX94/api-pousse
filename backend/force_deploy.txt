@@ -1,1 +1,1 @@
-sam. 24 août 2025 15:30:00 - Force deploy rollback SPA fix
+sam. 24 août 2025 15:35:00 - Force deploy with fresh frontend build
