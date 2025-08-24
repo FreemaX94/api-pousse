@@ -817,11 +817,19 @@ const Nieuwkoop = () => {
     
     const searchItems = async () => {
       try {
+        console.log('🔍 Recherche opérations diverses:', {
+          query: operationsStockQuery,
+          sortedItemsCount: sortedItems.length,
+          sampleItems: sortedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference}))
+        });
+        
         // Utiliser les mêmes données que l'onglet stock
         const filtered = sortedItems.filter(item => 
           item.name?.toLowerCase().includes(operationsStockQuery.toLowerCase()) ||
           item.reference?.toLowerCase().includes(operationsStockQuery.toLowerCase())
         );
+        
+        console.log('✅ Articles filtrés trouvés:', filtered.length);
         
         if (!cancelled) {
           setOperationsStockOptions(filtered.slice(0, 10)); // Limiter à 10 résultats
@@ -1048,7 +1056,7 @@ const Nieuwkoop = () => {
 
 
   useEffect(() => {
-    if (activeSection === "Stock") {
+    if (activeSection === "Stock" || activeSection === "Opérations diverses") {
       axiosApi.get("/catalog/nieuwkoop/stock")
         .then(response => {
           const data = response.data;
