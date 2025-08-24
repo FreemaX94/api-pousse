@@ -171,41 +171,22 @@ function setupDomains() {
       console.warn('⚠️ Routes système non disponibles:', error.message);
     }
     
-    // Routes explicites pour l'app React
-    const reactRoutes = ['/app/login', '/app/signup', '/app/forgot-password', '/app/reset-password', '/app/activate/:token', '/app/*'];
-    reactRoutes.forEach(route => {
-      app.get(route, (req, res) => {
-        console.log(`🌍 React route requested: ${req.path}`);
-        const indexPath = path.join(__dirname, '../public', 'index.html');
-        console.log(`✅ Serving React app from: ${indexPath}`);
-        res.sendFile(indexPath);
-      });
-    });
-    
     // Fallback pour React SPA (doit être en dernier après toutes les routes API)
     app.get('*', (req, res) => {
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'Route API non trouvée' });
       }
       
-      console.log(`🌍 SPA Fallback requested for: ${req.path}`);
-      let indexPath = path.join(__dirname, '../public', 'index.html');
-      console.log(`🔍 Checking path: ${indexPath}`);
-      console.log(`📁 File exists: ${fs.existsSync(indexPath)}`);
-      
+      let indexPath = path.join(__dirname, '../dist', 'index.html');
       if (!fs.existsSync(indexPath)) {
-        indexPath = path.join(__dirname, '../dist', 'index.html');
-        console.log(`🔍 Fallback path: ${indexPath}`);
-        console.log(`📁 Fallback exists: ${fs.existsSync(indexPath)}`);
+        indexPath = path.join(__dirname, '../public', 'index.html');
       }
       
       if (!fs.existsSync(indexPath)) {
         logger.error(`Fichier index.html non trouvé: ${indexPath}`);
-        console.error(`❌ Frontend non trouvé: ${indexPath}`);
         return res.status(404).json({ error: 'Frontend non trouvé' });
       }
       
-      console.log(`✅ Serving index.html from: ${indexPath}`);
       res.sendFile(indexPath);
     });
     
@@ -283,7 +264,7 @@ function initializeDomains() {
   }
 }
 
-// Les domaines seront initialisés depuis index.js pour éviter la duplication
+// L'initialisation des domaines se fait dans index.js
 // initializeDomains();
 
 module.exports = { app, setupDomains, initializeDomains };
