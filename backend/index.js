@@ -78,12 +78,16 @@ if (process.env.NODE_ENV !== 'test') {
       
       console.log(`🚀 Démarrage serveur sur le port ${PORT}...`);
       
-      // Initialisation unique des domaines
+      // S'assurer que les domaines sont initialisés avant de démarrer
+      if (initializeDomains) {
+        initializeDomains();
+      }
+      
+      // Forcer l'initialisation des domaines avec setupDomains
       try {
-        console.log('🔄 Initialisation unique des domaines...');
         const { setupDomains } = require('./src/app.js');
         setupDomains();
-        console.log('✅ Domaines initialisés avec succès');
+        console.log('✅ Domaines initialisés avec setupDomains');
       } catch (err) {
         console.error('❌ Erreur initialisation domaines:', err.message);
       }
