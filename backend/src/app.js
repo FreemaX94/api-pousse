@@ -171,6 +171,17 @@ function setupDomains() {
       console.warn('⚠️ Routes système non disponibles:', error.message);
     }
     
+    // Routes explicites pour l'app React
+    const reactRoutes = ['/app/login', '/app/signup', '/app/forgot-password', '/app/reset-password', '/app/activate/:token', '/app/*'];
+    reactRoutes.forEach(route => {
+      app.get(route, (req, res) => {
+        console.log(`🌍 React route requested: ${req.path}`);
+        const indexPath = path.join(__dirname, '../public', 'index.html');
+        console.log(`✅ Serving React app from: ${indexPath}`);
+        res.sendFile(indexPath);
+      });
+    });
+    
     // Fallback pour React SPA (doit être en dernier après toutes les routes API)
     app.get('*', (req, res) => {
       if (req.path.startsWith('/api/')) {
