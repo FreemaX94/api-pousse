@@ -31,4 +31,4 @@ StockEntrySchema.pre('save', async function(next) {
   }
 });
 
-module.exports = mongoose.model('StockEntry', StockEntrySchema);
+module.exports = mongoose.models.StockEntry || mongoose.model('StockEntry', StockEntrySchema);
