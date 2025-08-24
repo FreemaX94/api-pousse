@@ -177,9 +177,9 @@ function setupDomains() {
         return res.status(404).json({ error: 'Route API non trouvée' });
       }
       
-      let indexPath = path.join(__dirname, '../dist', 'index.html');
+      let indexPath = path.join(__dirname, '../public', 'index.html');
       if (!fs.existsSync(indexPath)) {
-        indexPath = path.join(__dirname, '../public', 'index.html');
+        indexPath = path.join(__dirname, '../dist', 'index.html');
       }
       
       if (!fs.existsSync(indexPath)) {
