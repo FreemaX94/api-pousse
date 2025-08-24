@@ -283,7 +283,7 @@ function initializeDomains() {
   }
 }
 
-// Initialiser les domaines immédiatement
-initializeDomains();
+// Les domaines seront initialisés depuis index.js pour éviter la duplication
+// initializeDomains();
 
 module.exports = { app, setupDomains, initializeDomains };
