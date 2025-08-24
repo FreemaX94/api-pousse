@@ -5,6 +5,7 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
   const [clientName, setClientName] = useState(initialData.client || "");
   const [description, setDescription] = useState(initialData.description || "");
   const [address, setAddress] = useState(initialData.address || "");
+  const [chargeProjet, setChargeProjet] = useState(initialData.chargeProjet || "");
   const [dateDebut, setDateDebut] = useState(
     initialData.dateDebut ? initialData.dateDebut.slice(0, 10) : ""
   );
@@ -133,6 +134,7 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
       formData.append("client", clientName);
       formData.append("description", description);
       formData.append("address", address);
+      formData.append("chargeProjet", chargeProjet);
       formData.append("dateDebut", dateDebut);
       formData.append("dateFin", dateFin);
       formData.append("statut", statut);
@@ -147,6 +149,7 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
         client: clientName,
         description,
         address,
+        chargeProjet,
         dateDebut,
         dateFin,
         statut,
@@ -160,6 +163,7 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
     setClientName("");
     setDescription("");
     setAddress("");
+    setChargeProjet("");
     setDateDebut("");
     setDateFin("");
     setStatut("En cours");
@@ -302,6 +306,46 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
           onChange={(e) => setAddress(e.target.value)}
           required
           placeholder="Adresse complète du projet"
+          style={{
+            width: '100%',
+            padding: '1rem 1.5rem',
+            border: '1px solid var(--color-border)',
+            borderRadius: '12px',
+            fontSize: '1rem',
+            fontWeight: '500',
+            background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+            color: 'var(--color-text-primary)',
+            transition: 'all 0.3s ease',
+            outline: 'none'
+          }}
+          onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+          onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+        />
+      </div>
+
+      {/* Chargé de projet */}
+      <div>
+        <label
+          htmlFor="chargeProjet"
+          style={{
+            display: 'block',
+            marginBottom: '0.5rem',
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            color: 'var(--color-primary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}
+        >
+          👨‍💼 Chargé de projet
+        </label>
+        <input
+          type="text"
+          id="chargeProjet"
+          name="chargeProjet"
+          value={chargeProjet}
+          onChange={(e) => setChargeProjet(e.target.value)}
+          placeholder="Nom du responsable du projet"
           style={{
             width: '100%',
             padding: '1rem 1.5rem',

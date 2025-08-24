@@ -256,6 +256,67 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                 </div>
               )}
 
+              {/* Chargé de projet */}
+              {p.chargeProjet && (
+                <div style={{
+                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--color-border)',
+                  backdropFilter: 'blur(10px)',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem'
+                }}>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '1.5rem',
+                    fontWeight: '700',
+                    boxShadow: 'var(--shadow-lg)'
+                  }}>
+                    👨‍💼
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontSize: '0.7rem',
+                      fontWeight: '800',
+                      color: 'var(--color-primary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      marginBottom: '0.25rem'
+                    }}>👨‍💼 Chargé de projet</div>
+                    <div style={{
+                      fontSize: '1rem',
+                      color: 'var(--color-text-primary)',
+                      fontWeight: '600'
+                    }}>
+                      {p.chargeProjet}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'var(--color-success)',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.7rem',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)'
+                  }}>
+                    ✅ Assigné
+                  </div>
+                </div>
+              )}
+
               {/* Dates et informations */}
               <div style={{
                 display: 'grid',

@@ -21,7 +21,7 @@ import ActivationPage from '../pages/ActivationPage';
 // import { NieuwkoopPage, ComptabilitePage, VehiculesPage, EntretienPage, MouvementsPage, LivraisonListPage, CatalogueAdmin, createLazyComponent } from '../utils/lazy';
 
 // Pages lourdes - Lazy loading standard (revenir à la config qui fonctionnait)
-const Nieuwkoop = lazy(() => import('../pages/Nieuwkoop'));
+const Nieuwkoop = lazy(() => import('../features/catalog/pages/Nieuwkoop'));
 const Composition = lazy(() => import('../pages/CompositionCSS'));
 const LivraisonList = lazy(() => import('../pages/LivraisonList'));
 const Entretien = lazy(() => import('../pages/Entretien'));

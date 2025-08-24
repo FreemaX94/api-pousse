@@ -614,6 +614,13 @@ const Nieuwkoop = () => {
   const [notifications, setNotifications] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
+  const [focusedCard, setFocusedCard] = useState(null);
+
+  // useEffect(() => {
+  //   if (focusedCard) {
+  //     console.log(`focusedCard state changed to: "${focusedCard}"`);
+  //   }
+  // }, [focusedCard]);
 
   const [activeSection, setActiveSection] = useState("Stock");
   const [activeCategory, setActiveCategory] = useState("");
@@ -651,9 +658,68 @@ const Nieuwkoop = () => {
   const [entrySubTab, setEntrySubTab] = useState('formulaire'); // 'formulaire', 'historique' ou 'externe'
   const [exitSubTab, setExitSubTab] = useState('formulaire'); // 'formulaire' ou 'historique'
   
+  // États pour les opérations diverses
+  const [operationsStockQuery, setOperationsStockQuery] = useState('');
+  const [operationsStockOptions, setOperationsStockOptions] = useState([]);
+  const [selectedOperationArticle, setSelectedOperationArticle] = useState(null);
+  
 
   const handleEntrySaved = () => setRefreshEntries(f => !f);
   const handleExitSaved  = () => setRefreshExits(f => !f);
+
+  // Calculate filtered and sorted items first (needed by operations search)
+  const totalPrice = addedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalQty = addedItems.reduce((acc, item) => acc + item.quantity, 0);
+  // 1) Filtrer par catégorie active + recherche
+  const filteredItems = addedItems.filter(prod =>
+    (!activeCategory || prod.category === activeCategory)
+    && prod.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // 2) Trier ce tableau filtré selon sortBy
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    switch (sortBy) {
+      case 'quantité':
+        return b.quantity - a.quantity;
+      case 'hauteur':
+        return b.height - a.height;
+      case 'diamètre':
+        return b.diameter - a.diameter;
+      case 'prix':
+      default:
+        return b.price - a.price;
+    }
+  });
+
+  // Recherche d'articles pour les opérations diverses
+  useEffect(() => {
+    if (operationsStockQuery.length < 2) {
+      setOperationsStockOptions([]);
+      return;
+    }
+    let cancelled = false;
+    
+    const searchItems = async () => {
+      try {
+        // Utiliser les mêmes données que l'onglet stock
+        const filtered = sortedItems.filter(item => 
+          item.name?.toLowerCase().includes(operationsStockQuery.toLowerCase()) ||
+          item.reference?.toLowerCase().includes(operationsStockQuery.toLowerCase())
+        );
+        if (!cancelled) {
+          setOperationsStockOptions(filtered.slice(0, 10)); // Limiter à 10 résultats
+        }
+      } catch (error) {
+        console.error('Error searching stock items:', error);
+      }
+    };
+    
+    const timeoutId = setTimeout(searchItems, 300); // Debounce
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [operationsStockQuery, sortedItems]);
 
   // États pour le sélecteur de date de visualisation du stock
   const today = new Date();
@@ -667,12 +733,12 @@ const Nieuwkoop = () => {
   useEffect(() => {
     api.get('/auth/me')
       .then(response => {
-        console.log('🔍 Structure response.data:', response.data);
+        // console.log('🔍 Structure response.data:', response.data);
         // Tester différentes structures possibles
         const user = response.data.user || response.data;
         const username = user.username || user.name || user.email || 'utilisateur';
         setCurrentUser(username);
-        console.log('✅ Utilisateur récupéré:', username);
+        // console.log('✅ Utilisateur récupéré:', username);
       })
       .catch(error => {
         console.error('❌ Erreur récupération utilisateur:', error);
@@ -700,6 +766,26 @@ const Nieuwkoop = () => {
     fetchProjects(); // recharge la liste des projets
   };
 
+  const handleCardClick = (prod, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log(`🎯 SINGLE CLICK on: "${prod.reference}"`);
+    
+    // Éviter de déclencher l'événement si on clique sur un bouton
+    if (event.target.closest('button')) {
+      console.log('❌ Button click ignored');
+      return;
+    }
+    
+    setFocusedCard(prod.reference);
+    console.log(`✅ Set focused card to: "${prod.reference}"`);
+  };
+
+  const closeFocus = () => {
+    console.log('Closing focused card');
+    setFocusedCard(null);
+  };
+
   const closeAssign = () => {
     setIsAssignOpen(false);
   };
@@ -725,7 +811,7 @@ const Nieuwkoop = () => {
   const calculateProjectedStock = async (targetDate) => {
     if (!targetDate) return;
     
-    console.log('📅 Calcul du stock projeté pour:', targetDate.toLocaleDateString('fr-FR'));
+    // console.log('📅 Calcul du stock projeté pour:', targetDate.toLocaleDateString('fr-FR'));
     
     try {
       // Récupérer tous les mouvements et projets
@@ -734,7 +820,7 @@ const Nieuwkoop = () => {
         getProjects()
       ]);
 
-      console.log('📦 Projets récupérés:', projectsData.length);
+      // console.log('📦 Projets récupérés:', projectsData.length);
 
       // Filtrer les mouvements jusqu'à la date cible
       const targetTime = targetDate.getTime();
@@ -750,21 +836,21 @@ const Nieuwkoop = () => {
         
         // Si la date cible est pendant la durée du projet
         if (startDate <= targetDate && targetDate <= endDate && project.status !== 'completed' && project.status !== 'cancelled') {
-          console.log('📁 Projet actif à cette date:', project.client?.name || project.title);
+          // console.log('📁 Projet actif à cette date:', project.client?.name || project.title);
           
           // Compter les materials du projet comme réservés
           if (project.materials && project.materials.length > 0) {
-            console.log(`🔍 PROJET "${project.client?.name || project.title}" - Matériaux:`, project.materials);
+            // console.log(`🔍 PROJET "${project.client?.name || project.title}" - Matériaux:`, project.materials);
             project.materials.forEach(material => {
               const ref = material.reference || material.ItemCode || '';
               if (ref) {
                 if (!stockAdjustments[ref]) {
                   stockAdjustments[ref] = 0;
                 }
-                console.log(`  🔍 AVANT: ${ref} = ${stockAdjustments[ref]}, ajout de -${material.quantity}`);
+                // console.log(`  🔍 AVANT: ${ref} = ${stockAdjustments[ref]}, ajout de -${material.quantity}`);
                 // Soustraire la quantité réservée pour ce projet
                 stockAdjustments[ref] -= (material.quantity || 0);
-                console.log(`  🔍 APRÈS: ${ref} = ${stockAdjustments[ref]}`);
+                // console.log(`  🔍 APRÈS: ${ref} = ${stockAdjustments[ref]}`);
                 console.log(`  🌱 ${material.name} (${ref}): -${material.quantity} (réservé)`);
               }
             });
@@ -799,7 +885,7 @@ const Nieuwkoop = () => {
   // Gérer le changement de date
   const handleDateSelection = (day) => {
     const newDate = new Date(selectedYear, selectedMonth, day);
-    console.log('📅 Date sélectionnée:', newDate.toLocaleDateString('fr-FR'));
+    // console.log('📅 Date sélectionnée:', newDate.toLocaleDateString('fr-FR'));
     setSelectedDay(day);
     setSelectedStockDate(newDate);
     calculateProjectedStock(newDate);
@@ -863,11 +949,11 @@ const Nieuwkoop = () => {
             }));
             
             // Debug: afficher les URLs d'images
-            console.log('🔍 Frontend - URLs d\'images générées:', cleaned.map(item => ({
-              name: item.name,
-              originalImages: item.images,
-              generatedImageUrl: item.image
-            })));
+            // console.log('🔍 Frontend - URLs d\'images générées:', cleaned.map(item => ({
+            //   name: item.name,
+            //   originalImages: item.images,
+            //   generatedImageUrl: item.image
+            // })));
             
             setAddedItems(cleaned);
             console.log('📦 Stock items loaded with references:', cleaned.map(item => ({
@@ -887,7 +973,7 @@ const Nieuwkoop = () => {
   }, [activeSection]);
 
   const handleSearch = () => {
-    console.log('🔍 Frontend - Recherche lancée pour le produit:', productId);
+    // console.log('🔍 Frontend - Recherche lancée pour le produit:', productId);
     setError(null);
     setImageUrl(`/api/catalog/nieuwkoop/items/${productId}/image`);
 
@@ -926,14 +1012,14 @@ const Nieuwkoop = () => {
     });
     
     const diameter = item.DiameterCulturePot || item.Diameter || item.Opening || (item.PotSize ? parseInt(item.PotSize) : 0) || 0;
-    console.log('🔍 Frontend - Calcul du diamètre:', {
-      DiameterCulturePot: item.DiameterCulturePot,
-      Diameter: item.Diameter,
-      Opening: item.Opening,
-      PotSize: item.PotSize,
-      'PotSize parsed': item.PotSize ? parseInt(item.PotSize) : 0,
-      'Valeur finale': diameter
-    });
+    // console.log('🔍 Frontend - Calcul du diamètre:', {
+    //   DiameterCulturePot: item.DiameterCulturePot,
+    //   Diameter: item.Diameter,
+    //   Opening: item.Opening,
+    //   PotSize: item.PotSize,
+    //   'PotSize parsed': item.PotSize ? parseInt(item.PotSize) : 0,
+    //   'Valeur finale': diameter
+    // });
 
     const payload = {
       reference: item.Itemcode,
@@ -1106,29 +1192,6 @@ const Nieuwkoop = () => {
     link.click();
   };
 
-  const totalPrice = addedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const totalQty = addedItems.reduce((acc, item) => acc + item.quantity, 0);
-  // 1) Filtrer par catégorie active + recherche
-const filteredItems = addedItems.filter(prod =>
-  (!activeCategory || prod.category === activeCategory)
-  && prod.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
-// 2) Trier ce tableau filtré selon sortBy
-// Remplace ton bloc de tri par celui-ci :
-const sortedItems = [...filteredItems].sort((a, b) => {
-  switch (sortBy) {
-    case 'quantité':
-      return b.quantity - a.quantity;
-    case 'hauteur':
-      return b.height - a.height;
-    case 'diamètre':
-      return b.diameter - a.diameter;
-    case 'prix':
-    default:
-      return b.price - a.price;
-  }
-});
 
 // 🌟 Mouse Trail Effect - Tracking
 useEffect(() => {
@@ -1173,8 +1236,358 @@ const { scrollY } = useScroll();
 const y1 = useTransform(scrollY, [0, 1000], [0, -200]);
 const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
 
+// console.log('🚀 NIEUWKOOP COMPONENT RENDERED', {
+  //   activeSection,
+  //   sortedItemsCount: sortedItems?.length || 0,
+  //   focusedCard: focusedCard?.name || 'none'
+  // });
+
+// Trouve le produit focalisé
+const focusedProduct = focusedCard ? sortedItems.find(prod => prod.reference === focusedCard) : null;
+
 return (
     <ThemeProvider>
+      {focusedCard && (
+        <div className="card-focus-overlay" onClick={closeFocus}>
+          <button className="close-focus-btn" onClick={closeFocus}>
+            ×
+          </button>
+          
+          {/* Carte focalisée rendue ici au niveau racine */}
+          {focusedProduct && (
+            <div className="stock-card stock-card-focused">
+              {/* En-tête */}
+              <div style={{
+                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                padding: '1.25rem',
+                color: 'var(--color-primary)',
+                borderBottom: '1px solid var(--color-primary)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '0.75rem'
+                }}>
+                  <div style={{ flex: 1, paddingRight: '1rem' }}>
+                    <h3 style={{
+                      fontSize: '1.1rem',
+                      fontWeight: '700',
+                      margin: 0,
+                      lineHeight: '1.3',
+                      marginBottom: '0.25rem',
+                      color: 'var(--color-primary)'
+                    }}>
+                      {focusedProduct.name}
+                    </h3>
+                    <p style={{
+                      fontSize: '0.8rem',
+                      opacity: 0.7,
+                      margin: 0,
+                      fontWeight: '500'
+                    }}>
+                      {focusedProduct.reference || 'N/A'}
+                    </p>
+                  </div>
+                  <div style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '700',
+                    color: 'var(--color-primary)'
+                  }}>
+                    €{focusedProduct.price ? focusedProduct.price.toFixed(2) : '0.00'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Image */}
+              <div style={{position: 'relative'}}>
+                <div style={{
+                  position: 'relative',
+                  height: '180px',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)'
+                }}>
+                  <img 
+                    src={focusedProduct.image} 
+                    alt={focusedProduct.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      padding: '1rem'
+                    }}
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div style={{
+                    display: 'none',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    fontSize: '3rem',
+                    opacity: 0.3
+                  }}>
+                    🌿
+                  </div>
+                </div>
+              </div>
+
+              {/* Corps principal */}
+              <div style={{padding: '1.5rem'}}>
+                {/* Quantité et statuts */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '1rem',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '1rem',
+                    background: 'var(--color-bg-secondary)',
+                    borderRadius: '12px'
+                  }}>
+                    <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.25rem'}}>
+                      Disponible
+                    </div>
+                    <div style={{
+                      fontSize: '2rem',
+                      fontWeight: '700',
+                      color: 'var(--color-primary)'
+                    }}>
+                      {(focusedProduct.quantity || 0) - (focusedProduct.reservedQuantity || 0)}
+                    </div>
+                  </div>
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '1rem',
+                    background: 'var(--color-bg-secondary)',
+                    borderRadius: '12px'
+                  }}>
+                    <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.25rem'}}>
+                      Total
+                    </div>
+                    <div style={{
+                      fontSize: '1.5rem',
+                      fontWeight: '600',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      {focusedProduct.quantity || 0}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dashboard - Statistiques et Informations */}
+                <div style={{
+                  background: 'var(--glass-bg)',
+                  backdropFilter: 'var(--glass-backdrop)',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
+                  marginBottom: '1rem',
+                  border: '1px solid var(--glass-border)',
+                  boxShadow: 'var(--glass-shadow)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '1rem'
+                  }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      background: 'var(--color-primary)',
+                      borderRadius: '50%',
+                      marginRight: '0.5rem',
+                      boxShadow: '0 0 10px var(--color-primary)'
+                    }}></div>
+                    <h4 style={{
+                      margin: 0,
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      Dashboard Produit
+                    </h4>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '1rem',
+                    marginBottom: '1rem'
+                  }}>
+                    {/* État */}
+                    <div style={{
+                      background: 'var(--color-surface-elevated)',
+                      padding: '1rem',
+                      borderRadius: '12px',
+                      textAlign: 'center',
+                      border: '1px solid var(--color-border)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>
+                        {(focusedProduct.quantity || 0) > 0 ? '✅' : '❌'}
+                      </div>
+                      <div style={{
+                        fontSize: '0.7rem', 
+                        color: 'var(--color-text-secondary)', 
+                        marginBottom: '0.25rem',
+                        fontWeight: '600'
+                      }}>
+                        ÉTAT
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem', 
+                        fontWeight: '600',
+                        color: 'var(--color-text-primary)'
+                      }}>
+                        {(focusedProduct.quantity || 0) > 0 ? 'En Stock' : 'Rupture'}
+                      </div>
+                    </div>
+
+                    {/* Sorties */}
+                    <div style={{
+                      background: 'var(--color-surface-elevated)',
+                      padding: '1rem',
+                      borderRadius: '12px',
+                      textAlign: 'center',
+                      border: '1px solid var(--color-border)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>📤</div>
+                      <div style={{
+                        fontSize: '0.7rem', 
+                        color: 'var(--color-text-secondary)', 
+                        marginBottom: '0.25rem',
+                        fontWeight: '600'
+                      }}>
+                        SORTIES
+                      </div>
+                      <div style={{
+                        fontSize: '1.2rem', 
+                        fontWeight: '700', 
+                        color: 'var(--color-primary)'
+                      }}>
+                        {focusedProduct.exitCount || 0}
+                      </div>
+                    </div>
+
+                    {/* Arrosages */}
+                    <div style={{
+                      background: 'var(--color-surface-elevated)',
+                      padding: '1rem',
+                      borderRadius: '12px',
+                      textAlign: 'center',
+                      border: '1px solid var(--color-border)',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>💧</div>
+                      <div style={{
+                        fontSize: '0.7rem', 
+                        color: 'var(--color-text-secondary)', 
+                        marginBottom: '0.25rem',
+                        fontWeight: '600'
+                      }}>
+                        ARROSAGES
+                      </div>
+                      <div style={{
+                        fontSize: '1.2rem', 
+                        fontWeight: '700', 
+                        color: 'var(--color-success)'
+                      }}>
+                        {focusedProduct.wateringCount || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Indicateurs de santé et activité */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '1rem'
+                  }}>
+                    <div style={{
+                      background: 'var(--color-success-bg)',
+                      border: '1px solid var(--color-success)',
+                      padding: '0.75rem',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{fontSize: '1rem', marginRight: '0.5rem'}}>🌱</div>
+                      <div>
+                        <div style={{
+                          fontSize: '0.7rem', 
+                          color: 'var(--color-text-secondary)',
+                          fontWeight: '600'
+                        }}>
+                          Dernière activité
+                        </div>
+                        <div style={{
+                          fontSize: '0.8rem', 
+                          fontWeight: '600',
+                          color: 'var(--color-text-primary)'
+                        }}>
+                          {focusedProduct.lastActivity || 'Aujourd\'hui'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      background: 'var(--color-warning)',
+                      backgroundOpacity: '0.1',
+                      border: '1px solid var(--color-warning)',
+                      padding: '0.75rem',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{fontSize: '1rem', marginRight: '0.5rem'}}>⚡</div>
+                      <div>
+                        <div style={{
+                          fontSize: '0.7rem', 
+                          color: 'var(--color-text-secondary)',
+                          fontWeight: '600'
+                        }}>
+                          Score santé
+                        </div>
+                        <div style={{
+                          fontSize: '0.8rem', 
+                          fontWeight: '600',
+                          color: 'var(--color-text-primary)'
+                        }}>
+                          {focusedProduct.healthScore || '85%'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Badge catégorie */}
+                {focusedProduct.category && (
+                  <div style={{
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    textAlign: 'center',
+                    marginBottom: '1rem'
+                  }}>
+                    {focusedProduct.category}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
       <motion.div 
         className="flex min-h-screen" 
         initial={{ opacity: 0 }}
@@ -1268,7 +1681,7 @@ return (
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            {["Catalogue", "Produits", "Stock", "Entrée", "Sortie", "Projets"].map((item, index) => (
+            {["Catalogue", "Produits", "Stock", "Entrée", "Sortie", "Projets", "Opérations diverses"].map((item, index) => (
               <motion.button
                 whileHover={{ scale: 1.05, x: 10 }}
                 whileTap={{ scale: 0.95 }}
@@ -2456,19 +2869,19 @@ return (
                         const isInRange = checkDate >= startDate && checkDate <= endDate;
                         const hasMaterials = project.materials?.length > 0;
                         
-                        console.log(`📅 Projet ${project.title || project.client?.name}:`, {
-                          startDate: startDate.toLocaleDateString('fr-FR'),
-                          endDate: endDate.toLocaleDateString('fr-FR'),
-                          checkDate: checkDate.toLocaleDateString('fr-FR'),
-                          isInRange,
-                          hasMaterials,
-                          materials: project.materials
-                        });
+                        // console.log(`📅 Projet ${project.title || project.client?.name}:`, {
+                        //   startDate: startDate.toLocaleDateString('fr-FR'),
+                        //   endDate: endDate.toLocaleDateString('fr-FR'),
+                        //   checkDate: checkDate.toLocaleDateString('fr-FR'),
+                        //   isInRange,
+                        //   hasMaterials,
+                        //   materials: project.materials
+                        // });
                         
                         return isInRange && hasMaterials;
                       });
 
-                      console.log(`✅ ${projectsAtDate.length} projet(s) trouvé(s) pour cette date`);
+                      // console.log(`✅ ${projectsAtDate.length} projet(s) trouvé(s) pour cette date`);
                       if (projectsAtDate.length === 0) return null;
 
                       return (
@@ -2553,8 +2966,8 @@ return (
                                     <span>🏗️</span>
                                     {(() => {
                                       // Afficher TOUTE la structure du projet pour debug
-                                      console.log('🔍 Structure complète du projet:', project);
-                                      console.log('🔍 Clés disponibles:', Object.keys(project));
+                                      // console.log('🔍 Structure complète du projet:', project);
+                                      // console.log('🔍 Clés disponibles:', Object.keys(project));
                                       
                                       // Chercher le bon nom dans tous les champs possibles
                                       // PRIORISER LE NOM DU CLIENT PLUTÔT QUE LA DESCRIPTION
@@ -2589,7 +3002,7 @@ return (
                                         name = 'Projet sans nom';
                                       }
                                       
-                                      console.log(`✅ Nom final affiché: "${name}"`);
+                                      // console.log(`✅ Nom final affiché: "${name}"`);
                                       return name;
                                     })()}
                                   </h5>
@@ -2641,7 +3054,7 @@ return (
                                           // Utiliser soit l'image stockée soit l'image générée
                                           const finalImageUrl = material.image || imageUrl;
                                           
-                                          console.log(`🖼️ Image pour ${material.name} (${material.reference}):`, finalImageUrl);
+                                          // console.log(`🖼️ Image pour ${material.name} (${material.reference}):`, finalImageUrl);
                                           
                                           return finalImageUrl ? (
                                             <div style={{
@@ -3084,22 +3497,26 @@ return (
                     whileHover={{ scale: 1.05, y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                     style={{
-                      background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' 
+                        : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
                       padding: '1.5rem',
                       borderRadius: '16px',
                       textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(59, 130, 246, 0.15)'
+                      boxShadow: isDark 
+                        ? '0 4px 20px rgba(59, 130, 246, 0.25)' 
+                        : '0 4px 20px rgba(59, 130, 246, 0.15)'
                     }}
                   >
                     <span style={{
                       fontSize: '2.5rem',
                       fontWeight: '800',
-                      color: '#2563eb',
+                      color: isDark ? '#e0e7ff' : '#2563eb',
                       display: 'block'
                     }}>{filteredItems.length}</span>
                     <span style={{
                       fontSize: '0.9rem',
-                      color: '#64748b',
+                      color: isDark ? '#cbd5e1' : '#64748b',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -3109,22 +3526,26 @@ return (
                     whileHover={{ scale: 1.05, y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                     style={{
-                      background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' 
+                        : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
                       padding: '1.5rem',
                       borderRadius: '16px',
                       textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(16, 185, 129, 0.15)'
+                      boxShadow: isDark 
+                        ? '0 4px 20px rgba(16, 185, 129, 0.25)' 
+                        : '0 4px 20px rgba(16, 185, 129, 0.15)'
                     }}
                   >
                     <span style={{
                       fontSize: '2.5rem',
                       fontWeight: '800',
-                      color: '#10b981',
+                      color: isDark ? '#d1fae5' : '#10b981',
                       display: 'block'
                     }}>{filteredItems.reduce((sum, item) => sum + (item.quantity || 0), 0)}</span>
                     <span style={{
                       fontSize: '0.9rem',
-                      color: '#64748b',
+                      color: isDark ? '#cbd5e1' : '#64748b',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -3134,22 +3555,26 @@ return (
                     whileHover={{ scale: 1.05, y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                     style={{
-                      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' 
+                        : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
                       padding: '1.5rem',
                       borderRadius: '16px',
                       textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(245, 158, 11, 0.15)'
+                      boxShadow: isDark 
+                        ? '0 4px 20px rgba(245, 158, 11, 0.25)' 
+                        : '0 4px 20px rgba(245, 158, 11, 0.15)'
                     }}
                   >
                     <span style={{
                       fontSize: '2.5rem',
                       fontWeight: '800',
-                      color: '#f59e0b',
+                      color: isDark ? '#fef3c7' : '#f59e0b',
                       display: 'block'
                     }}>{filteredItems.filter(item => (item.quantity || 0) - (item.reservedQuantity || 0) > 0).length}</span>
                     <span style={{
                       fontSize: '0.9rem',
-                      color: '#64748b',
+                      color: isDark ? '#cbd5e1' : '#64748b',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -3159,22 +3584,26 @@ return (
                     whileHover={{ scale: 1.05, y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                     style={{
-                      background: 'linear-gradient(135deg, #e9d5ff 0%, #c084fc 100%)',
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)' 
+                        : 'linear-gradient(135deg, #e9d5ff 0%, #c084fc 100%)',
                       padding: '1.5rem',
                       borderRadius: '16px',
                       textAlign: 'center',
-                      boxShadow: '0 4px 20px rgba(147, 51, 234, 0.15)'
+                      boxShadow: isDark 
+                        ? '0 4px 20px rgba(147, 51, 234, 0.25)' 
+                        : '0 4px 20px rgba(147, 51, 234, 0.15)'
                     }}
                   >
                     <span style={{
                       fontSize: '2.5rem',
                       fontWeight: '800',
-                      color: '#9333ea',
+                      color: isDark ? '#e9d5ff' : '#9333ea',
                       display: 'block'
                     }}>{filteredItems.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0).toFixed(2)} €</span>
                     <span style={{
                       fontSize: '0.9rem',
-                      color: '#64748b',
+                      color: isDark ? '#cbd5e1' : '#64748b',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -3190,9 +3619,13 @@ return (
                   marginBottom: '3rem',
                   flexWrap: 'wrap',
                   padding: '2rem',
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                  background: isDark 
+                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' 
+                    : 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                   borderRadius: '20px',
-                  boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.04)'
+                  boxShadow: isDark 
+                    ? 'inset 0 2px 8px rgba(0, 0, 0, 0.2)' 
+                    : 'inset 0 2px 8px rgba(0, 0, 0, 0.04)'
                 }}>
                   <div style={{flex: 1, minWidth: '300px'}}>
                     <div style={{position: 'relative'}}>
@@ -3203,7 +3636,7 @@ return (
                         transform: 'translateY(-50%)',
                         pointerEvents: 'none'
                       }}>
-                        <Search size={24} style={{color: '#64748b'}} />
+                        <Search size={24} style={{color: isDark ? '#94a3b8' : '#64748b'}} />
                       </div>
                       <motion.input
                         type="text"
@@ -3243,9 +3676,11 @@ return (
                           fontWeight: '500',
                           border: '2px solid transparent',
                           borderRadius: '16px',
-                          background: 'white',
-                          color: '#000000',
-                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                          background: isDark ? '#374151' : 'white',
+                          color: isDark ? '#f3f4f6' : '#000000',
+                          boxShadow: isDark 
+                            ? '0 4px 20px rgba(0, 0, 0, 0.25)' 
+                            : '0 4px 20px rgba(0, 0, 0, 0.06)',
                           outline: 'none',
                           transition: 'all 0.3s ease'
                         }}
@@ -3305,14 +3740,25 @@ return (
 <div className="relative inline-block text-left">
   <button
     onClick={() => setShowSortMenu(open => !open)}
-    className="flex items-center px-3 py-1 text-white bg-gray-600 rounded hover:bg-gray-700 focus:outline-none"
+    className="flex items-center px-3 py-1 rounded focus:outline-none"
+    style={{
+      color: isDark ? '#f3f4f6' : 'white',
+      background: isDark ? '#4b5563' : '#4b5563',
+      border: 'none'
+    }}
+    onMouseEnter={(e) => e.target.style.background = isDark ? '#6b7280' : '#374151'}
+    onMouseLeave={(e) => e.target.style.background = isDark ? '#4b5563' : '#4b5563'}
   >
     Trier par <ChevronDown size={16} className="ml-1" />
   </button>
 
   {showSortMenu && (
     <div
-      className="absolute right-0 z-10 w-40 mt-2 bg-white border rounded shadow-lg"
+      className="absolute right-0 z-10 w-40 mt-2 border rounded shadow-lg"
+      style={{
+        background: isDark ? '#374151' : 'white',
+        borderColor: isDark ? '#4b5563' : '#d1d5db'
+      }}
       onMouseLeave={() => setShowSortMenu(false)}
     >
       {["prix", "quantité", "hauteur", "diamètre"].map(option => (
@@ -3322,7 +3768,21 @@ return (
             setSortBy(option);
             setShowSortMenu(false);
           }}
-          className="px-4 py-2 capitalize cursor-pointer hover:bg-gray-100"
+          className="px-4 py-2 capitalize cursor-pointer"
+          style={{
+            color: isDark ? '#f3f4f6' : '#374151',
+            backgroundColor: sortBy === option ? (isDark ? '#4b5563' : '#f3f4f6') : 'transparent'
+          }}
+          onMouseEnter={(e) => {
+            if (sortBy !== option) {
+              e.target.style.backgroundColor = isDark ? '#4b5563' : '#f3f4f6';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (sortBy !== option) {
+              e.target.style.backgroundColor = 'transparent';
+            }
+          }}
         >
           {option}
         </div>
@@ -3411,18 +3871,30 @@ return (
                     const isLowStock = available > 0 && available <= 5;
                     const recentlyModified = isRecentlyModified(prod);
 
+                    const isFocused = focusedCard === prod.reference;
+
+                    // Si cette carte est focalisée, on ne la rend pas dans la grille
+                    if (isFocused) {
+                      return null;
+                    }
+
                     return (
                       <motion.div
                         key={`${prod._id}-${stockProjections[prod.reference] || 0}`}
                         className="stock-card fade-in-up"
+                        data-reference={prod.reference}
+                        data-focused={focusedCard}
                         draggable
                         onDragStart={(e) => handleDragStart(e, prod)}
                         onDragEnd={handleDragEnd}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, prod)}
-                        whileHover="hover"
-                        initial="hidden"
-                        animate={["visible", "breathing"]}
+                        onClick={(e) => {
+                          handleCardClick(prod, e);
+                        }}
+                        whileHover={focusedCard === prod.reference ? {} : "hover"}
+                        initial={focusedCard === prod.reference ? {} : "hidden"}
+                        animate={focusedCard === prod.reference ? {} : ["visible", "breathing"]}
                         custom={index}
                         variants={{
                           hidden: { 
@@ -3573,6 +4045,63 @@ return (
                               }}>
                                 {prod.reference || 'N/A'}
                               </p>
+                              
+                              {/* Pastilles de statut */}
+                              <div style={{
+                                display: 'flex',
+                                gap: '0.5rem',
+                                marginTop: '0.5rem'
+                              }}>
+                                {/* Pastille Disponible */}
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  background: available > 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                                  color: 'white',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '12px',
+                                  fontSize: '0.65rem',
+                                  fontWeight: '600',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.5px',
+                                  boxShadow: available > 0 ? '0 2px 8px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)'
+                                }}>
+                                  <div style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    borderRadius: '50%',
+                                    background: 'rgba(255, 255, 255, 0.8)',
+                                    marginRight: '0.4rem'
+                                  }}></div>
+                                  {available > 0 ? 'Disponible' : 'Indisponible'}
+                                </div>
+
+                                {/* Pastille Stock Permanent */}
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  background: (prod.quantity || 0) > 10 ? 'var(--color-primary)' : 'var(--color-warning)',
+                                  color: 'white',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '12px',
+                                  fontSize: '0.65rem',
+                                  fontWeight: '600',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.5px',
+                                  boxShadow: (prod.quantity || 0) > 10 ? 
+                                    '0 2px 8px rgba(217, 119, 6, 0.3)' : 
+                                    '0 2px 8px rgba(234, 179, 8, 0.3)'
+                                }}>
+                                  <div style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    borderRadius: '50%',
+                                    background: 'rgba(255, 255, 255, 0.8)',
+                                    marginRight: '0.4rem'
+                                  }}></div>
+                                  {(prod.quantity || 0) > 10 ? 'Stock Permanent' : 'Stock Limité'}
+                                </div>
+                              </div>
                             </div>
                             <div style={{
                               fontSize: '1.25rem',
@@ -4188,6 +4717,572 @@ return (
                 showHistory={showHistory}
               />
             </Suspense>
+          </motion.section>
+        )}
+
+        {activeSection === "Opérations diverses" && (
+          <motion.section key="operations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">
+            {/* En-tête de la section */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+              borderRadius: '20px',
+              padding: '2rem',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-xl)',
+              color: 'white',
+              marginBottom: '3rem'
+            }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                style={{ fontSize: '3rem', marginBottom: '1rem' }}
+              >
+                🔄
+              </motion.div>
+              <h2 style={{
+                margin: 0,
+                fontSize: '2.5rem',
+                fontWeight: '800',
+                marginBottom: '0.5rem',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                Opérations Diverses
+              </h2>
+              <p style={{
+                margin: 0,
+                fontSize: '1.2rem',
+                opacity: 0.9,
+                fontWeight: '500'
+              }}>
+                Système de vente entre pôles internes
+              </p>
+            </div>
+
+            {/* Formulaire de vente entre pôles */}
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-lg)',
+              padding: '2rem',
+              position: 'relative',
+              overflow: 'hidden',
+              maxWidth: '1000px',
+              margin: '0 auto'
+            }}>
+              {/* Background decorative elements */}
+              <div style={{
+                position: 'absolute',
+                top: '-50%',
+                right: '-50%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))',
+                borderRadius: '50%',
+                pointerEvents: 'none',
+                opacity: 0.1
+              }} />
+              
+              <div style={{
+                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                borderRadius: '16px',
+                padding: '2rem',
+                marginBottom: '2rem',
+                border: '1px solid var(--color-primary)',
+                position: 'relative',
+                zIndex: 1,
+                textAlign: 'center'
+              }}>
+                <h3 style={{
+                  fontSize: '2rem', 
+                  fontWeight: '700',
+                  color: 'var(--color-primary)',
+                  marginBottom: '0.5rem',
+                  margin: 0
+                }}>
+                  🏢 Vente Inter-Pôles
+                </h3>
+                <p style={{
+                  color: 'var(--color-secondary)',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  margin: 0,
+                  opacity: 0.8
+                }}>
+                  Pôle Événementiel ➡️ Pôles Création, Entretien, Upsell
+                </p>
+              </div>
+
+              {/* Formulaire */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '2rem',
+                position: 'relative',
+                zIndex: 1
+              }}>
+                {/* Sélection Pôle Vendeur */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    🏢 Pôle Vendeur
+                  </label>
+                  <select
+                    disabled
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                      color: 'var(--color-text-primary)',
+                      opacity: 0.8,
+                      cursor: 'not-allowed'
+                    }}
+                  >
+                    <option>🎉 Événementiel (Fixe)</option>
+                  </select>
+                </div>
+
+                {/* Sélection Pôle Acheteur */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    🎯 Pôle Acheteur *
+                  </label>
+                  <select
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  >
+                    <option value="" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>Sélectionnez un pôle acheteur</option>
+                    <option value="creation" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🏗️ Création</option>
+                    <option value="entretien" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🔧 Entretien</option>
+                    <option value="upsell" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>📈 Upsell</option>
+                  </select>
+                </div>
+
+                {/* Recherche d'article */}
+                <div style={{gridColumn: '1 / -1'}}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '1rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    🔍 Article du stock
+                  </label>
+                  
+                  <div style={{
+                    background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                    borderRadius: '16px',
+                    border: '1px solid var(--color-primary)',
+                    padding: '1.5rem',
+                    position: 'relative'
+                  }}>
+                    <input
+                      type="text"
+                      value={operationsStockQuery}
+                      onChange={(e) => setOperationsStockQuery(e.target.value)}
+                      placeholder="Rechercher un article par nom ou référence..."
+                      style={{
+                        width: '100%',
+                        padding: '1rem 1.5rem',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '12px',
+                        fontSize: '1rem',
+                        fontWeight: '500',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
+                        transition: 'all 0.3s ease',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                      onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    />
+
+                    {/* Résultats de recherche */}
+                    {operationsStockOptions.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '1.5rem',
+                        right: '1.5rem',
+                        background: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '12px',
+                        boxShadow: 'var(--shadow-xl)',
+                        zIndex: 10,
+                        maxHeight: '400px',
+                        overflowY: 'auto',
+                        marginTop: '0.5rem'
+                      }}>
+                        {operationsStockOptions.map((item, index) => {
+                          const available = (item.quantity || 0) - (item.reservedQuantity || 0);
+                          const isOutOfStock = available <= 0;
+                          const isLowStock = available > 0 && available <= 5;
+                          
+                          return (
+                            <div
+                              key={index}
+                              onClick={() => {
+                                setSelectedOperationArticle(item);
+                                setOperationsStockQuery(item.name);
+                                setOperationsStockOptions([]);
+                              }}
+                              style={{
+                                padding: '1rem',
+                                borderBottom: index < operationsStockOptions.length - 1 ? '1px solid var(--color-border)' : 'none',
+                                cursor: !isOutOfStock ? 'pointer' : 'not-allowed',
+                                transition: 'all 0.3s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                opacity: isOutOfStock ? 0.5 : 1
+                              }}
+                              onMouseEnter={(e) => !isOutOfStock && (e.target.style.background = 'var(--color-bg-secondary)')}
+                              onMouseLeave={(e) => !isOutOfStock && (e.target.style.background = 'transparent')}
+                            >
+                              {/* Image */}
+                              <div style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                background: 'var(--color-bg-secondary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                {item.image ? (
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                ) : (
+                                  <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>🌿</span>
+                                )}
+                              </div>
+
+                              {/* Informations */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ 
+                                  fontWeight: '600', 
+                                  color: 'var(--color-text-primary)', 
+                                  marginBottom: '0.25rem',
+                                  fontSize: '1rem'
+                                }}>
+                                  {item.name}
+                                </div>
+                                <div style={{ 
+                                  fontSize: '0.85rem', 
+                                  color: 'var(--color-text-secondary)', 
+                                  marginBottom: '0.5rem' 
+                                }}>
+                                  Réf: {item.reference}
+                                </div>
+                                <div style={{ 
+                                  display: 'flex', 
+                                  gap: '1rem', 
+                                  alignItems: 'center', 
+                                  flexWrap: 'wrap' 
+                                }}>
+                                  <span style={{ 
+                                    fontSize: '1.1rem', 
+                                    fontWeight: '700', 
+                                    color: 'var(--color-primary)' 
+                                  }}>
+                                    €{item.price ? item.price.toFixed(2) : '0.00'}
+                                  </span>
+                                  <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '20px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    background: isOutOfStock ? 'var(--color-danger)' : 
+                                               isLowStock ? 'var(--color-warning)' : 'var(--color-success)',
+                                    color: 'white'
+                                  }}>
+                                    <span>
+                                      {isOutOfStock ? '❌' : isLowStock ? '⚠️' : '✅'}
+                                    </span>
+                                    <span>
+                                      {available} dispo
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action */}
+                              <div style={{
+                                background: isOutOfStock ? 'var(--color-secondary)' : 'var(--color-primary)',
+                                color: 'white',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '20px',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                textTransform: 'uppercase',
+                                cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                                opacity: isOutOfStock ? 0.6 : 1,
+                                flexShrink: 0
+                              }}>
+                                {isOutOfStock ? 'Rupture' : 'Sélectionner'}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Article sélectionné */}
+                    {selectedOperationArticle && (
+                      <div style={{
+                        marginTop: '1rem',
+                        padding: '1rem',
+                        background: 'var(--color-success-bg)',
+                        border: '1px solid var(--color-success)',
+                        borderRadius: '12px'
+                      }}>
+                        <div style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          color: 'var(--color-success)',
+                          textTransform: 'uppercase',
+                          marginBottom: '0.5rem'
+                        }}>
+                          ✅ Article sélectionné
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }}>
+                          {selectedOperationArticle.image && (
+                            <img
+                              src={selectedOperationArticle.image}
+                              alt={selectedOperationArticle.name}
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '8px',
+                                objectFit: 'cover'
+                              }}
+                            />
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                              {selectedOperationArticle.name}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                              Réf: {selectedOperationArticle.reference} • €{selectedOperationArticle.price?.toFixed(2) || '0.00'}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSelectedOperationArticle(null);
+                              setOperationsStockQuery('');
+                            }}
+                            style={{
+                              background: 'var(--color-secondary)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '30px',
+                              height: '30px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quantité et Coefficient */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    🔢 Quantité *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    placeholder="Ex: 10"
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  />
+                </div>
+
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    📊 Coefficient *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    required
+                    placeholder="Ex: 1.2 (pour +20%)"
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  />
+                </div>
+
+                {/* Bouton de validation */}
+                <div style={{gridColumn: '1 / -1', marginTop: '2rem'}}>
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      width: '100%',
+                      padding: '1.5rem 2rem',
+                      fontSize: '1.2rem',
+                      fontWeight: '700',
+                      background: 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: 'var(--shadow-lg)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '1rem'
+                    }}
+                  >
+                    <span style={{ fontSize: '1.5rem' }}>💰</span>
+                    Créer l'opération de vente
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+
+            {/* Section Historique des opérations */}
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-lg)',
+              padding: '2rem',
+              textAlign: 'center'
+            }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: 'var(--color-primary)',
+                marginBottom: '1rem'
+              }}>
+                📊 Historique des opérations
+              </h3>
+              <p style={{
+                color: 'var(--color-text-secondary)',
+                fontSize: '1rem',
+                margin: 0
+              }}>
+                Les opérations inter-pôles apparaîtront ici une fois créées
+              </p>
+            </div>
           </motion.section>
         )}
         

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './Nieuwkoop.css';
 
 const NieuwkoopGrid = ({ 
   sortedItems, 
@@ -7,10 +8,43 @@ const NieuwkoopGrid = ({
   openAssignModal,
   addedItems 
 }) => {
+  const [focusedCard, setFocusedCard] = useState(null);
+  
+  const handleCardClick = (prod, event) => {
+    console.log('Card clicked:', prod.name, prod.code);
+    // Éviter de déclencher l'événement si on clique sur un bouton
+    if (event.target.closest('button')) {
+      console.log('Button clicked, ignoring card click');
+      return;
+    }
+    console.log('Setting focused card:', prod);
+    setFocusedCard(prod);
+  };
+
+  const closeFocus = () => {
+    console.log('Closing focused card');
+    setFocusedCard(null);
+  };
+
+  console.log('🔍 NieuwkoopGrid rendered with:', {
+    sortedItemsCount: sortedItems?.length || 0,
+    focusedCard,
+    addedItemsCount: addedItems?.length || 0
+  });
+
   // Extraire les catégories dynamiquement comme dans la sidebar
   const categories = [...new Set(addedItems.map(item => item.category))].filter(Boolean);
+  
   return (
-    <div className="nieuwkoop-grid">
+    <>
+      {focusedCard && (
+        <div className="card-focus-overlay" onClick={closeFocus}>
+          <button className="close-focus-btn" onClick={closeFocus}>
+            ×
+          </button>
+        </div>
+      )}
+      <div className="nieuwkoop-grid">
       {sortedItems.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">🔍</div>
@@ -22,6 +56,7 @@ const NieuwkoopGrid = ({
       ) : (
         <div className="stock-grid-4">
           {sortedItems.map((prod, index) => {
+            console.log('🎯 Rendering card:', prod.name, 'index:', index);
             const available = (prod.quantity || 0) - (prod.reservedQuantity || 0);
             const isOutOfStock = available <= 0;
             const isLowStock = available > 0 && available <= 5;
@@ -29,13 +64,14 @@ const NieuwkoopGrid = ({
             return (
               <div
                 key={prod.code}
-                className="stock-card fade-in-up"
+                className={`stock-card fade-in-up ${focusedCard?.code === prod.code ? 'stock-card-focused' : ''}`}
                 style={{
                   border: isOutOfStock ? '3px solid var(--color-danger)' : 
                          isLowStock ? '3px solid var(--color-warning)' : 
                          '3px solid transparent',
                   cursor: 'pointer'
                 }}
+                onClick={(e) => handleCardClick(prod, e)}
               >
                 {/* En-tête avec badge et actions */}
                 <div style={{
@@ -251,7 +287,8 @@ const NieuwkoopGrid = ({
           })}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
