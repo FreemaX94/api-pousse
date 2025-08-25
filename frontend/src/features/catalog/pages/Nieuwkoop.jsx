@@ -4855,39 +4855,78 @@ return (
           <motion.section key="operations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">
             {/* En-tête de la section */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
-              borderRadius: '20px',
-              padding: '2rem',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '16px',
+              padding: '3rem 2rem',
               textAlign: 'center',
-              boxShadow: 'var(--shadow-xl)',
-              color: 'white',
-              marginBottom: '3rem'
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              marginBottom: '3rem',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
+              {/* Effet de fond subtil */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
+                pointerEvents: 'none'
+              }} />
+              
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                style={{ fontSize: '3rem', marginBottom: '1rem' }}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, type: "spring", stiffness: 300 }}
+                style={{ 
+                  fontSize: '4rem', 
+                  marginBottom: '1.5rem',
+                  background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
               >
                 🔄
               </motion.div>
+              
               <h2 style={{
                 margin: 0,
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                marginBottom: '0.5rem',
-                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                fontSize: '2.8rem',
+                fontWeight: '700',
+                marginBottom: '0.8rem',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                letterSpacing: '-0.025em',
+                lineHeight: '1.1'
               }}>
-                Opérations Diverses v2.3.4-DEBUG
+                Opérations Diverses
               </h2>
+              
               <p style={{
                 margin: 0,
-                fontSize: '1.2rem',
-                opacity: 0.9,
-                fontWeight: '500'
+                fontSize: '1.1rem',
+                color: 'var(--color-text-secondary)',
+                fontWeight: '400',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                maxWidth: '500px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                lineHeight: '1.5'
               }}>
                 Système de vente entre pôles internes
               </p>
+              
+              {/* Ligne décorative */}
+              <div style={{
+                width: '60px',
+                height: '3px',
+                background: 'linear-gradient(90deg, #6366f1, #a855f7)',
+                margin: '1.5rem auto 0',
+                borderRadius: '2px'
+              }} />
             </div>
 
             {/* Formulaire de vente entre pôles */}
