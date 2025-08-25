@@ -4904,7 +4904,7 @@ return (
                 marginBottom: '0.5rem',
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}>
-                Opérations Diverses v2.3.3
+                Opérations Diverses v2.3.4-DEBUG
               </h2>
               <p style={{
                 margin: 0,
