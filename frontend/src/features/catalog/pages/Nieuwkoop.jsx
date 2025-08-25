@@ -48,7 +48,7 @@ import {
 import axiosApi, { handleApiError } from "../../../api/axios";
 import { useTheme, ThemeProvider } from "../../../contexts/ThemeContext";
 
-// 🚀 Lazy loading des composants lourds pour le code splitting
+// 🚀 Lazy loading des composants lourds pour le code splitting - Cache refresh 20250824-225545
 const EntryForm = lazy(() => import('../../../components/EntryForm'));
 const ExitForm = lazy(() => import('../../../components/ExitForm'));
 const EntryList = lazy(() => import('../../../components/EntryList'));
@@ -784,8 +784,8 @@ const Nieuwkoop = () => {
   }, [activeSection, needsStockRefresh]);
 
   // Calculate filtered and sorted items first (needed by operations search)
-  const totalPrice = addedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const totalQty = addedItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalPrice = addedItems.reduce((acc, item) => acc + item.price * (item.quantity || 0), 0);
+  const totalQty = addedItems.reduce((acc, item) => acc + (item.quantity || 0), 0);
   // 1) Filtrer par catégorie active + recherche
   const filteredItems = addedItems.filter(prod =>
     (!activeCategory || prod.category === activeCategory)
@@ -819,17 +819,21 @@ const Nieuwkoop = () => {
       try {
         console.log('🔍 Recherche opérations diverses:', {
           query: operationsStockQuery,
+          addedItemsCount: addedItems.length,
+          filteredItemsCount: filteredItems.length,
           sortedItemsCount: sortedItems.length,
-          sampleItems: sortedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference}))
+          sampleAddedItems: addedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference})),
+          sampleSortedItems: sortedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference}))
         });
         
-        // Utiliser les mêmes données que l'onglet stock
-        const filtered = sortedItems.filter(item => 
+        // Utiliser directement addedItems au lieu de sortedItems pour éviter les filtres
+        const filtered = addedItems.filter(item => 
           item.name?.toLowerCase().includes(operationsStockQuery.toLowerCase()) ||
           item.reference?.toLowerCase().includes(operationsStockQuery.toLowerCase())
         );
         
         console.log('✅ Articles filtrés trouvés:', filtered.length);
+        console.log('📝 Premier article filtré:', filtered[0] ? {name: filtered[0].name, reference: filtered[0].reference} : 'aucun');
         
         if (!cancelled) {
           setOperationsStockOptions(filtered.slice(0, 10)); // Limiter à 10 résultats
@@ -844,7 +848,7 @@ const Nieuwkoop = () => {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [operationsStockQuery, sortedItems]);
+  }, [operationsStockQuery, addedItems, filteredItems, sortedItems]);
 
   // États pour le sélecteur de date de visualisation du stock
   const today = new Date();
@@ -1054,6 +1058,26 @@ const Nieuwkoop = () => {
     fetchProjects();
   };
 
+  const updateCategory = (id, category) => {
+    console.log('🔄 Updating category for item:', id, 'to:', category);
+    axiosApi.put(`/catalog/nieuwkoop/stock/${id}/category`, { category })
+      .then(response => {
+        const updated = response.data;
+        console.log('✅ Category updated successfully:', { id, newCategory: category, response: updated });
+        
+        // Mettre à jour immédiatement l'état addedItems avec la nouvelle catégorie
+        setAddedItems(prev => {
+          const newItems = prev.map(item => 
+            item._id === id ? { ...item, category: category } : item
+          );
+          console.log('🔄 AddedItems state updated:', newItems.find(item => item._id === id)?.category);
+          return newItems;
+        });
+      })
+      .catch(err => {
+        console.error("❌ Erreur mise à jour catégorie:", err);
+      });
+  };
 
   useEffect(() => {
     if (activeSection === "Stock" || activeSection === "Opérations diverses") {
@@ -1875,13 +1899,12 @@ return (
     📦 Tous les articles
   </button>
   {[
-    { label: "Entretien 🧰",   key: "entretien" },
-    { label: "[EV] Plantes 🌿",     key: "plante" },
-    { label: "[EV] Contenants 🏺",  key: "contenant" },
-    { label: "[EV] Noël 🎄",        key: "noel" },
-    { label: "[EV] Artificiels 🧠", key: "artificiel" },
-    { label: "[EV] Séchés 🍂",      key: "seche" },
-    { label: "[EV] Autre 🤷",       key: "autre" }
+    { label: "🌿 Plantes",     key: "plante" },
+    { label: "🏺 Contenants",  key: "contenant" },
+    { label: "🎨 Décor",       key: "decoration" },
+    { label: "🧠 Artificiels", key: "artificiel" },
+    { label: "🍂 Séchés",      key: "seche" },
+    { label: "🧰 Entretien",   key: "entretien" }
   ].map(({ label, key }) => (
     <button
       key={key}
@@ -4595,13 +4618,12 @@ return (
                                 }}
                               >
                                 <option value="">🤷‍♂️ Non classé</option>
-                                <option value="plante">🌿 Plantes & Végétaux</option>
-                                <option value="contenant">🏺 Pots & Contenants</option>
-                                <option value="noel">🎄 Collection Noël</option>
-                                <option value="artificiel">🧠 Plantes Artificielles</option>
-                                <option value="seche">🍂 Fleurs Séchées</option>
-                                <option value="entretien">🧰 Matériel Entretien</option>
-                                <option value="autre">🔮 Autres Articles</option>
+                                <option value="plante">🌿 Plantes</option>
+                                <option value="contenant">🏺 Contenants</option>
+                                <option value="decoration">🎨 Décor</option>
+                                <option value="artificiel">🧠 Artificiels</option>
+                                <option value="seche">🍂 Séchés</option>
+                                <option value="entretien">🧰 Entretien</option>
                               </motion.select>
                             </motion.div>
                             
@@ -4726,19 +4748,6 @@ return (
                           </div>
 
                           {/* Dates simplifiées */}
-                          {isRecentlyModified(prod) && (
-                            <div style={{
-                              padding: '0.5rem',
-                              background: 'var(--color-bg-secondary)',
-                              borderRadius: '8px',
-                              fontSize: '0.7rem',
-                              color: 'var(--color-primary)',
-                              textAlign: 'center',
-                              border: '1px solid var(--color-accent)'
-                            }}>
-                              🔄 Modifié récemment
-                            </div>
-                          )}
                         </div>
                         
                       </motion.div>
@@ -5764,14 +5773,6 @@ return (
   );
 };
 
-  const updateCategory = (id, category) => {
-    axiosApi.put(`/catalog/nieuwkoop/stock/${id}/category`, { category })
-      .then(response => {
-        const updated = response.data;
-        setAddedItems(prev => prev.map(item => item._id === id ? updated : item));
-      })
-      .catch(err => console.error("Erreur mise à jour catégorie:", err));
-  };
 
 const fetchMovements = async () => {
     try {
