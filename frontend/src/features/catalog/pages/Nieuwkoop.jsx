@@ -810,12 +810,6 @@ const Nieuwkoop = () => {
 
   // Recherche d'articles pour les opérations diverses
   useEffect(() => {
-    console.log('🔍 SEARCH TRIGGER:', {
-      query: operationsStockQuery,
-      queryLength: operationsStockQuery.length,
-      willSearch: operationsStockQuery.length >= 2
-    });
-    
     if (operationsStockQuery.length < 2) {
       setOperationsStockOptions([]);
       return;
@@ -824,26 +818,7 @@ const Nieuwkoop = () => {
     
     const searchItems = async () => {
       try {
-        console.log('🔍 Recherche opérations diverses:', {
-          query: operationsStockQuery,
-          addedItemsCount: addedItems.length,
-          filteredItemsCount: filteredItems.length,
-          sortedItemsCount: sortedItems.length,
-          sampleAddedItems: addedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference})),
-          sampleSortedItems: sortedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference}))
-        });
-        
-        // Debug: afficher tous les noms qui contiennent "ter"
-        if (operationsStockQuery.toLowerCase() === 'ter') {
-          const itemsWithTer = addedItems.filter(item => 
-            item.name?.toLowerCase().includes('ter') ||
-            item.reference?.toLowerCase().includes('ter')
-          );
-          console.log('🔍 Articles contenant "ter":', itemsWithTer.map(item => ({name: item.name, reference: item.reference})));
-          
-          // Afficher aussi quelques noms au hasard pour vérifier les données
-          console.log('🔍 Échantillon de tous les noms:', addedItems.slice(0, 10).map(item => item.name));
-        }
+        console.log('🔍 Recherche:', operationsStockQuery, '- Articles disponibles:', addedItems.length);
         
         // Utiliser directement addedItems au lieu de sortedItems pour éviter les filtres
         const filtered = addedItems.filter(item => 
@@ -851,8 +826,7 @@ const Nieuwkoop = () => {
           item.reference?.toLowerCase().includes(operationsStockQuery.toLowerCase())
         );
         
-        console.log('✅ Articles filtrés trouvés:', filtered.length);
-        console.log('📝 Premier article filtré:', filtered[0] ? {name: filtered[0].name, reference: filtered[0].reference} : 'aucun');
+        console.log('✅ Résultats trouvés:', filtered.length, filtered.length > 0 ? '- Premier: ' + filtered[0].name : '');
         
         if (!cancelled) {
           setOperationsStockOptions(filtered.slice(0, 10)); // Limiter à 10 résultats
@@ -867,7 +841,7 @@ const Nieuwkoop = () => {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [operationsStockQuery, addedItems, filteredItems, sortedItems]);
+  }, [operationsStockQuery, addedItems]);
 
   // États pour le sélecteur de date de visualisation du stock
   const today = new Date();
