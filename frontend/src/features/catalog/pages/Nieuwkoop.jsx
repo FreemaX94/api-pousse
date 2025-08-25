@@ -810,6 +810,12 @@ const Nieuwkoop = () => {
 
   // Recherche d'articles pour les opérations diverses
   useEffect(() => {
+    console.log('🔍 SEARCH TRIGGER:', {
+      query: operationsStockQuery,
+      queryLength: operationsStockQuery.length,
+      willSearch: operationsStockQuery.length >= 2
+    });
+    
     if (operationsStockQuery.length < 2) {
       setOperationsStockOptions([]);
       return;
@@ -826,6 +832,18 @@ const Nieuwkoop = () => {
           sampleAddedItems: addedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference})),
           sampleSortedItems: sortedItems.slice(0, 3).map(item => ({name: item.name, reference: item.reference}))
         });
+        
+        // Debug: afficher tous les noms qui contiennent "ter"
+        if (operationsStockQuery.toLowerCase() === 'ter') {
+          const itemsWithTer = addedItems.filter(item => 
+            item.name?.toLowerCase().includes('ter') ||
+            item.reference?.toLowerCase().includes('ter')
+          );
+          console.log('🔍 Articles contenant "ter":', itemsWithTer.map(item => ({name: item.name, reference: item.reference})));
+          
+          // Afficher aussi quelques noms au hasard pour vérifier les données
+          console.log('🔍 Échantillon de tous les noms:', addedItems.slice(0, 10).map(item => item.name));
+        }
         
         // Utiliser directement addedItems au lieu de sortedItems pour éviter les filtres
         const filtered = addedItems.filter(item => 
