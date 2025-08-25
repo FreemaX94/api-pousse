@@ -716,7 +716,7 @@ const Nieuwkoop = () => {
       };
 
 
-      const response = await axiosApi.post('/api/internal-operations', operationData);
+      const response = await axiosApi.post('/internal-operations', operationData);
 
       if (response.data.success) {
         console.log(`✅ Opération créée: ${response.data.operation.operationId}`);
@@ -755,7 +755,7 @@ const Nieuwkoop = () => {
   const loadOperationsHistory = async () => {
     setOperationsLoading(true);
     try {
-      const response = await axiosApi.get('/api/internal-operations?limit=20&sortBy=createdAt&sortOrder=desc');
+      const response = await axiosApi.get('/internal-operations?limit=20&sortBy=createdAt&sortOrder=desc');
       if (response.data.success) {
         setOperationsHistory(response.data.operations);
       }
