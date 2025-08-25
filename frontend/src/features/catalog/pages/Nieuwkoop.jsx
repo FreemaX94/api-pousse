@@ -48,7 +48,7 @@ import {
 import axiosApi, { handleApiError } from "../../../api/axios";
 import { useTheme, ThemeProvider } from "../../../contexts/ThemeContext";
 
-// 🚀 Lazy loading des composants lourds pour le code splitting - Cache refresh 20250825-223000
+// 🚀 Lazy loading des composants lourds pour le code splitting - Cache refresh 20250825-223300 - PRODUCTION FIX
 const EntryForm = lazy(() => import('../../../components/EntryForm'));
 const ExitForm = lazy(() => import('../../../components/ExitForm'));
 const EntryList = lazy(() => import('../../../components/EntryList'));
@@ -4885,7 +4885,7 @@ return (
                 marginBottom: '0.5rem',
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}>
-                Opérations Diverses
+                Opérations Diverses v2.3.3
               </h2>
               <p style={{
                 margin: 0,
