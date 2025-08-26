@@ -768,12 +768,11 @@ const Nieuwkoop = () => {
   };
 
   // Charger l'historique quand on arrive sur l'onglet Opérations diverses
-  // Temporairement désactivé car l'endpoint /internal-operations n'existe pas encore
-  // useEffect(() => {
-  //   if (activeSection === 'Opérations diverses') {
-  //     loadOperationsHistory();
-  //   }
-  // }, [activeSection]);
+  useEffect(() => {
+    if (activeSection === 'Opérations diverses') {
+      loadOperationsHistory();
+    }
+  }, [activeSection]);
 
   // Actualiser le stock si nécessaire quand on revient sur l'onglet Stock
   useEffect(() => {
