@@ -176,6 +176,16 @@ function ExternalEntryForm({ onSaved, currentUser }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
+  
+  // États pour l'édition inline
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editingField, setEditingField] = useState(null); // 'name', 'price', 'height', 'diameter'
+  const [editValue, setEditValue] = useState('');
+  
+  // URL de base pour les images
+  const imageBaseUrl = import.meta.env.MODE === 'development' 
+    ? 'http://localhost:3001/api' 
+    : (import.meta.env.VITE_API_BASE_URL || '/api');
 
   // Charger projets
   useEffect(() => {
@@ -752,6 +762,75 @@ const Nieuwkoop = () => {
   };
 
   // Fonction pour charger l'historique des opérations
+  // Fonctions pour l'édition inline
+  const handleStartEdit = (itemId, field, currentValue) => {
+    setEditingItemId(itemId);
+    setEditingField(field);
+    setEditValue(currentValue);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingItemId || !editingField) return;
+
+    try {
+      const updateData = {};
+      
+      // Préparer les données selon le champ
+      switch (editingField) {
+        case 'name':
+          updateData.name = editValue;
+          break;
+        case 'price':
+          updateData.pricing = { price: parseFloat(editValue) || 0 };
+          break;
+        case 'height':
+          updateData.dimensions = { height: parseFloat(editValue) || 0 };
+          break;
+        case 'diameter':
+          updateData.dimensions = { diameter: parseFloat(editValue) || 0 };
+          break;
+        default:
+          return;
+      }
+
+      const response = await axiosApi.put(`/catalog/nieuwkoop/stock/${editingItemId}`, updateData);
+      
+      if (response.data) {
+        // Mettre à jour l'élément dans la liste locale
+        setItems(prevItems => prevItems.map(item => {
+          if (item._id === editingItemId) {
+            const updated = { ...item };
+            if (editingField === 'name') updated.name = editValue;
+            if (editingField === 'price') updated.price = parseFloat(editValue) || 0;
+            if (editingField === 'height') updated.dimensions = { ...updated.dimensions, height: parseFloat(editValue) || 0 };
+            if (editingField === 'diameter') updated.dimensions = { ...updated.dimensions, diameter: parseFloat(editValue) || 0 };
+            return updated;
+          }
+          return item;
+        }));
+        
+        handleCancelEdit();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      handleCancelEdit();
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
   const loadOperationsHistory = async () => {
     setOperationsLoading(true);
     try {
@@ -1891,27 +1970,46 @@ return (
     📦 Tous les articles
   </button>
   {[
-    { label: "🌿 Plantes",     key: "plante" },
+    { label: "🌿 Plantes", key: "plante", subcategories: [
+        { label: "🌿 Plantes extérieures", key: "plantes-exterieures" }
+      ]
+    },
     { label: "🏺 Contenants",  key: "contenant" },
     { label: "🎨 Décor",       key: "decoration" },
     { label: "🧠 Artificiels", key: "artificiel" },
     { label: "🍂 Séchés",      key: "seche" },
     { label: "🧰 Entretien",   key: "entretien" }
-  ].map(({ label, key }) => (
-    <button
-      key={key}
-      onClick={() => {
-        setActiveSection("Stock");
-        setActiveCategory(key);
-      }}
-      className={`pl-4 py-1 text-left rounded ${
-        activeCategory === key ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-      } hover:bg-gray-100 ${
-        key === 'entretien' ? 'border-b border-gray-300 mb-1' : ''
-      }`}
-    >
-      {label}
-    </button>
+  ].map(({ label, key, subcategories }) => (
+    <div key={key}>
+      <button
+        onClick={() => {
+          setActiveSection("Stock");
+          setActiveCategory(key);
+        }}
+        className={`pl-4 py-1 text-left rounded w-full ${
+          activeCategory === key ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
+        } hover:bg-gray-100 ${
+          key === 'entretien' ? 'border-b border-gray-300 mb-1' : ''
+        }`}
+      >
+        {label}
+      </button>
+      {/* Sous-catégories */}
+      {subcategories && subcategories.map(({ label: subLabel, key: subKey }) => (
+        <button
+          key={subKey}
+          onClick={() => {
+            setActiveSection("Stock");
+            setActiveCategory(subKey);
+          }}
+          className={`pl-8 py-1 text-left rounded w-full text-sm ${
+            activeCategory === subKey ? "text-green-500 font-medium bg-green-50" : "text-gray-500"
+          } hover:bg-gray-50`}
+        >
+          {subLabel}
+        </button>
+      ))}
+    </div>
   ))}
 </div>
 
@@ -5173,7 +5271,7 @@ return (
                               }}>
                                 {item.image ? (
                                   <img
-                                    src={item.image}
+                                    src={item.image.startsWith('http') ? item.image : `${imageBaseUrl}${item.image}`}
                                     alt={item.name}
                                     style={{
                                       width: '100%',
@@ -5194,7 +5292,32 @@ return (
                                   marginBottom: '0.25rem',
                                   fontSize: '1rem'
                                 }}>
-                                  {item.name}
+                                  {editingItemId === item._id && editingField === 'name' ? (
+                                    <input
+                                      type="text"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onKeyDown={handleKeyPress}
+                                      onBlur={handleSaveEdit}
+                                      autoFocus
+                                      style={{
+                                        width: '100%',
+                                        padding: '0.25rem',
+                                        border: '1px solid var(--color-primary)',
+                                        borderRadius: '4px',
+                                        fontSize: '1rem',
+                                        fontWeight: '600'
+                                      }}
+                                    />
+                                  ) : (
+                                    <span
+                                      onClick={() => handleStartEdit(item._id, 'name', item.name)}
+                                      style={{ cursor: 'pointer' }}
+                                      title="Cliquer pour modifier"
+                                    >
+                                      {item.name}
+                                    </span>
+                                  )}
                                 </div>
                                 <div style={{ 
                                   fontSize: '0.85rem', 
@@ -5203,7 +5326,7 @@ return (
                                 }}>
                                   Réf: {item.reference}
                                 </div>
-                                {(item.height || item.diameter) && (
+                                {(item.dimensions?.height || item.dimensions?.diameter) && (
                                   <div style={{ 
                                     fontSize: '0.8rem', 
                                     color: 'var(--color-text-secondary)', 
@@ -5211,8 +5334,64 @@ return (
                                     display: 'flex',
                                     gap: '1rem'
                                   }}>
-                                    {item.height && <span>H: {item.height}cm</span>}
-                                    {item.diameter && <span>Ø: {item.diameter}cm</span>}
+                                    {item.dimensions?.height > 0 && (
+                                      <span>
+                                        H: {editingItemId === item._id && editingField === 'height' ? (
+                                          <input
+                                            type="number"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onKeyDown={handleKeyPress}
+                                            onBlur={handleSaveEdit}
+                                            autoFocus
+                                            style={{
+                                              width: '50px',
+                                              padding: '0.1rem',
+                                              border: '1px solid var(--color-primary)',
+                                              borderRadius: '2px',
+                                              fontSize: '0.8rem'
+                                            }}
+                                          />
+                                        ) : (
+                                          <span
+                                            onClick={() => handleStartEdit(item._id, 'height', item.dimensions?.height || 0)}
+                                            style={{ cursor: 'pointer' }}
+                                            title="Cliquer pour modifier"
+                                          >
+                                            {item.dimensions.height}
+                                          </span>
+                                        )}cm
+                                      </span>
+                                    )}
+                                    {item.dimensions?.diameter > 0 && (
+                                      <span>
+                                        Ø: {editingItemId === item._id && editingField === 'diameter' ? (
+                                          <input
+                                            type="number"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onKeyDown={handleKeyPress}
+                                            onBlur={handleSaveEdit}
+                                            autoFocus
+                                            style={{
+                                              width: '50px',
+                                              padding: '0.1rem',
+                                              border: '1px solid var(--color-primary)',
+                                              borderRadius: '2px',
+                                              fontSize: '0.8rem'
+                                            }}
+                                          />
+                                        ) : (
+                                          <span
+                                            onClick={() => handleStartEdit(item._id, 'diameter', item.dimensions?.diameter || 0)}
+                                            style={{ cursor: 'pointer' }}
+                                            title="Cliquer pour modifier"
+                                          >
+                                            {item.dimensions.diameter}
+                                          </span>
+                                        )}cm
+                                      </span>
+                                    )}
                                   </div>
                                 )}
                                 <div style={{ 
@@ -5226,7 +5405,34 @@ return (
                                     fontWeight: '700', 
                                     color: 'var(--color-primary)' 
                                   }}>
-                                    €{item.price ? item.price.toFixed(2) : '0.00'}
+                                    €{editingItemId === item._id && editingField === 'price' ? (
+                                      <input
+                                        type="number"
+                                        step="0.01"
+                                        value={editValue}
+                                        onChange={(e) => setEditValue(e.target.value)}
+                                        onKeyDown={handleKeyPress}
+                                        onBlur={handleSaveEdit}
+                                        autoFocus
+                                        style={{
+                                          width: '80px',
+                                          padding: '0.2rem',
+                                          border: '1px solid var(--color-primary)',
+                                          borderRadius: '4px',
+                                          fontSize: '1.1rem',
+                                          fontWeight: '700',
+                                          color: 'var(--color-primary)'
+                                        }}
+                                      />
+                                    ) : (
+                                      <span
+                                        onClick={() => handleStartEdit(item._id, 'price', item.price || 0)}
+                                        style={{ cursor: 'pointer' }}
+                                        title="Cliquer pour modifier"
+                                      >
+                                        {item.price ? item.price.toFixed(2) : '0.00'}
+                                      </span>
+                                    )}
                                   </span>
                                   <div style={{
                                     display: 'flex',

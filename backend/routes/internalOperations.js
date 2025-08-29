@@ -21,6 +21,7 @@ router.post('/',
   celebrate({
     [Segments.BODY]: Joi.object({
       buyingDepartment: Joi.string().valid('creation', 'entretien', 'upsell').required(),
+      sellingDepartment: Joi.string().valid('evenementiel', 'creation', 'entretien', 'upsell').optional(),
       article: Joi.object({
         reference: Joi.string().required(),
         name: Joi.string().required(),
