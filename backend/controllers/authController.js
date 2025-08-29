@@ -186,7 +186,7 @@ exports.login = [bruteForceProtection, progressiveRateLimit, celebrate(loginSche
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.COOKIE_SAMESITE || 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
       maxAge: 15 * 60 * 1000 // 15 minutes (réduit de 8h)
     };
 
@@ -249,7 +249,7 @@ exports.refresh = [celebrate(refreshSchema), async (req, res, next) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.COOKIE_SAMESITE || 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
       maxAge: 15 * 60 * 1000 // 15 minutes
     };
 
@@ -390,7 +390,7 @@ exports.logout = async (req, res, next) => {
     res.clearCookie('accessToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.COOKIE_SAMESITE || 'strict'
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict'
     });
     
     if (req.user) {
@@ -510,7 +510,7 @@ exports.autoRefresh = async (req, res, next) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.COOKIE_SAMESITE || 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
       maxAge: 15 * 60 * 1000
     };
     
