@@ -23,52 +23,25 @@ const CactusIcon = ({ size = 48, color = "currentColor" }) => (
     fill="none" 
     xmlns="http://www.w3.org/2000/svg"
   >
-    <motion.path
+    <path
       d="M12 2v16M8 6c-1.5 0-3 1.5-3 3s1.5 3 3 3M16 10c1.5 0 3-1.5 3-3s-1.5-3-3-3M12 18c-2 0-3 1-3 2h6c0-1-1-2-3-2z"
       stroke={color}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
-      animate={{
-        strokeDasharray: [0, 100],
-        strokeDashoffset: [0, -100]
-      }}
-      transition={{
-        duration: 4,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
     />
-    <motion.circle
+    <circle
       cx="9"
       cy="8"
       r="1"
       fill={color}
-      animate={{
-        scale: [1, 1.5, 1],
-        opacity: [0.5, 1, 0.5]
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        delay: 0.5
-      }}
     />
-    <motion.circle
+    <circle
       cx="15"
       cy="6"
       r="1"
       fill={color}
-      animate={{
-        scale: [1, 1.5, 1],
-        opacity: [0.5, 1, 0.5]
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        delay: 1
-      }}
     />
   </svg>
 )
@@ -256,60 +229,20 @@ const HomeContent = () => {
             transformStyle: 'preserve-3d'
           }}
         >
-          <motion.span
-            animate={{
-              rotate: [0, 10, -10, 0]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            style={{ display: 'inline-block', marginRight: '1rem' }}
-          >
+          <span style={{ display: 'inline-block', marginRight: '1rem' }}>
             <CactusIcon 
               size={60} 
               color="var(--color-primary)"
             />
-          </motion.span>
+          </span>
           
           <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-            {['P', 'o', 'u', 's', 's', 'e'].map((letter, index) => (
-              <motion.span
-                key={index}
-                animate={{
-                  textShadow: [
-                    `2px 2px 0px var(--color-secondary), 4px 4px 0px var(--color-primary), 6px 6px 0px var(--color-accent), 8px 8px 15px rgba(0,0,0,0.4)`,
-                    `3px 3px 0px var(--color-secondary), 6px 6px 0px var(--color-primary), 9px 9px 0px var(--color-accent), 12px 12px 20px rgba(0,0,0,0.5)`,
-                    `2px 2px 0px var(--color-secondary), 4px 4px 0px var(--color-primary), 6px 6px 0px var(--color-accent), 8px 8px 15px rgba(0,0,0,0.4)`
-                  ]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: index * 0.1
-                }}
-                whileHover={{
-                  scale: 1.3,
-                  y: -10,
-                  textShadow: `4px 4px 0px var(--color-secondary), 8px 8px 0px var(--color-primary), 12px 12px 0px var(--color-accent), 16px 16px 25px rgba(0,0,0,0.6)`,
-                  transition: { 
-                    type: "spring",
-                    stiffness: 500,
-                    damping: 15,
-                    duration: 0.3
-                  }
-                }}
-                style={{
-                  color: '#ffffff',
-                  display: 'inline-block',
-                  cursor: 'pointer'
-                }}
-              >
-                {letter}
-              </motion.span>
-            ))}
+            <span style={{
+              color: '#ffffff',
+              textShadow: '2px 2px 0px var(--color-secondary), 4px 4px 0px var(--color-primary), 6px 6px 0px var(--color-accent), 8px 8px 15px rgba(0,0,0,0.4)'
+            }}>
+              Pousse
+            </span>
           </span>
         </motion.h1>
         

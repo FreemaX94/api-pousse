@@ -42,6 +42,12 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Vérifier si la requête demande à éviter la redirection automatique
+      if (originalRequest.headers?.['X-No-Auto-Redirect'] === 'true') {
+        console.warn('🚫 Redirection automatique évitée pour cette requête');
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         // Si un refresh est déjà en cours, mettre en queue
         return new Promise((resolve, reject) => {
