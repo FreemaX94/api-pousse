@@ -22,27 +22,9 @@ const {
   getTokenStats
 } = require('../services/jwtService');
 
-// Rate limiting pour les tentatives de connexion (sécurisé)
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives max contre brute force
-  message: { error: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Ajouter un délai progressif
-  skipSuccessfulRequests: true,
-  skipFailedRequests: false,
-});
-
-// Rate limiting pour l'enregistrement (plus restrictif)
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 heure
-  max: 2, // 2 créations de compte par IP (réduit de 3 à 2)
-  message: { error: 'Trop de créations de compte. Réessayez dans 1 heure.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: false,
-});
+// Rate limiting désactivé pour permettre plusieurs connexions simultanées
+const loginLimiter = (req, res, next) => next(); // Désactivé
+const registerLimiter = (req, res, next) => next(); // Désactivé
 
 // Validation des schémas
 const registerSchema = {

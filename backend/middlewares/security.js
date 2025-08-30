@@ -1,44 +1,10 @@
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 
-// Rate limiting global - Optimisé pour équipes multiples utilisateurs
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5000, // 5000 requêtes (adapté pour plusieurs utilisateurs simultanés)
-  message: 'Trop de requêtes, veuillez réessayer plus tard',
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Clé personnalisée : par utilisateur si connecté, sinon par IP
-  keyGenerator: (req) => {
-    // Si utilisateur connecté, rate limit par utilisateur
-    if (req.user && req.user.id) {
-      return `user:${req.user.id}`;
-    }
-    // Sinon par IP (pour les non-connectés)
-    return `ip:${req.ip}`;
-  },
-  // Skip pour les environnements de développement
-  skip: (req) => {
-    return process.env.NODE_ENV === 'development';
-  }
-});
-
-// Rate limiting strict pour auth
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives max pour éviter brute force
-  skipSuccessfulRequests: true,
-  message: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Rate limiting pour opérations sensibles
-const strictLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 heure
-  max: 10,
-  message: 'Limite atteinte pour cette opération',
-});
+// Rate limiting désactivé pour permettre plusieurs connexions simultanées
+const globalLimiter = (req, res, next) => next(); // Désactivé
+const authLimiter = (req, res, next) => next(); // Désactivé  
+const strictLimiter = (req, res, next) => next(); // Désactivé
 
 // CSRF protection - Alternative implementation without csurf
 const csrfProtection = (req, res, next) => {

@@ -32,7 +32,7 @@ const app = express();
 
 // Sécurité globale
 app.use(helmetConfig);
-app.use(globalLimiter);
+// app.use(globalLimiter); // Désactivé pour permettre plusieurs connexions simultanées
 
 // CORS configuration
 const corsOptions = {
