@@ -161,12 +161,12 @@ function ExternalEntryForm({ onSaved, currentUser }) {
     type: 'entrée',
     reference: '',
     name: '',
-    quantity: 1,
-    price: 0,
+    quantity: '',
+    price: '',
     image: null,
     coef: 1,
-    height: 0,
-    diameter: 0,
+    height: '',
+    diameter: '',
     eventDate: new Date().toISOString().substr(0, 10),
     project: '',
     note: '',
@@ -213,11 +213,11 @@ function ExternalEntryForm({ onSaved, currentUser }) {
     }
 
     let finalValue = value;
-    if (name === 'quantity') finalValue = Math.max(1, parseInt(value, 10) || 1);
+    if (name === 'quantity') finalValue = value === '' ? '' : Math.max(1, parseInt(value, 10) || 1);
     if (name === 'coef') finalValue = parseFloat(value);
-    if (name === 'price') finalValue = parseFloat(value) || 0;
-    if (name === 'height') finalValue = Math.max(0, parseFloat(value) || 0);
-    if (name === 'diameter') finalValue = Math.max(0, parseFloat(value) || 0);
+    if (name === 'price') finalValue = value === '' ? '' : parseFloat(value) || 0;
+    if (name === 'height') finalValue = value === '' ? '' : Math.max(0, parseFloat(value) || 0);
+    if (name === 'diameter') finalValue = value === '' ? '' : Math.max(0, parseFloat(value) || 0);
 
     setFormData(fd => ({ ...fd, [name]: finalValue }));
     setError('');
@@ -252,12 +252,12 @@ function ExternalEntryForm({ onSaved, currentUser }) {
         type: 'entrée',
         reference: '',
         name: '',
-        quantity: 1,
-        price: 0,
+        quantity: '',
+        price: '',
         image: null,
         coef: 1,
-        height: 0,
-        diameter: 0,
+        height: '',
+        diameter: '',
         eventDate: new Date().toISOString().substr(0, 10),
         project: '',
         note: '',
@@ -2389,6 +2389,26 @@ return (
 
 {activeSection === "Stock" && (
  <div className="flex flex-col gap-1 mt-2 ml-4 text-sm">
+  {/* Entretien séparé en haut */}
+  <button
+    onClick={() => {
+      setActiveSection("Stock");
+      setActiveCategory("entretien");
+    }}
+    className={`pl-4 py-1 text-left rounded ${
+      activeCategory === "entretien" ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
+    } hover:bg-gray-100 mb-2`}
+  >
+    🧰 Entretien
+  </button>
+  
+  {/* Barre de séparation */}
+  <div style={{
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%)',
+    margin: '0.5rem 0 1rem 0'
+  }}></div>
+
   <button
     onClick={() => {
       setActiveSection("Stock");
@@ -2408,8 +2428,10 @@ return (
     { label: "🏺 Contenants",  key: "contenant" },
     { label: "🎨 Décor",       key: "decoration" },
     { label: "🧠 Artificiels", key: "artificiel" },
-    { label: "🍂 Séchés",      key: "seche" },
-    { label: "🧰 Entretien",   key: "entretien" }
+    { label: "🍂 Séchés",      key: "seche", subcategories: [
+        { label: "🤷‍♂️ Non classé", key: "" }
+      ]
+    }
   ].map(({ label, key, subcategories }) => (
     <div key={key}>
       <button
@@ -3108,7 +3130,14 @@ return (
                   >
                     {['🌺 Janvier', '❄️ Février', '🌸 Mars', '🌷 Avril', '🌿 Mai', '☀️ Juin', 
                       '🌻 Juillet', '🌾 Août', '🍂 Septembre', '🍁 Octobre', '🍄 Novembre', '🎄 Décembre'].map((month, index) => (
-                      <option key={index} value={index}>{month}</option>
+                      <option 
+                        key={index} 
+                        value={index}
+                        style={{
+                          backgroundColor: 'var(--color-surface)',
+                          color: 'var(--color-text-primary)'
+                        }}
+                      >{month}</option>
                     ))}
                   </select>
 
@@ -3145,7 +3174,14 @@ return (
                     }}
                   >
                     {[2024, 2025, 2026, 2027, 2028].map(year => (
-                      <option key={year} value={year}>📆 {year}</option>
+                      <option 
+                        key={year} 
+                        value={year}
+                        style={{
+                          backgroundColor: 'var(--color-surface)',
+                          color: 'var(--color-text-primary)'
+                        }}
+                      >📆 {year}</option>
                     ))}
                   </select>
 
@@ -4738,6 +4774,7 @@ return (
                               >
                                 <option value="">🤷‍♂️ Non classé</option>
                                 <option value="plante">🌿 Plantes</option>
+                                <option value="plantes-exterieurs">🌲 Plantes extérieurs</option>
                                 <option value="contenant">🏺 Contenants</option>
                                 <option value="decoration">🎨 Décor</option>
                                 <option value="artificiel">🧠 Artificiels</option>

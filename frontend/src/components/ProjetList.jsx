@@ -183,39 +183,65 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                 : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))',
               padding: '1.5rem 2rem',
               position: 'relative',
-              zIndex: 1
+              zIndex: 1,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start'
             }}>
-              <h3 style={{
-                fontSize: '1.3rem',
-                fontWeight: '800',
-                color: 'var(--color-text-inverse)',
-                margin: 0,
-                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-              }}>
-                {p.client?.name || p.client}
-              </h3>
-              <div style={{
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                padding: '0.25rem 0.75rem',
-                borderRadius: '12px',
-                fontSize: '0.8rem',
-                fontWeight: '700',
-                display: 'inline-block',
-                marginTop: '0.5rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid var(--color-border)'
-              }}>
-                {displayStatus === 'En cours' && '⚡ En cours'}
-                {displayStatus === 'Terminé' && '✅ Terminé'}
-                {displayStatus === 'Archivé' && '📁 Archivé'}
-                {displayStatus === 'Brouillon' && '📝 Brouillon'}
-                {displayStatus === 'Planifié' && '📅 Planifié'}
-                {displayStatus === 'En attente' && '⏸️ En attente'}
-                {displayStatus === 'Annulé' && '❌ Annulé'}
+              <div>
+                <h3 style={{
+                  fontSize: '1.3rem',
+                  fontWeight: '800',
+                  color: 'var(--color-text-inverse)',
+                  margin: 0,
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                }}>
+                  {p.client?.name || p.client}
+                </h3>
+                <div style={{
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '12px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  display: 'inline-block',
+                  marginTop: '0.5rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid var(--color-border)'
+                }}>
+                  {displayStatus === 'En cours' && '⚡ En cours'}
+                  {displayStatus === 'Terminé' && '✅ Terminé'}
+                  {displayStatus === 'Archivé' && '📁 Archivé'}
+                  {displayStatus === 'Brouillon' && '📝 Brouillon'}
+                  {displayStatus === 'Planifié' && '📅 Planifié'}
+                  {displayStatus === 'En attente' && '⏸️ En attente'}
+                  {displayStatus === 'Annulé' && '❌ Annulé'}
+                </div>
               </div>
+              
+              {/* Concepteur en haut à droite */}
+              {p.chargeProjet && (
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '20px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  color: 'var(--color-text-inverse)',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span>👨‍💼</span>
+                  {p.chargeProjet}
+                </div>
+              )}
             </div>
 
             {/* Contenu */}
@@ -256,66 +282,6 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                 </div>
               )}
 
-              {/* Chargé de projet */}
-              {p.chargeProjet && (
-                <div style={{
-                  background: 'linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary))',
-                  padding: '1rem',
-                  borderRadius: '16px',
-                  border: '1px solid var(--color-border)',
-                  backdropFilter: 'blur(10px)',
-                  marginBottom: '1.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem'
-                }}>
-                  <div style={{
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    boxShadow: 'var(--shadow-lg)'
-                  }}>
-                    👨‍💼
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: '0.7rem',
-                      fontWeight: '800',
-                      color: 'var(--color-primary)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      marginBottom: '0.25rem'
-                    }}>👨‍💼 Chargé de projet</div>
-                    <div style={{
-                      fontSize: '1rem',
-                      color: 'var(--color-text-primary)',
-                      fontWeight: '600'
-                    }}>
-                      {p.chargeProjet}
-                    </div>
-                  </div>
-                  <div style={{
-                    background: 'var(--color-success)',
-                    color: 'white',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.7rem',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)'
-                  }}>
-                    ✅ Assigné
-                  </div>
-                </div>
-              )}
 
               {/* Dates et informations */}
               <div style={{
