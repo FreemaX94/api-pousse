@@ -73,59 +73,23 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
             isNewPlant: results[0].isNewPlant
           })
           
-          // Enrichir les résultats avec les dimensions si manquantes
-          const enrichedResults = await Promise.all(results.map(async (item) => {
-            // Si les dimensions manquent, essayer de les récupérer depuis l'API
-            if ((!item.height || !item.diameter) && item.reference) {
-              try {
-                console.log(`📡 Frontend - Récupération dimensions pour ${item.reference}...`)
-                const response = await fetch(`/api/nieuwkoop/items/${item.reference}/details`)
-                if (response.ok) {
-                  const details = await response.json()
-                  const nieuwkoopItem = details.item
-                  console.log(`📦 Frontend - Détails reçus pour ${item.reference}:`, nieuwkoopItem)
-                  
-                  // Chercher toutes les propriétés possibles pour le diamètre
-                  const possibleDiameters = [
-                    nieuwkoopItem?.DiameterCulturePot,
-                    nieuwkoopItem?.PotSize,
-                    nieuwkoopItem?.Diameter,
-                    nieuwkoopItem?.PotDiameter,
-                    nieuwkoopItem?.Width,  // Parfois la largeur = diamètre pour les pots
-                    nieuwkoopItem?.Size
-                  ].filter(val => val && val > 0)
-                  
-                  console.log(`🔍 Frontend - Propriétés diamètre trouvées pour ${item.reference}:`, {
-                    DiameterCulturePot: nieuwkoopItem?.DiameterCulturePot,
-                    PotSize: nieuwkoopItem?.PotSize,
-                    Diameter: nieuwkoopItem?.Diameter,
-                    PotDiameter: nieuwkoopItem?.PotDiameter,
-                    Width: nieuwkoopItem?.Width,
-                    Size: nieuwkoopItem?.Size,
-                    possibleDiameters
-                  })
-                  
-                  const enrichedItem = {
-                    ...item,
-                    height: nieuwkoopItem?.Height || item.height || 0,
-                    diameter: possibleDiameters[0] || item.diameter || 0
-                  }
-                  
-                  console.log(`✅ Frontend - Item enrichi ${item.reference}:`, {
-                    height: enrichedItem.height,
-                    diameter: enrichedItem.diameter
-                  })
-                  
-                  return enrichedItem
-                }
-              } catch (error) {
-                console.log(`⚠️ Frontend - Erreur récupération dimensions pour ${item.reference}:`, error)
-              }
-            }
-            return item
+          // Le backend fait déjà l'enrichissement des dimensions, mais s'il ne retourne pas height/diameter
+          // on les extrait de l'objet dimensions
+          console.log('📦 ExitForm - Résultats reçus du backend:', results.map(r => ({ 
+            reference: r.reference, 
+            name: r.name, 
+            height: r.height || r.dimensions?.height, 
+            diameter: r.diameter || r.dimensions?.diameter,
+            dimensions: r.dimensions
+          })))
+          
+          const enrichedResults = results.map(item => ({
+            ...item,
+            height: item.height || item.dimensions?.height || 0,
+            diameter: item.diameter || item.dimensions?.diameter || 0
           }))
           
-          setSuggestions(enrichedResults)
+          setSuggestions(enrichedResults || [])
         } else {
           setSuggestions(results || [])
         }
@@ -673,13 +637,8 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
                         flexWrap: 'wrap'
                       }}>
                         {item.price > 0 && <span>💰 {item.price}€</span>}
-                        {item.height > 0 && <span>📏 H: {item.height}cm</span>}
-                        {item.diameter > 0 && <span>📐 Ø: {item.diameter}cm</span>}
-                        {(!item.height || !item.diameter) && (
-                          <span style={{color: '#666', fontStyle: 'italic'}}>
-                            Dimensions en cours de récupération...
-                          </span>
-                        )}
+                        <span>📏 H: {item.height || 0}cm</span>
+                        <span>📐 Ø: {item.diameter || 0}cm</span>
                       </div>
                     </div>
                   </div>

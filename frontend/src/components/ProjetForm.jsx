@@ -40,47 +40,21 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
         console.log('🔍 ProjetForm - Résultats de recherche reçus:', items);
         
         if (items && items.length > 0) {
-          // Enrichir les résultats avec les dimensions si manquantes
-          const enrichedResults = await Promise.all(items.map(async (item) => {
-            // Si les dimensions manquent, essayer de les récupérer depuis l'API
-            if ((!item.height || !item.diameter) && item.reference) {
-              try {
-                console.log(`📡 ProjetForm - Récupération dimensions pour ${item.reference}...`);
-                const response = await fetch(`/api/nieuwkoop/items/${item.reference}/details`);
-                if (response.ok) {
-                  const details = await response.json();
-                  const nieuwkoopItem = details.item;
-                  console.log(`📦 ProjetForm - Détails reçus pour ${item.reference}:`, nieuwkoopItem);
-                  
-                  // Chercher toutes les propriétés possibles pour le diamètre
-                  const possibleDiameters = [
-                    nieuwkoopItem?.DiameterCulturePot,
-                    nieuwkoopItem?.PotSize,
-                    nieuwkoopItem?.Diameter,
-                    nieuwkoopItem?.PotDiameter,
-                    nieuwkoopItem?.Width,  // Parfois la largeur = diamètre pour les pots
-                    nieuwkoopItem?.Size
-                  ].filter(val => val && val > 0);
-                  
-                  const enrichedItem = {
-                    ...item,
-                    height: nieuwkoopItem?.Height || item.height || 0,
-                    diameter: possibleDiameters[0] || item.diameter || 0
-                  };
-                  
-                  console.log(`✅ ProjetForm - Item enrichi ${item.reference}:`, {
-                    height: enrichedItem.height,
-                    diameter: enrichedItem.diameter
-                  });
-                  
-                  return enrichedItem;
-                }
-              } catch (error) {
-                console.log(`⚠️ ProjetForm - Erreur récupération dimensions pour ${item.reference}:`, error);
-              }
-            }
-            return item;
-          }));
+          // Le backend fait déjà l'enrichissement des dimensions, mais s'il ne retourne pas height/diameter
+          // on les extrait de l'objet dimensions
+          console.log('📦 ProjetForm - Résultats reçus du backend:', items.map(r => ({ 
+            reference: r.reference, 
+            name: r.name, 
+            height: r.height || r.dimensions?.height, 
+            diameter: r.diameter || r.dimensions?.diameter,
+            dimensions: r.dimensions
+          })))
+          
+          const enrichedResults = items.map(item => ({
+            ...item,
+            height: item.height || item.dimensions?.height || 0,
+            diameter: item.diameter || item.dimensions?.diameter || 0
+          }))
           
           if (!cancelled) setStockOptions(enrichedResults);
         } else {

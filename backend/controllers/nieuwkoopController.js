@@ -178,8 +178,8 @@ exports.getNieuwkoopItems = async (req, res) => {
     // Enrichir les données manquantes depuis l'API Nieuwkoop
     const enrichedItems = await Promise.all(items.map(async (item) => {
       // Vérifier si les dimensions sont manquantes (null, undefined, 0 ou vide)
-      const hasHeight = item.height && item.height > 0;
-      const hasDiameter = item.diameter && item.diameter > 0;
+      const hasHeight = (item.dimensions?.height && item.dimensions.height > 0) || (item.height && item.height > 0);
+      const hasDiameter = (item.dimensions?.diameter && item.dimensions.diameter > 0) || (item.diameter && item.diameter > 0);
       
       console.log(`🔍 Vérification dimensions pour ${item.reference}:`, {
         height: item.height,
@@ -199,13 +199,13 @@ exports.getNieuwkoopItems = async (req, res) => {
               PotSize: nieuwkoopData.PotSize
             });
             
-            // Mettre à jour l'item avec les nouvelles dimensions
+            // Mettre à jour l'item avec les nouvelles dimensions (format nested)
             const updateData = {};
             if (!hasHeight && nieuwkoopData.Height) {
-              updateData.height = nieuwkoopData.Height;
+              updateData['dimensions.height'] = nieuwkoopData.Height;
             }
             if (!hasDiameter && (nieuwkoopData.DiameterCulturePot || nieuwkoopData.PotSize)) {
-              updateData.diameter = nieuwkoopData.DiameterCulturePot || nieuwkoopData.PotSize;
+              updateData['dimensions.diameter'] = nieuwkoopData.DiameterCulturePot || nieuwkoopData.PotSize;
             }
             
             // Sauvegarder en base pour éviter les futurs appels API
@@ -243,6 +243,12 @@ exports.getNieuwkoopItems = async (req, res) => {
       const reservedQuantity = item.stock?.reservedQuantity || item.reservedQuantity || 0;
       const availableQuantity = Math.max(0, stockQuantity - reservedQuantity);
 
+      // Calculer les dimensions avec fallbacks multiples
+      const height = item.dimensions?.height || item.height || item.Height || 0;
+      const diameter = item.dimensions?.diameter || item.diameter || item.DiameterCulturePot || item.PotSize || 0;
+      const width = item.dimensions?.width || item.width || item.Width || 0;
+      const depth = item.dimensions?.depth || item.depth || item.Depth || 0;
+
       return {
         _id: item._id,
         reference: item.reference || '',
@@ -262,11 +268,19 @@ exports.getNieuwkoopItems = async (req, res) => {
         // Prix avec fallbacks multiples (priorité aux champs directs pour anciens articles)
         price: item.price || item.pricing?.price || item.PriceNett || 0,
         priceFormatted: item.priceFormatted || `${(item.price || item.pricing?.price || item.PriceNett || 0).toFixed(2)} EUR`,
-        // Dimensions avec fallbacks multiples (priorité aux champs directs pour anciens articles)
-        height: item.height || item.dimensions?.height || item.Height || 0,
-        diameter: item.diameter || item.dimensions?.diameter || item.DiameterCulturePot || item.PotSize || 0,
-        width: item.width || item.dimensions?.width || item.Width || 0,
-        depth: item.depth || item.dimensions?.depth || item.Depth || 0,
+        // Dimensions extraites et calculées
+        height,
+        diameter,
+        width,
+        depth,
+        // Objet dimensions complet pour compatibilité
+        dimensions: {
+          height,
+          diameter,
+          width,
+          depth,
+          unit: item.dimensions?.unit || 'cm'
+        },
         // Marquer si c'est une nouvelle plante (faux pour les articles existants)
         isNewPlant: false,
         // Dates
