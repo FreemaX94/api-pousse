@@ -489,13 +489,13 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                           e.target.style.transform = 'translateX(0)';
                         }}
                       >
-                        {material.image && (
+                        {(material.image || material.reference) && (
                           <img
-                            src={material.image}
+                            src={material.image || `/api/nieuwkoop/items/${material.reference}/image`}
                             alt={material.name}
                             style={{
-                              width: '35px',
-                              height: '35px',
+                              width: '45px',
+                              height: '45px',
                               borderRadius: '8px',
                               objectFit: 'cover',
                               border: '2px solid rgba(34,197,94,0.2)'
@@ -527,23 +527,23 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                             </span>
                           </div>
                         </div>
-                        <div style={{
-                          background: material.status === 'needed' ? 'var(--color-warning)' : 
-                                     material.status === 'ordered' ? 'var(--color-primary)' :
-                                     material.status === 'delivered' ? 'var(--color-success)' : 'var(--color-secondary)',
-                          color: 'var(--color-text-inverse)',
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: '6px',
-                          fontSize: '0.7rem',
-                          fontWeight: '600',
-                          textTransform: 'uppercase'
-                        }}>
-                          {material.status === 'needed' && '📋 Requis'}
-                          {material.status === 'ordered' && '📦 Commandé'}
-                          {material.status === 'delivered' && '✅ Livré'}
-                          {material.status === 'used' && '🔧 Utilisé'}
-                          {material.status === 'returned' && '↩️ Retourné'}
-                        </div>
+                        {material.status !== 'needed' && (
+                          <div style={{
+                            background: material.status === 'ordered' ? 'var(--color-primary)' :
+                                       material.status === 'delivered' ? 'var(--color-success)' : 'var(--color-secondary)',
+                            color: 'var(--color-text-inverse)',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '6px',
+                            fontSize: '0.7rem',
+                            fontWeight: '600',
+                            textTransform: 'uppercase'
+                          }}>
+                            {material.status === 'ordered' && '📦 Commandé'}
+                            {material.status === 'delivered' && '✅ Livré'}
+                            {material.status === 'used' && '🔧 Utilisé'}
+                            {material.status === 'returned' && '↩️ Retourné'}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

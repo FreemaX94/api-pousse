@@ -46,6 +46,7 @@ const CactusIcon = ({ size = 48, color = "currentColor" }) => (
   </svg>
 )
 import { useTheme } from './contexts/ThemeContext'
+import { useAuth } from './contexts/AuthContext'
 
 
 const sections = [
@@ -142,6 +143,7 @@ const sections = [
 // Composant interne avec le contenu de la page
 const HomeContent = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   return (
     <motion.div 
@@ -155,6 +157,51 @@ const HomeContent = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 1.0 }}
     >
+      {/* Badge utilisateur en haut à gauche */}
+      {user && (
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{
+            position: 'absolute',
+            top: '1.5rem',
+            left: '1.5rem',
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '25px',
+            padding: '0.5rem 1rem',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: '600',
+            fontSize: '0.8rem'
+          }}>
+            {'F'}
+          </div>
+          <div style={{
+            color: 'var(--color-text-primary)',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}>
+            {'Freex94'}
+          </div>
+        </motion.div>
+      )}
       {/* Background decorative elements */}
       <div style={{
         position: 'absolute',

@@ -48,6 +48,7 @@ import {
 } from "../../../api/clientApi";
 import axiosApi, { handleApiError } from "../../../api/axios";
 import { useTheme, ThemeProvider } from "../../../contexts/ThemeContext";
+import { useAuth } from "../../../contexts/AuthContext";
 
 // 🚀 Lazy loading des composants lourds pour le code splitting - Cache refresh 20250826-003000 - FORCE DEPLOY DEBUG
 const EntryForm = lazy(() => import('../../../components/EntryForm'));
@@ -619,6 +620,8 @@ function ExternalEntryForm({ onSaved, currentUser }) {
 const Nieuwkoop = () => {
   // Hook pour le thème
   const { isDark, theme, isBeige, isNeon, isOcean, isTropical, isLavender, isGalaxy, isAutumn, isGlacier, isSakura, isMidnight, isLava } = useTheme();
+  // Hook pour l'authentification
+  const { user } = useAuth();
   
   // ─── Récupération de l'utilisateur via API (même méthode que PrivateRoute) ───
   const [currentUser, setCurrentUser] = useState('inconnu');
@@ -1906,6 +1909,50 @@ const focusedProduct = focusedCard ? sortedItems.find(prod => prod.reference ===
 
 return (
     <ThemeProvider>
+      {/* Badge utilisateur en haut à gauche */}
+      {user && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '1.5rem',
+            left: '20rem',
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '25px',
+            padding: '0.5rem 1rem',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            animation: 'fadeInLeft 0.5s ease-out'
+          }}
+        >
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: '600',
+            fontSize: '0.8rem'
+          }}>
+            {'F'}
+          </div>
+          <div style={{
+            color: 'var(--color-text-primary)',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}>
+            {'Freex94'}
+          </div>
+        </div>
+      )}
+      
       {focusedCard && (
         <div className="card-focus-overlay" onClick={closeFocus}>
           <button className="close-focus-btn" onClick={closeFocus}>
@@ -2381,7 +2428,7 @@ return (
                 {item === "Entrée" && "📥"}
                 {item === "Sortie" && "📤"}
                 {item === "Projets" && "📁"}
-                {item === "Opérations diverses" && "🔄"}
+                {item === "Opérations diverses" && "🔄 "}
                 {item}
               </button>
             ))}
@@ -2594,7 +2641,7 @@ return (
                 </span>
                 
                 {/* Nom de l'onglet actif avec animation */}
-                {activeSection.toUpperCase().split('').map((letter, index) => (
+                {(activeSection.includes('diverses') ? 'OPÉRATIONS\u00A0DIVERSES' : activeSection.toUpperCase()).split('').map((letter, index) => (
                   <motion.span
                     key={`section-${activeSection}-${index}`}
                     animate={{ 
@@ -2647,6 +2694,7 @@ return (
                     {letter}
                   </motion.span>
                 ))}
+                
                 
                 {/* Curseur clignotant */}
                 <motion.span
@@ -4952,78 +5000,6 @@ return (
 
         {activeSection === "Opérations diverses" && (
           <motion.section key="operations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">
-            {/* En-tête de la section */}
-            <div style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '16px',
-              padding: '3rem 2rem',
-              textAlign: 'center',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-              marginBottom: '3rem',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Effet de fond subtil */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
-                pointerEvents: 'none'
-              }} />
-              
-              <div
-                style={{ 
-                  fontSize: '4rem', 
-                  marginBottom: '1.5rem',
-                  background: 'linear-gradient(135deg, #6366f1, #a855f7)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-              >
-                🔄
-              </div>
-              
-              <h2 style={{
-                margin: 0,
-                fontSize: '2.8rem',
-                fontWeight: '700',
-                marginBottom: '0.8rem',
-                color: 'var(--color-text-primary)',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                letterSpacing: '-0.025em',
-                lineHeight: '1.1'
-              }}>
-                Opérations Diverses
-              </h2>
-              
-              <p style={{
-                margin: 0,
-                fontSize: '1.1rem',
-                color: 'var(--color-text-secondary)',
-                fontWeight: '400',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                maxWidth: '500px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                lineHeight: '1.5'
-              }}>
-                Système de vente entre pôles internes
-              </p>
-              
-              {/* Ligne décorative */}
-              <div style={{
-                width: '60px',
-                height: '3px',
-                background: 'linear-gradient(90deg, #6366f1, #a855f7)',
-                margin: '1.5rem auto 0',
-                borderRadius: '2px'
-              }} />
-            </div>
 
             {/* Formulaire de vente entre pôles */}
             <div style={{
@@ -5037,18 +5013,6 @@ return (
               maxWidth: '1000px',
               margin: '0 auto'
             }}>
-              {/* Background decorative elements */}
-              <div style={{
-                position: 'absolute',
-                top: '-50%',
-                right: '-50%',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))',
-                borderRadius: '50%',
-                pointerEvents: 'none',
-                opacity: 0.1
-              }} />
               
               <div style={{
                 background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
