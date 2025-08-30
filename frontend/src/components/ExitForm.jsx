@@ -37,6 +37,20 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
       .catch(() => setError('Impossible de charger la liste des projets.'));
   }, []);
 
+  // Fonction pour les styles d'input adaptés au thème (utilise les variables CSS)
+  const getInputStyles = () => ({
+    width: '100%',
+    padding: '1rem 1.5rem',
+    border: '2px solid var(--color-border-input)',
+    borderRadius: '16px',
+    fontSize: '1rem',
+    fontWeight: '500',
+    background: 'var(--color-bg-input)',
+    transition: 'all 0.3s ease',
+    outline: 'none',
+    color: 'var(--color-text-input)'
+  });
+
   // Débounce et fetch des suggestions
   useEffect(() => {
     if (searchTerm.length < 2) {
@@ -973,18 +987,7 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
                 max={selectedPlant ? selectedPlant.availableQuantity : undefined}
                 value={formData.quantity}
                 onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '1rem 1.5rem',
-                  border: '2px solid var(--color-border-input)',
-                  borderRadius: '16px',
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  background: 'var(--color-bg-input)',
-                  transition: 'all 0.3s ease',
-                  outline: 'none',
-                  color: 'var(--color-text-input)'
-                }}
+                style={getInputStyles()}
                 onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
                 onBlur={(e) => e.target.style.borderColor = 'var(--color-border-input)'}
               />
@@ -1026,18 +1029,7 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
               value={formData.exitDate}
               onChange={handleChange}
               required
-              style={{
-                width: '100%',
-                padding: '1rem 1.5rem',
-                border: '2px solid var(--color-border-input)',
-                borderRadius: '16px',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'var(--color-bg-input)',
-                transition: 'all 0.3s ease',
-                outline: 'none',
-                color: 'var(--color-text-input)'
-              }}
+              style={getInputStyles()}
               onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--color-border-input)'}
             />
