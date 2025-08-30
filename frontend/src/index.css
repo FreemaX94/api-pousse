@@ -139,6 +139,30 @@
   --color-border-input: #cbd5e1;
   --color-bg-muted: rgba(148, 163, 184, 0.1);
   
+  /* Variables complètes pour ExitForm */
+  --glass-backdrop: blur(8px);
+  --gradient-primary-subtle: linear-gradient(135deg, rgba(29, 78, 216, 0.1), rgba(37, 99, 235, 0.05));
+  --color-border-subtle: rgba(148, 163, 184, 0.3);
+  --shadow-primary: 0 4px 14px rgba(29, 78, 216, 0.3);
+  --color-text-inverse: #ffffff;
+  --color-bg-dropdown: #ffffff;
+  --shadow-dropdown: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --color-bg-hover: rgba(241, 245, 249, 0.8);
+  --gradient-success: linear-gradient(135deg, #22c55e, #16a34a);
+  --gradient-primary: linear-gradient(135deg, #1d4ed8, #2563eb);
+  --color-border-primary: #cbd5e1;
+  --gradient-error: linear-gradient(135deg, #ef4444, #dc2626);
+  --color-border-error: #fca5a5;
+  --color-text-error: #dc2626;
+  --gradient-error-subtle: rgba(254, 226, 226, 0.8);
+  --color-border-success: #bbf7d0;
+  --color-text-success: #16a34a;
+  --gradient-success: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  --shadow-error: 0 4px 14px rgba(239, 68, 68, 0.3);
+  --shadow-success: 0 4px 14px rgba(34, 197, 94, 0.3);
+  --shadow-primary-hover: 0 8px 25px rgba(29, 78, 216, 0.4);
+  --shadow-text-primary: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -165,6 +189,30 @@
   --color-text-input: #f9fafb;
   --color-border-input: #374151;
   --color-bg-muted: rgba(71, 85, 105, 0.2);
+  
+  /* Variables complètes pour ExitForm - Thème sombre */
+  --glass-backdrop: blur(8px);
+  --gradient-primary-subtle: linear-gradient(135deg, rgba(13, 148, 136, 0.2), rgba(20, 184, 166, 0.1));
+  --color-border-subtle: rgba(71, 85, 105, 0.3);
+  --shadow-primary: 0 4px 14px rgba(13, 148, 136, 0.4);
+  --color-text-inverse: #ffffff;
+  --color-bg-dropdown: #1f2937;
+  --shadow-dropdown: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --color-bg-hover: rgba(55, 65, 81, 0.8);
+  --gradient-success: linear-gradient(135deg, #22c55e, #16a34a);
+  --gradient-primary: linear-gradient(135deg, #0d9488, #14b8a6);
+  --color-border-primary: #374151;
+  --gradient-error: linear-gradient(135deg, #ef4444, #dc2626);
+  --color-border-error: #f87171;
+  --color-text-error: #f87171;
+  --gradient-error-subtle: rgba(127, 29, 29, 0.3);
+  --color-border-success: #4ade80;
+  --color-text-success: #4ade80;
+  --gradient-success: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1));
+  --shadow-error: 0 4px 14px rgba(239, 68, 68, 0.5);
+  --shadow-success: 0 4px 14px rgba(34, 197, 94, 0.5);
+  --shadow-primary-hover: 0 8px 25px rgba(13, 148, 136, 0.6);
+  --shadow-text-primary: 0 2px 4px rgba(0, 0, 0, 0.3);
   
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.14);
