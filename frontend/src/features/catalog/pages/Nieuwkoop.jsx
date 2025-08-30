@@ -1914,7 +1914,10 @@ return (
           
           {/* Carte focalisée rendue ici au niveau racine */}
           {focusedProduct && (
-            <div className="stock-card stock-card-focused">
+            <div 
+              className="stock-card stock-card-focused"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* En-tête */}
               <div style={{
                 background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
@@ -4349,19 +4352,34 @@ return (
                                 marginTop: '0.5rem'
                               }}>
                                 {/* Pastille Disponible */}
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  background: available > 0 ? 'var(--color-success)' : 'var(--color-danger)',
-                                  color: 'white',
-                                  padding: '0.25rem 0.6rem',
-                                  borderRadius: '12px',
-                                  fontSize: '0.65rem',
-                                  fontWeight: '600',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.5px',
-                                  boxShadow: available > 0 ? '0 2px 8px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)'
-                                }}>
+                                <div 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🏷️ Clic sur pastille disponibilité:', available > 0 ? 'Disponible' : 'Indisponible');
+                                  }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    background: available > 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                                    color: 'white',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '12px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    boxShadow: available > 0 ? '0 2px 8px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(239, 68, 68, 0.3)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.transform = 'scale(1.05)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.transform = 'scale(1)';
+                                  }}
+                                >
                                   <div style={{
                                     width: '6px',
                                     height: '6px',
@@ -4373,21 +4391,46 @@ return (
                                 </div>
 
                                 {/* Pastille Stock Permanent */}
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  background: (prod.quantity || 0) > 10 ? 'var(--color-primary)' : 'var(--color-warning)',
-                                  color: 'white',
-                                  padding: '0.25rem 0.6rem',
-                                  borderRadius: '12px',
-                                  fontSize: '0.65rem',
-                                  fontWeight: '600',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.5px',
-                                  boxShadow: (prod.quantity || 0) > 10 ? 
-                                    '0 2px 8px rgba(217, 119, 6, 0.3)' : 
-                                    '0 2px 8px rgba(234, 179, 8, 0.3)'
-                                }}>
+                                <div 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const currentQuantity = prod.quantity || 0;
+                                    const isCurrentlyPermanent = currentQuantity > 10;
+                                    const newQuantity = isCurrentlyPermanent ? 5 : 15; // Bascule entre 5 (limité) et 15 (permanent)
+                                    
+                                    console.log('🏷️ Basculement stock:', isCurrentlyPermanent ? 'Permanent → Limité' : 'Limité → Permanent');
+                                    updateQuantity(prod._id, newQuantity);
+                                  }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    background: (prod.quantity || 0) > 10 ? 'var(--color-primary)' : 'var(--color-warning)',
+                                    color: 'white',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '12px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    boxShadow: (prod.quantity || 0) > 10 ? 
+                                      '0 2px 8px rgba(217, 119, 6, 0.3)' : 
+                                      '0 2px 8px rgba(234, 179, 8, 0.3)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.transform = 'scale(1.05)';
+                                    e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.transform = 'scale(1)';
+                                    e.target.style.boxShadow = (prod.quantity || 0) > 10 ? 
+                                      '0 2px 8px rgba(217, 119, 6, 0.3)' : 
+                                      '0 2px 8px rgba(234, 179, 8, 0.3)';
+                                  }}
+                                  title={`Cliquer pour basculer vers ${(prod.quantity || 0) > 10 ? 'Stock Limité' : 'Stock Permanent'}`}
+                                >
                                   <div style={{
                                     width: '6px',
                                     height: '6px',
