@@ -24,16 +24,75 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
     setSelectedFiles(Array.from(e.target.files));
   };
 
-  // Recherche stock
+  // Recherche stock avec enrichissement des dimensions
   useEffect(() => {
     if (stockQuery.length < 2) {
       setStockOptions([]);
       return;
     }
     let cancelled = false;
-    getStockItems(stockQuery)
-      .then(items => { if (!cancelled) setStockOptions(items); })
-      .catch(() => {});
+    
+    const fetchEnrichedItems = async () => {
+      try {
+        const items = await getStockItems(stockQuery);
+        if (cancelled) return;
+        
+        console.log('🔍 ProjetForm - Résultats de recherche reçus:', items);
+        
+        if (items && items.length > 0) {
+          // Enrichir les résultats avec les dimensions si manquantes
+          const enrichedResults = await Promise.all(items.map(async (item) => {
+            // Si les dimensions manquent, essayer de les récupérer depuis l'API
+            if ((!item.height || !item.diameter) && item.reference) {
+              try {
+                console.log(`📡 ProjetForm - Récupération dimensions pour ${item.reference}...`);
+                const response = await fetch(`/api/nieuwkoop/items/${item.reference}/details`);
+                if (response.ok) {
+                  const details = await response.json();
+                  const nieuwkoopItem = details.item;
+                  console.log(`📦 ProjetForm - Détails reçus pour ${item.reference}:`, nieuwkoopItem);
+                  
+                  // Chercher toutes les propriétés possibles pour le diamètre
+                  const possibleDiameters = [
+                    nieuwkoopItem?.DiameterCulturePot,
+                    nieuwkoopItem?.PotSize,
+                    nieuwkoopItem?.Diameter,
+                    nieuwkoopItem?.PotDiameter,
+                    nieuwkoopItem?.Width,  // Parfois la largeur = diamètre pour les pots
+                    nieuwkoopItem?.Size
+                  ].filter(val => val && val > 0);
+                  
+                  const enrichedItem = {
+                    ...item,
+                    height: nieuwkoopItem?.Height || item.height || 0,
+                    diameter: possibleDiameters[0] || item.diameter || 0
+                  };
+                  
+                  console.log(`✅ ProjetForm - Item enrichi ${item.reference}:`, {
+                    height: enrichedItem.height,
+                    diameter: enrichedItem.diameter
+                  });
+                  
+                  return enrichedItem;
+                }
+              } catch (error) {
+                console.log(`⚠️ ProjetForm - Erreur récupération dimensions pour ${item.reference}:`, error);
+              }
+            }
+            return item;
+          }));
+          
+          if (!cancelled) setStockOptions(enrichedResults);
+        } else {
+          if (!cancelled) setStockOptions(items || []);
+        }
+      } catch (error) {
+        console.error('Erreur de recherche stock ProjetForm:', error);
+        if (!cancelled) setStockOptions([]);
+      }
+    };
+    
+    fetchEnrichedItems();
     return () => { cancelled = true; };
   }, [stockQuery]);
 
@@ -636,8 +695,15 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
                       <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
                         {item.reference} — {item.name}
                       </div>
-                      <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         <span>{item.price ? `${item.price}€` : 'Prix non défini'}</span>
+                        {item.height > 0 && <span style={{fontSize: '0.8rem'}}>📏 H: {item.height}cm</span>}
+                        {item.diameter > 0 && <span style={{fontSize: '0.8rem'}}>📐 Ø: {item.diameter}cm</span>}
+                        {(!item.height || !item.diameter) && (
+                          <span style={{color: '#666', fontStyle: 'italic', fontSize: '0.8rem'}}>
+                            Dimensions en cours...
+                          </span>
+                        )}
                         <div style={{
                           display: 'flex',
                           alignItems: 'center',

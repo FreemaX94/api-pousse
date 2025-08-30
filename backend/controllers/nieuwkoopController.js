@@ -175,8 +175,57 @@ exports.getNieuwkoopItems = async (req, res) => {
     const duration = Date.now() - startTime;
     logger.nieuwkoop.search(req.user?.userId, search || 'all', items.length, duration);
     
+    // Enrichir les données manquantes depuis l'API Nieuwkoop
+    const enrichedItems = await Promise.all(items.map(async (item) => {
+      // Vérifier si les dimensions sont manquantes (null, undefined, 0 ou vide)
+      const hasHeight = item.height && item.height > 0;
+      const hasDiameter = item.diameter && item.diameter > 0;
+      
+      console.log(`🔍 Vérification dimensions pour ${item.reference}:`, {
+        height: item.height,
+        diameter: item.diameter,
+        hasHeight,
+        hasDiameter
+      });
+      
+      if ((!hasHeight || !hasDiameter) && item.reference) {
+        console.log(`📡 Récupération dimensions API pour ${item.reference}...`);
+        try {
+          const nieuwkoopData = await nieuwkoopApi.fetchItem(item.reference);
+          if (nieuwkoopData) {
+            console.log(`📦 Données Nieuwkoop pour ${item.reference}:`, {
+              Height: nieuwkoopData.Height,
+              DiameterCulturePot: nieuwkoopData.DiameterCulturePot,
+              PotSize: nieuwkoopData.PotSize
+            });
+            
+            // Mettre à jour l'item avec les nouvelles dimensions
+            const updateData = {};
+            if (!hasHeight && nieuwkoopData.Height) {
+              updateData.height = nieuwkoopData.Height;
+            }
+            if (!hasDiameter && (nieuwkoopData.DiameterCulturePot || nieuwkoopData.PotSize)) {
+              updateData.diameter = nieuwkoopData.DiameterCulturePot || nieuwkoopData.PotSize;
+            }
+            
+            // Sauvegarder en base pour éviter les futurs appels API
+            if (Object.keys(updateData).length > 0) {
+              console.log(`💾 Sauvegarde dimensions pour ${item.reference}:`, updateData);
+              await NieuwkoopItem.findByIdAndUpdate(item._id, updateData);
+              // Appliquer les mises à jour à l'objet courant
+              Object.assign(item, updateData);
+              console.log(`✅ Dimensions mises à jour pour ${item.reference}`);
+            }
+          }
+        } catch (error) {
+          console.log(`⚠️ Impossible de récupérer les dimensions pour ${item.reference}:`, error.message);
+        }
+      }
+      return item;
+    }));
+
     // Transformer les données pour le frontend avec la quantité disponible calculée
-    const transformedItems = items.map(item => {
+    const transformedItems = enrichedItems.map(item => {
       // Gérer les différents formats d'images (anciens et nouveaux)
       let imageUrl = '';
       if (item.primaryImage?.url) {

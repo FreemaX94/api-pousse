@@ -47,8 +47,9 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
       try {
         const results = await getStockItems(searchTerm)
         console.log('🔍 Frontend - Résultats de recherche reçus:', results)
+        
         if (results && results.length > 0) {
-          console.log('📦 Frontend - Premier item détaillé:', {
+          console.log('📦 Frontend - Premier item avant enrichissement:', {
             reference: results[0].reference,
             name: results[0].name,
             price: results[0].price,
@@ -57,10 +58,66 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
             availableQuantity: results[0].availableQuantity,
             isNewPlant: results[0].isNewPlant
           })
+          
+          // Enrichir les résultats avec les dimensions si manquantes
+          const enrichedResults = await Promise.all(results.map(async (item) => {
+            // Si les dimensions manquent, essayer de les récupérer depuis l'API
+            if ((!item.height || !item.diameter) && item.reference) {
+              try {
+                console.log(`📡 Frontend - Récupération dimensions pour ${item.reference}...`)
+                const response = await fetch(`/api/nieuwkoop/items/${item.reference}/details`)
+                if (response.ok) {
+                  const details = await response.json()
+                  const nieuwkoopItem = details.item
+                  console.log(`📦 Frontend - Détails reçus pour ${item.reference}:`, nieuwkoopItem)
+                  
+                  // Chercher toutes les propriétés possibles pour le diamètre
+                  const possibleDiameters = [
+                    nieuwkoopItem?.DiameterCulturePot,
+                    nieuwkoopItem?.PotSize,
+                    nieuwkoopItem?.Diameter,
+                    nieuwkoopItem?.PotDiameter,
+                    nieuwkoopItem?.Width,  // Parfois la largeur = diamètre pour les pots
+                    nieuwkoopItem?.Size
+                  ].filter(val => val && val > 0)
+                  
+                  console.log(`🔍 Frontend - Propriétés diamètre trouvées pour ${item.reference}:`, {
+                    DiameterCulturePot: nieuwkoopItem?.DiameterCulturePot,
+                    PotSize: nieuwkoopItem?.PotSize,
+                    Diameter: nieuwkoopItem?.Diameter,
+                    PotDiameter: nieuwkoopItem?.PotDiameter,
+                    Width: nieuwkoopItem?.Width,
+                    Size: nieuwkoopItem?.Size,
+                    possibleDiameters
+                  })
+                  
+                  const enrichedItem = {
+                    ...item,
+                    height: nieuwkoopItem?.Height || item.height || 0,
+                    diameter: possibleDiameters[0] || item.diameter || 0
+                  }
+                  
+                  console.log(`✅ Frontend - Item enrichi ${item.reference}:`, {
+                    height: enrichedItem.height,
+                    diameter: enrichedItem.diameter
+                  })
+                  
+                  return enrichedItem
+                }
+              } catch (error) {
+                console.log(`⚠️ Frontend - Erreur récupération dimensions pour ${item.reference}:`, error)
+              }
+            }
+            return item
+          }))
+          
+          setSuggestions(enrichedResults)
+        } else {
+          setSuggestions(results || [])
         }
-        setSuggestions(results)
       } catch (err) {
         console.error('Erreur de recherche stock :', err)
+        setSuggestions([])
       }
     }, 300)
     return () => clearTimeout(handler)
@@ -598,11 +655,17 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
                         fontSize: '0.7rem', 
                         marginTop: '0.25rem',
                         display: 'flex',
-                        gap: '0.5rem'
+                        gap: '0.5rem',
+                        flexWrap: 'wrap'
                       }}>
                         {item.price > 0 && <span>💰 {item.price}€</span>}
                         {item.height > 0 && <span>📏 H: {item.height}cm</span>}
                         {item.diameter > 0 && <span>📐 Ø: {item.diameter}cm</span>}
+                        {(!item.height || !item.diameter) && (
+                          <span style={{color: '#666', fontStyle: 'italic'}}>
+                            Dimensions en cours de récupération...
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -951,7 +1014,7 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
               marginBottom: '0.5rem',
               fontSize: '1rem',
               fontWeight: '700',
-              color: '#1e293b',
+              color: 'var(--color-text-primary)',
               background: 'var(--color-bg-muted, rgba(100, 116, 139, 0.1))',
               padding: '0.5rem 1rem',
               borderRadius: '8px',
@@ -966,16 +1029,17 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
               style={{
                 width: '100%',
                 padding: '1rem 1.5rem',
-                border: '2px solid rgba(148,163,184,0.3)',
+                border: '2px solid var(--color-border-input)',
                 borderRadius: '16px',
                 fontSize: '1rem',
                 fontWeight: '500',
-                background: 'rgba(255,255,255,0.9)',
+                background: 'var(--color-bg-input)',
                 transition: 'all 0.3s ease',
-                outline: 'none'
+                outline: 'none',
+                color: 'var(--color-text-input)'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#ef4444'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(148,163,184,0.3)'}
+              onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--color-border-input)'}
             />
           </div>
         )}
@@ -1071,15 +1135,15 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
                 style={{
                   width: '100%',
                   padding: '1rem 1.5rem',
-                  border: '2px solid rgba(148,163,184,0.3)',
+                  border: '2px solid var(--color-border-input)',
                   borderRadius: '16px',
                   fontSize: '1rem',
                   fontWeight: '500',
-                  background: 'rgba(255,255,255,0.9)',
+                  background: 'var(--color-bg-input)',
                   transition: 'all 0.3s ease',
                   outline: 'none',
                   cursor: 'pointer',
-                  color: '#000000'
+                  color: 'var(--color-text-input)'
                 }}
                 onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
                 onBlur={(e) => e.target.style.borderColor = 'var(--color-border-input)'}
@@ -1102,7 +1166,7 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
             marginBottom: '0.5rem',
             fontSize: '1rem',
             fontWeight: '700',
-            color: '#1e293b',
+            color: 'var(--color-text-primary)',
             background: 'var(--color-bg-muted, rgba(100, 116, 139, 0.1))',
             padding: '0.5rem 1rem',
             borderRadius: '8px',
@@ -1116,19 +1180,19 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
             style={{
               width: '100%',
               padding: '1rem 1.5rem',
-              border: '2px solid rgba(148,163,184,0.3)',
+              border: '2px solid var(--color-border-input)',
               borderRadius: '16px',
               fontSize: '1rem',
               fontWeight: '500',
-              background: 'rgba(255,255,255,0.9)',
+              background: 'var(--color-bg-input)',
               transition: 'all 0.3s ease',
               outline: 'none',
               minHeight: '120px',
               resize: 'vertical',
-              color: '#000000'
+              color: 'var(--color-text-input)'
             }}
-            onFocus={(e) => e.target.style.borderColor = '#ef4444'}
-            onBlur={(e) => e.target.style.borderColor = 'rgba(148,163,184,0.3)'}
+            onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+            onBlur={(e) => e.target.style.borderColor = 'var(--color-border-input)'}
           />
         </div>
 
