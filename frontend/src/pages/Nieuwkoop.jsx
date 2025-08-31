@@ -1,3 +1,7 @@
+// ❌ FICHIER DÉSACTIVÉ - NE PLUS UTILISER
+// ⚠️ IMPORTANT : Utiliser à la place frontend/src/features/catalog/pages/Nieuwkoop.jsx
+// Ce fichier est obsolète et ne doit plus être modifié
+/*
 import React, { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { Search } from 'lucide-react';
 import { ChevronDown } from "lucide-react";
@@ -75,7 +79,29 @@ function ExternalEntryForm({ onSaved, currentUser }) {
       buttonGradient: 'linear-gradient(135deg, #10b981, #059669)',
       errorBackground: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
       errorBorder: '#fca5a5',
-      errorText: '#dc2626'
+      errorText: '#dc2626',
+      // Variables CSS équivalentes
+      colorPrimary: '#10b981',
+      colorAccent: '#3b82f6',
+      colorSecondary: '#64748b',
+      colorSuccess: '#10b981',
+      colorWarning: '#f59e0b',
+      colorDanger: '#ef4444',
+      colorBgPrimary: '#ffffff',
+      colorBgSecondary: '#f8fafc',
+      colorSurface: '#ffffff',
+      colorSurfaceElevated: 'rgba(255,255,255,0.9)',
+      colorBorder: 'rgba(148,163,184,0.3)',
+      colorTextPrimary: '#1e293b',
+      colorTextSecondary: '#64748b',
+      glassBackground: 'rgba(255,255,255,0.8)',
+      glassBackdrop: 'blur(12px)',
+      glassBorder: 'rgba(255,255,255,0.2)',
+      glassShadow: '0 8px 32px rgba(0,0,0,0.1)',
+      shadowSm: '0 1px 2px rgba(0,0,0,0.05)',
+      shadowMd: '0 4px 6px rgba(0,0,0,0.1)',
+      shadowLg: '0 10px 15px rgba(0,0,0,0.1)',
+      shadowXl: '0 20px 25px rgba(0,0,0,0.15)'
     };
 
     if (isDark) {
@@ -90,7 +116,29 @@ function ExternalEntryForm({ onSaved, currentUser }) {
         buttonGradient: 'linear-gradient(135deg, #10b981, #059669)',
         errorBackground: 'linear-gradient(135deg, #431a1a, #562626)',
         errorBorder: '#dc2626',
-        errorText: '#fca5a5'
+        errorText: '#fca5a5',
+        // Variables CSS équivalentes pour le mode sombre
+        colorPrimary: '#10b981',
+        colorAccent: '#3b82f6',
+        colorSecondary: '#64748b',
+        colorSuccess: '#10b981',
+        colorWarning: '#f59e0b',
+        colorDanger: '#ef4444',
+        colorBgPrimary: '#334155',
+        colorBgSecondary: '#475569',
+        colorSurface: '#334155',
+        colorSurfaceElevated: 'rgba(51,65,85,0.9)',
+        colorBorder: 'rgba(100,116,139,0.3)',
+        colorTextPrimary: '#f1f5f9',
+        colorTextSecondary: '#cbd5e1',
+        glassBackground: 'rgba(51,65,85,0.8)',
+        glassBackdrop: 'blur(12px)',
+        glassBorder: 'rgba(100,116,139,0.2)',
+        glassShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        shadowSm: '0 1px 2px rgba(0,0,0,0.2)',
+        shadowMd: '0 4px 6px rgba(0,0,0,0.3)',
+        shadowLg: '0 10px 15px rgba(0,0,0,0.4)',
+        shadowXl: '0 20px 25px rgba(0,0,0,0.5)'
       };
     }
 
@@ -1258,10 +1306,10 @@ return (
             <div className="stock-card stock-card-focused">
               {/* En-tête */}
               <div style={{
-                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                 padding: '1.25rem',
-                color: 'var(--color-primary)',
-                borderBottom: '1px solid var(--color-primary)'
+                color: themeStyles.colorPrimary,
+                borderBottom: `1px solid ${themeStyles.colorPrimary}`
               }}>
                 <div style={{
                   display: 'flex',
@@ -1276,7 +1324,7 @@ return (
                       margin: 0,
                       lineHeight: '1.3',
                       marginBottom: '0.25rem',
-                      color: 'var(--color-primary)'
+                      color: themeStyles.colorPrimary
                     }}>
                       {focusedProduct.name}
                     </h3>
@@ -1292,7 +1340,7 @@ return (
                   <div style={{
                     fontSize: '1.25rem',
                     fontWeight: '700',
-                    color: 'var(--color-primary)'
+                    color: themeStyles.colorPrimary
                   }}>
                     €{focusedProduct.price ? focusedProduct.price.toFixed(2) : '0.00'}
                   </div>
@@ -1305,7 +1353,7 @@ return (
                   position: 'relative',
                   height: '180px',
                   overflow: 'hidden',
-                  background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)'
+                  background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`
                 }}>
                   <img 
                     src={focusedProduct.image} 
@@ -1346,7 +1394,7 @@ return (
                   <div style={{
                     textAlign: 'center',
                     padding: '1rem',
-                    background: 'var(--color-bg-secondary)',
+                    background: themeStyles.colorBgSecondary,
                     borderRadius: '12px'
                   }}>
                     <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.25rem'}}>
@@ -1355,7 +1403,7 @@ return (
                     <div style={{
                       fontSize: '2rem',
                       fontWeight: '700',
-                      color: 'var(--color-primary)'
+                      color: themeStyles.colorPrimary
                     }}>
                       {(focusedProduct.quantity || 0) - (focusedProduct.reservedQuantity || 0)}
                     </div>
@@ -1363,7 +1411,7 @@ return (
                   <div style={{
                     textAlign: 'center',
                     padding: '1rem',
-                    background: 'var(--color-bg-secondary)',
+                    background: themeStyles.colorBgSecondary,
                     borderRadius: '12px'
                   }}>
                     <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.25rem'}}>
@@ -1372,7 +1420,7 @@ return (
                     <div style={{
                       fontSize: '1.5rem',
                       fontWeight: '600',
-                      color: 'var(--color-text-primary)'
+                      color: themeStyles.colorTextPrimary
                     }}>
                       {focusedProduct.quantity || 0}
                     </div>
@@ -1381,13 +1429,13 @@ return (
 
                 {/* Dashboard - Statistiques et Informations */}
                 <div style={{
-                  background: 'var(--glass-bg)',
-                  backdropFilter: 'var(--glass-backdrop)',
+                  background: themeStyles.glassBackground,
+                  backdropFilter: themeStyles.glassBackdrop,
                   borderRadius: '16px',
                   padding: '1.5rem',
                   marginBottom: '1rem',
-                  border: '1px solid var(--glass-border)',
-                  boxShadow: 'var(--glass-shadow)'
+                  border: `1px solid ${themeStyles.glassBorder}`,
+                  boxShadow: themeStyles.glassShadow
                 }}>
                   <div style={{
                     display: 'flex',
@@ -1397,16 +1445,16 @@ return (
                     <div style={{
                       width: '12px',
                       height: '12px',
-                      background: 'var(--color-primary)',
+                      background: themeStyles.colorPrimary,
                       borderRadius: '50%',
                       marginRight: '0.5rem',
-                      boxShadow: '0 0 10px var(--color-primary)'
+                      boxShadow: `0 0 10px ${themeStyles.colorPrimary}`
                     }}></div>
                     <h4 style={{
                       margin: 0,
                       fontSize: '1rem',
                       fontWeight: '700',
-                      color: 'var(--color-text-primary)'
+                      color: themeStyles.colorTextPrimary
                     }}>
                       Dashboard Produit
                     </h4>
@@ -1420,11 +1468,11 @@ return (
                   }}>
                     {/* État */}
                     <div style={{
-                      background: 'var(--color-surface-elevated)',
+                      background: themeStyles.colorSurfaceElevated,
                       padding: '1rem',
                       borderRadius: '12px',
                       textAlign: 'center',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       backdropFilter: 'blur(10px)'
                     }}>
                       <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>
@@ -1432,7 +1480,7 @@ return (
                       </div>
                       <div style={{
                         fontSize: '0.7rem', 
-                        color: 'var(--color-text-secondary)', 
+                        color: themeStyles.colorTextSecondary, 
                         marginBottom: '0.25rem',
                         fontWeight: '600'
                       }}>
@@ -1441,7 +1489,7 @@ return (
                       <div style={{
                         fontSize: '0.8rem', 
                         fontWeight: '600',
-                        color: 'var(--color-text-primary)'
+                        color: themeStyles.colorTextPrimary
                       }}>
                         {(focusedProduct.quantity || 0) > 0 ? 'En Stock' : 'Rupture'}
                       </div>
@@ -1449,17 +1497,17 @@ return (
 
                     {/* Sorties */}
                     <div style={{
-                      background: 'var(--color-surface-elevated)',
+                      background: themeStyles.colorSurfaceElevated,
                       padding: '1rem',
                       borderRadius: '12px',
                       textAlign: 'center',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       backdropFilter: 'blur(10px)'
                     }}>
                       <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>📤</div>
                       <div style={{
                         fontSize: '0.7rem', 
-                        color: 'var(--color-text-secondary)', 
+                        color: themeStyles.colorTextSecondary, 
                         marginBottom: '0.25rem',
                         fontWeight: '600'
                       }}>
@@ -1468,7 +1516,7 @@ return (
                       <div style={{
                         fontSize: '1.2rem', 
                         fontWeight: '700', 
-                        color: 'var(--color-primary)'
+                        color: themeStyles.colorPrimary
                       }}>
                         {focusedProduct.exitCount || 0}
                       </div>
@@ -1476,17 +1524,17 @@ return (
 
                     {/* Arrosages */}
                     <div style={{
-                      background: 'var(--color-surface-elevated)',
+                      background: themeStyles.colorSurfaceElevated,
                       padding: '1rem',
                       borderRadius: '12px',
                       textAlign: 'center',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       backdropFilter: 'blur(10px)'
                     }}>
                       <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>💧</div>
                       <div style={{
                         fontSize: '0.7rem', 
-                        color: 'var(--color-text-secondary)', 
+                        color: themeStyles.colorTextSecondary, 
                         marginBottom: '0.25rem',
                         fontWeight: '600'
                       }}>
@@ -1495,7 +1543,7 @@ return (
                       <div style={{
                         fontSize: '1.2rem', 
                         fontWeight: '700', 
-                        color: 'var(--color-success)'
+                        color: themeStyles.colorSuccess
                       }}>
                         {focusedProduct.wateringCount || 0}
                       </div>
@@ -1509,8 +1557,8 @@ return (
                     gap: '1rem'
                   }}>
                     <div style={{
-                      background: 'var(--color-success-bg)',
-                      border: '1px solid var(--color-success)',
+                      background: themeStyles.colorSuccess + '20',
+                      border: `1px solid ${themeStyles.colorSuccess}`,
                       padding: '0.75rem',
                       borderRadius: '10px',
                       display: 'flex',
@@ -1521,7 +1569,7 @@ return (
                       <div>
                         <div style={{
                           fontSize: '0.7rem', 
-                          color: 'var(--color-text-secondary)',
+                          color: themeStyles.colorTextSecondary,
                           fontWeight: '600'
                         }}>
                           Dernière activité
@@ -1529,7 +1577,7 @@ return (
                         <div style={{
                           fontSize: '0.8rem', 
                           fontWeight: '600',
-                          color: 'var(--color-text-primary)'
+                          color: themeStyles.colorTextPrimary
                         }}>
                           {focusedProduct.lastActivity || 'Aujourd\'hui'}
                         </div>
@@ -1537,9 +1585,9 @@ return (
                     </div>
 
                     <div style={{
-                      background: 'var(--color-warning)',
+                      background: themeStyles.colorWarning,
                       backgroundOpacity: '0.1',
-                      border: '1px solid var(--color-warning)',
+                      border: `1px solid ${themeStyles.colorWarning}`,
                       padding: '0.75rem',
                       borderRadius: '10px',
                       display: 'flex',
@@ -1550,7 +1598,7 @@ return (
                       <div>
                         <div style={{
                           fontSize: '0.7rem', 
-                          color: 'var(--color-text-secondary)',
+                          color: themeStyles.colorTextSecondary,
                           fontWeight: '600'
                         }}>
                           Score santé
@@ -1558,7 +1606,7 @@ return (
                         <div style={{
                           fontSize: '0.8rem', 
                           fontWeight: '600',
-                          color: 'var(--color-text-primary)'
+                          color: themeStyles.colorTextPrimary
                         }}>
                           {focusedProduct.healthScore || '85%'}
                         </div>
@@ -1570,7 +1618,7 @@ return (
                 {/* Badge catégorie */}
                 {focusedProduct.category && (
                   <div style={{
-                    background: 'var(--color-primary)',
+                    background: themeStyles.colorPrimary,
                     color: 'white',
                     padding: '0.5rem 1rem',
                     borderRadius: '20px',
@@ -1594,7 +1642,7 @@ return (
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         style={{ 
-          background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+          background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
           position: 'relative',
           overflow: 'hidden'
         }}
@@ -1670,9 +1718,9 @@ return (
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         style={{
-          background: 'var(--color-surface)',
-          borderColor: 'var(--color-border)',
-          boxShadow: 'var(--shadow-md)'
+          background: themeStyles.colorSurface,
+          borderColor: themeStyles.colorBorder,
+          boxShadow: themeStyles.shadowMd
         }}>
         <div className="flex flex-col gap-8">
           <motion.nav 
@@ -1698,11 +1746,11 @@ return (
                   alignItems: 'center',
                   gap: '0.5rem',
                   padding: '0.75rem',
-                  borderRadius: 'var(--radius-lg)',
-                  transition: 'all var(--transition-base)',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s ease',
                   textAlign: 'left',
-                  background: activeSection === item ? 'var(--color-primary)' : 'transparent',
-                  color: activeSection === item ? 'white' : 'var(--color-text-secondary)',
+                  background: activeSection === item ? themeStyles.colorPrimary : 'transparent',
+                  color: activeSection === item ? 'white' : themeStyles.colorTextSecondary,
                   fontWeight: activeSection === item ? '600' : '500',
                   border: 'none',
                   cursor: 'pointer',
@@ -1710,14 +1758,14 @@ return (
                 }}
                 onMouseEnter={(e) => {
                   if (activeSection !== item) {
-                    e.target.style.background = 'var(--color-bg-secondary)';
-                    e.target.style.color = 'var(--color-primary)';
+                    e.target.style.background = themeStyles.colorBgSecondary;
+                    e.target.style.color = themeStyles.colorPrimary;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeSection !== item) {
                     e.target.style.background = 'transparent';
-                    e.target.style.color = 'var(--color-text-secondary)';
+                    e.target.style.color = themeStyles.colorTextSecondary;
                   }
                 }}
                 onClick={() => setActiveSection(item)}
@@ -1740,9 +1788,18 @@ return (
       setActiveSection("Stock");
       setActiveCategory("");
     }}
-    className={`pl-4 py-1 text-left rounded ${
-      !activeCategory ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-    } hover:bg-gray-100 border-b border-gray-300 mb-1`}
+    className={`pl-4 py-1 text-left rounded hover:bg-gray-100 border-b border-gray-300 mb-1 ${
+      !activeCategory ? "font-semibold bg-green-50" : ""
+    }`}
+    ref={(el) => {
+      if (el && isDark && activeCategory) {
+        el.style.setProperty('color', '#ffffff', 'important');
+      }
+    }}
+    style={{
+      color: !activeCategory ? '#22c55e' : (isDark ? '#ffffff' : '#4b5563'),
+      fontWeight: !activeCategory ? '600' : 'normal'
+    }}
   >
     📦 Tous les articles
   </button>
@@ -1761,11 +1818,21 @@ return (
         setActiveSection("Stock");
         setActiveCategory(key);
       }}
-      className={`pl-4 py-1 text-left rounded ${
-        activeCategory === key ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-      } hover:bg-gray-100 ${
+      className={`pl-4 py-1 text-left rounded hover:bg-gray-100 ${
+        activeCategory === key ? "font-semibold bg-green-50" : ""
+      } ${
         key === 'entretien' ? 'border-b border-gray-300 mb-1' : ''
       }`}
+      ref={(el) => {
+        if (el && isDark && activeCategory !== key) {
+          el.style.setProperty('color', '#ffffff', 'important');
+        }
+      }}
+      style={{
+        color: activeCategory === key ? '#22c55e' : (isDark ? '#ffffff' : '#4b5563'),
+        backgroundColor: activeCategory === key ? '#f0fdf4' : 'transparent',
+        fontWeight: activeCategory === key ? '600' : 'normal'
+      }}
     >
       {label}
     </button>
@@ -1805,23 +1872,23 @@ return (
             gap: '0.5rem',
             padding: '0.75rem',
             color: 'white',
-            background: 'var(--color-danger)',
-            borderRadius: 'var(--radius-lg)',
+            background: themeStyles.colorDanger,
+            borderRadius: '12px',
             border: 'none',
             cursor: 'pointer',
             fontWeight: '600',
             fontSize: '0.875rem',
-            transition: 'all var(--transition-base)',
+            transition: 'all 0.3s ease',
             width: '100%',
             justifyContent: 'center'
           }}
           onMouseEnter={(e) => {
             e.target.style.background = '#dc2626';
             e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = 'var(--shadow-lg)';
+            e.target.style.boxShadow = themeStyles.shadowLg;
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'var(--color-danger)';
+            e.target.style.background = themeStyles.colorDanger;
             e.target.style.transform = 'translateY(0)';
             e.target.style.boxShadow = 'none';
           }}
@@ -2136,8 +2203,8 @@ return (
               display: 'flex',
               flexDirection: 'column',
               width: '100%',
-              padding: 'var(--space-xl)',
-              gap: 'var(--space-xl)',
+              padding: '2rem',
+              gap: '2rem',
               minHeight: '100vh',
               position: 'relative'
             }}
@@ -2255,8 +2322,8 @@ return (
               display: 'flex',
               flexDirection: 'column',
               width: '100%',
-              padding: 'var(--space-xl)',
-              gap: 'var(--space-xl)',
+              padding: '2rem',
+              gap: '2rem',
               minHeight: '100vh',
               position: 'relative'
             }}
@@ -2356,7 +2423,7 @@ return (
         )}
 
         {activeSection === "Stock" && (
-          <div style={{ padding: 'var(--space-xl)', minHeight: '100vh' }}>
+          <div style={{ padding: '2rem', minHeight: '100vh' }}>
 
             <motion.section
               key="stock"
@@ -2365,7 +2432,7 @@ return (
               transition={{ duration: 0.4 }}
               className="panel"
             >
-              {/* <form style={{ display: 'flex', gap: 'var(--space-lg)', alignItems: 'center', marginBottom: 'var(--space-xl)' }}>
+              {/* <form style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2rem' }}>
                 <input
                   type="text"
                   value={productId}
@@ -2392,13 +2459,13 @@ return (
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               style={{
-                background: 'var(--glass-bg)',
-                backdropFilter: 'var(--glass-backdrop)',
-                borderRadius: 'var(--radius-xl)',
+                background: themeStyles.glassBackground,
+                backdropFilter: themeStyles.glassBackdrop,
+                borderRadius: '16px',
                 padding: '2.5rem',
                 marginBottom: '2rem',
-                boxShadow: 'var(--shadow-xl)',
-                border: '1px solid var(--glass-border)',
+                boxShadow: themeStyles.shadowXl,
+                border: `1px solid ${themeStyles.glassBorder}`,
                 position: 'relative',
                 overflow: 'hidden'
               }}
@@ -2410,7 +2477,7 @@ return (
                 right: '-100px',
                 width: '400px',
                 height: '400px',
-                background: 'radial-gradient(circle, var(--color-primary-rgb, rgba(16,185,129,0.15)) 0%, transparent 60%)',
+                background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 60%)',
                 animation: 'float 6s ease-in-out infinite',
                 pointerEvents: 'none',
                 opacity: 0.1
@@ -2421,7 +2488,7 @@ return (
                 left: '-100px',
                 width: '350px',
                 height: '350px',
-                background: 'radial-gradient(circle, var(--color-accent-rgb, rgba(59,130,246,0.1)) 0%, transparent 60%)',
+                background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%)',
                 animation: 'float 8s ease-in-out infinite reverse',
                 pointerEvents: 'none',
                 opacity: 0.08
@@ -2433,7 +2500,7 @@ return (
                 transform: 'translate(-50%, -50%)',
                 width: '600px',
                 height: '600px',
-                background: 'radial-gradient(circle at center, var(--color-primary-rgb, rgba(16,185,129,0.05)) 0%, transparent 70%)',
+                background: 'radial-gradient(circle at center, rgba(16,185,129,0.05) 0%, transparent 70%)',
                 animation: 'spin 20s linear infinite',
                 pointerEvents: 'none',
                 opacity: 0.3
@@ -2447,7 +2514,7 @@ return (
                   style={{
                     fontSize: '1.75rem',
                     fontWeight: '800',
-                    background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-secondary) 100%)',
+                    background: `linear-gradient(135deg, ${themeStyles.colorPrimary} 0%, ${themeStyles.colorAccent} 50%, ${themeStyles.colorSecondary} 100%)`,
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -2470,7 +2537,7 @@ return (
                     }}
                     style={{ 
                       fontSize: '2rem',
-                      filter: 'drop-shadow(0 4px 8px var(--shadow-color-primary, rgba(16,185,129,0.3)))'
+                      filter: 'drop-shadow(0 4px 8px rgba(16,185,129,0.3))'
                     }}
                   >
                     📅
@@ -2491,9 +2558,9 @@ return (
                       gap: '1rem',
                       marginBottom: '1.5rem',
                       padding: '1rem 2rem',
-                      background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
+                      background: `linear-gradient(135deg, ${themeStyles.colorPrimary} 0%, ${themeStyles.colorAccent} 100%)`,
                       borderRadius: '20px',
-                      boxShadow: '0 8px 24px var(--shadow-color-primary, rgba(16,185,129,0.3))',
+                      boxShadow: '0 8px 24px rgba(16,185,129,0.3)',
                       position: 'relative',
                       overflow: 'hidden'
                     }}
@@ -2594,15 +2661,15 @@ return (
                       padding: '1rem 2rem 1rem 3.5rem',
                       borderRadius: '20px',
                       border: '2px solid transparent',
-                      background: 'linear-gradient(var(--color-surface), var(--color-surface)) padding-box, linear-gradient(135deg, var(--color-primary), var(--color-accent)) border-box',
+                      background: `linear-gradient(${themeStyles.colorSurface}, ${themeStyles.colorSurface}) padding-box, linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent}) border-box`,
                       fontSize: '1.1rem',
                       fontWeight: '700',
-                      color: 'var(--color-text-primary)',
+                      color: themeStyles.colorTextPrimary,
                       cursor: 'pointer',
                       outline: 'none',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       minWidth: '180px',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px var(--glass-border)',
+                      boxShadow: `0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px ${themeStyles.glassBorder}`,
                       backdropFilter: 'blur(10px)',
                       position: 'relative',
                       appearance: 'none',
@@ -2612,11 +2679,11 @@ return (
                       paddingRight: '3rem'
                     }}
                     onFocus={(e) => {
-                      e.target.style.boxShadow = '0 0 0 3px var(--focus-ring-primary, rgba(16,185,129,0.2)), 0 8px 30px var(--shadow-lg)';
+                      e.target.style.boxShadow = `0 0 0 3px rgba(16,185,129,0.2), 0 8px 30px ${themeStyles.shadowLg}`;
                       e.target.style.transform = 'translateY(-2px) scale(1.02)';
                     }}
                     onBlur={(e) => {
-                      e.target.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px var(--glass-border)';
+                      e.target.style.boxShadow = `0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px ${themeStyles.glassBorder}`;
                       e.target.style.transform = 'translateY(0) scale(1)';
                     }}
                   >
@@ -2635,15 +2702,15 @@ return (
                       padding: '1rem 2rem 1rem 1.5rem',
                       borderRadius: '20px',
                       border: '2px solid transparent',
-                      background: 'linear-gradient(var(--color-surface), var(--color-surface)) padding-box, linear-gradient(135deg, var(--color-accent), var(--color-primary)) border-box',
+                      background: `linear-gradient(${themeStyles.colorSurface}, ${themeStyles.colorSurface}) padding-box, linear-gradient(135deg, ${themeStyles.colorAccent}, ${themeStyles.colorPrimary}) border-box`,
                       fontSize: '1.1rem',
                       fontWeight: '700',
-                      color: 'var(--color-text-primary)',
+                      color: themeStyles.colorTextPrimary,
                       cursor: 'pointer',
                       outline: 'none',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       minWidth: '140px',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px var(--glass-border)',
+                      boxShadow: `0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px ${themeStyles.glassBorder}`,
                       backdropFilter: 'blur(10px)',
                       appearance: 'none',
                       backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E")`,
@@ -2652,11 +2719,11 @@ return (
                       paddingRight: '3rem'
                     }}
                     onFocus={(e) => {
-                      e.target.style.boxShadow = '0 0 0 3px var(--focus-ring-accent, rgba(59,130,246,0.2)), 0 8px 30px var(--shadow-lg)';
+                      e.target.style.boxShadow = `0 0 0 3px rgba(59,130,246,0.2), 0 8px 30px ${themeStyles.shadowLg}`;
                       e.target.style.transform = 'translateY(-2px) scale(1.02)';
                     }}
                     onBlur={(e) => {
-                      e.target.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px var(--glass-border)';
+                      e.target.style.boxShadow = `0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px ${themeStyles.glassBorder}`;
                       e.target.style.transform = 'translateY(0) scale(1)';
                     }}
                   >
@@ -2710,10 +2777,10 @@ return (
                           onMouseEnter={(e) => {
                             if (!isSelected) {
                               e.currentTarget.style.background = isToday 
-                                ? 'linear-gradient(135deg, var(--color-accent), var(--color-primary))'
-                                : 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
+                                ? `linear-gradient(135deg, ${themeStyles.colorAccent}, ${themeStyles.colorPrimary})`
+                                : `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})`;
                               e.currentTarget.style.color = 'white';
-                              e.currentTarget.style.boxShadow = '0 4px 12px var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.1)';
+                              e.currentTarget.style.boxShadow = `0 4px 12px ${themeStyles.shadowMd}, inset 0 1px 0 rgba(255,255,255,0.1)`;
                               e.currentTarget.style.borderColor = 'transparent';
                               e.currentTarget.style.transform = 'translateY(-2px) scale(1.08)';
                             }
@@ -2721,11 +2788,11 @@ return (
                           onMouseLeave={(e) => {
                             if (!isSelected) {
                               e.currentTarget.style.background = isToday 
-                                ? 'var(--glass-bg)'
-                                : 'var(--color-surface)';
-                              e.currentTarget.style.color = 'var(--color-text-primary)';
-                              e.currentTarget.style.boxShadow = '0 1px 3px var(--shadow-sm)';
-                              e.currentTarget.style.borderColor = isToday ? 'var(--color-accent)' : 'var(--glass-border)';
+                                ? themeStyles.glassBackground
+                                : themeStyles.colorSurface;
+                              e.currentTarget.style.color = themeStyles.colorTextPrimary;
+                              e.currentTarget.style.boxShadow = `0 1px 3px ${themeStyles.shadowSm}`;
+                              e.currentTarget.style.borderColor = isToday ? themeStyles.colorAccent : themeStyles.glassBorder;
                               e.currentTarget.style.transform = 'translateY(0) scale(1)';
                             }
                           }}
@@ -2736,15 +2803,15 @@ return (
                             borderRadius: '12px',
                             border: `1px solid ${
                               isSelected ? 'transparent' : 
-                              isToday ? 'var(--color-accent)' : 
-                              'var(--glass-border)'
+                              isToday ? themeStyles.colorAccent : 
+                              themeStyles.glassBorder
                             }`,
                             background: isSelected 
-                              ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' 
+                              ? `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})` 
                               : isToday 
-                                ? 'var(--glass-bg)'
-                                : 'var(--color-surface)',
-                            color: isSelected ? 'white' : 'var(--color-text-primary)',
+                                ? themeStyles.glassBackground
+                                : themeStyles.colorSurface,
+                            color: isSelected ? 'white' : themeStyles.colorTextPrimary,
                             fontSize: '0.9rem',
                             fontWeight: isSelected || isToday ? '700' : '500',
                             cursor: 'pointer',
@@ -2752,10 +2819,10 @@ return (
                             position: 'relative',
                             overflow: 'hidden',
                             boxShadow: isSelected 
-                              ? '0 4px 12px var(--shadow-color-primary, rgba(16,185,129,0.4)), inset 0 1px 0 rgba(255,255,255,0.1)' 
+                              ? '0 4px 12px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.1)' 
                               : isToday
-                                ? '0 2px 8px var(--shadow-color-accent, rgba(59,130,246,0.2))'
-                                : '0 1px 3px var(--shadow-sm)',
+                                ? '0 2px 8px rgba(59,130,246,0.2)'
+                                : `0 1px 3px ${themeStyles.shadowSm}`,
                             backdropFilter: 'blur(8px)',
                             display: 'flex',
                             alignItems: 'center',
@@ -2814,8 +2881,8 @@ return (
                                 width: '5px',
                                 height: '5px',
                                 borderRadius: '50%',
-                                background: 'var(--color-primary)',
-                                boxShadow: '0 0 4px var(--color-primary)'
+                                background: themeStyles.colorPrimary,
+                                boxShadow: `0 0 4px ${themeStyles.colorPrimary}`
                               }} 
                             />
                           )}
@@ -2891,12 +2958,12 @@ return (
                           transition={{ duration: 0.4, delay: 0.1 }}
                           style={{
                             marginTop: '1rem',
-                            background: 'linear-gradient(135deg, var(--glass-bg) 0%, var(--color-surface) 100%)',
-                            borderRadius: 'var(--radius-xl)',
+                            background: `linear-gradient(135deg, ${themeStyles.glassBackground} 0%, ${themeStyles.colorSurface} 100%)`,
+                            borderRadius: '16px',
                             padding: '1.5rem',
-                            border: '2px solid var(--color-accent)',
-                            boxShadow: '0 10px 30px var(--shadow-color-accent, rgba(59,130,246,0.15))',
-                            backdropFilter: 'var(--glass-backdrop)',
+                            border: `2px solid ${themeStyles.colorAccent}`,
+                            boxShadow: '0 10px 30px rgba(59,130,246,0.15)',
+                            backdropFilter: themeStyles.glassBackdrop,
                             position: 'relative',
                             overflow: 'hidden'
                           }}
@@ -2908,7 +2975,7 @@ return (
                             right: '-10%',
                             width: '200px',
                             height: '200px',
-                            background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)',
+                            background: `radial-gradient(circle, ${themeStyles.colorAccent} 0%, transparent 70%)`,
                             opacity: 0.05,
                             animation: 'pulse 4s ease-in-out infinite',
                             pointerEvents: 'none'
@@ -2921,7 +2988,7 @@ return (
                             <h4 style={{
                               fontSize: '1.2rem',
                               fontWeight: '700',
-                              color: 'var(--color-text-primary)',
+                              color: themeStyles.colorTextPrimary,
                               marginBottom: '1rem',
                               display: 'flex',
                               alignItems: 'center',
@@ -2941,12 +3008,12 @@ return (
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 style={{
-                                  background: 'var(--color-surface)',
-                                  borderRadius: 'var(--radius-lg)',
+                                  background: themeStyles.colorSurface,
+                                  borderRadius: '12px',
                                   padding: '1rem',
                                   marginBottom: index < projectsAtDate.length - 1 ? '1rem' : 0,
-                                  border: '1px solid var(--glass-border)',
-                                  boxShadow: 'var(--shadow-sm)'
+                                  border: `1px solid ${themeStyles.glassBorder}`,
+                                  boxShadow: themeStyles.shadowSm
                                 }}
                               >
                                 <div style={{
@@ -2958,7 +3025,7 @@ return (
                                   <h5 style={{
                                     fontSize: '1.1rem',
                                     fontWeight: '700',
-                                    color: 'var(--color-primary)',
+                                    color: themeStyles.colorPrimary,
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem'
@@ -3008,10 +3075,10 @@ return (
                                   </h5>
                                   <span style={{
                                     fontSize: '0.85rem',
-                                    color: 'var(--color-text-secondary)',
-                                    background: 'var(--glass-bg)',
+                                    color: themeStyles.colorTextSecondary,
+                                    background: themeStyles.glassBackground,
                                     padding: '0.25rem 0.75rem',
-                                    borderRadius: 'var(--radius-md)',
+                                    borderRadius: '8px',
                                     fontWeight: '600'
                                   }}>
                                     {project.materials.length} article{project.materials.length > 1 ? 's' : ''}
@@ -3033,8 +3100,8 @@ return (
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         padding: '0.5rem',
-                                        background: 'var(--glass-bg)',
-                                        borderRadius: 'var(--radius-md)',
+                                        background: themeStyles.glassBackground,
+                                        borderRadius: '8px',
                                         fontSize: '0.9rem'
                                       }}
                                     >
@@ -3060,11 +3127,11 @@ return (
                                             <div style={{
                                               width: '45px',
                                               height: '45px',
-                                              borderRadius: 'var(--radius-md)',
+                                              borderRadius: '8px',
                                               overflow: 'hidden',
-                                              border: '2px solid var(--glass-border)',
-                                              boxShadow: 'var(--shadow-sm)',
-                                              background: 'var(--color-surface)',
+                                              border: `2px solid ${themeStyles.glassBorder}`,
+                                              boxShadow: themeStyles.shadowSm,
+                                              background: themeStyles.colorSurface,
                                               display: 'flex',
                                               alignItems: 'center',
                                               justifyContent: 'center',
@@ -3094,7 +3161,7 @@ return (
                                                 width: '100%',
                                                 height: '100%',
                                                 fontSize: '1.5rem',
-                                                color: 'var(--color-text-secondary)'
+                                                color: themeStyles.colorTextSecondary
                                               }}>
                                                 🌿
                                               </div>
@@ -3103,13 +3170,13 @@ return (
                                             <div style={{
                                               width: '45px',
                                               height: '45px',
-                                              borderRadius: 'var(--radius-md)',
-                                              background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                                              borderRadius: '8px',
+                                              background: `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})`,
                                               display: 'flex',
                                               alignItems: 'center',
                                               justifyContent: 'center',
                                               fontSize: '1.5rem',
-                                              boxShadow: 'var(--shadow-sm)',
+                                              boxShadow: themeStyles.shadowSm,
                                               flexShrink: 0
                                             }}>
                                               🌿
@@ -3125,7 +3192,7 @@ return (
                                           minWidth: 0 // pour permettre le text overflow
                                         }}>
                                           <span style={{
-                                            color: 'var(--color-text-primary)',
+                                            color: themeStyles.colorTextPrimary,
                                             fontWeight: '600',
                                             fontSize: '0.95rem',
                                             lineHeight: '1.2',
@@ -3138,10 +3205,10 @@ return (
                                           {material.reference && (
                                             <span style={{
                                               fontSize: '0.75rem',
-                                              color: 'var(--color-text-secondary)',
-                                              background: 'var(--color-surface)',
+                                              color: themeStyles.colorTextSecondary,
+                                              background: themeStyles.colorSurface,
                                               padding: '0.1rem 0.5rem',
-                                              borderRadius: 'var(--radius-sm)',
+                                              borderRadius: '6px',
                                               alignSelf: 'flex-start',
                                               fontWeight: '500'
                                             }}>
@@ -3156,13 +3223,13 @@ return (
                                         gap: '0.5rem'
                                       }}>
                                         <span style={{
-                                          background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                                          background: `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})`,
                                           color: 'white',
                                           padding: '0.25rem 0.75rem',
-                                          borderRadius: 'var(--radius-md)',
+                                          borderRadius: '8px',
                                           fontWeight: '700',
                                           fontSize: '0.9rem',
-                                          boxShadow: 'var(--shadow-sm)'
+                                          boxShadow: themeStyles.shadowSm
                                         }}>
                                           {material.quantity} unité{material.quantity > 1 ? 's' : ''}
                                         </span>
@@ -3175,12 +3242,12 @@ return (
                                   <div style={{
                                     marginTop: '0.75rem',
                                     paddingTop: '0.75rem',
-                                    borderTop: '1px solid var(--glass-border)',
+                                    borderTop: `1px solid ${themeStyles.glassBorder}`,
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
                                     fontSize: '0.85rem',
-                                    color: 'var(--color-text-secondary)'
+                                    color: themeStyles.colorTextSecondary
                                   }}>
                                     <span>📍</span>
                                     {project.location.address}
@@ -3196,7 +3263,7 @@ return (
                               style={{
                                 marginTop: '1rem',
                                 paddingTop: '1rem',
-                                borderTop: '2px solid var(--glass-border)',
+                                borderTop: `2px solid ${themeStyles.glassBorder}`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between'
@@ -3204,7 +3271,7 @@ return (
                             >
                               <span style={{
                                 fontSize: '0.9rem',
-                                color: 'var(--color-text-secondary)',
+                                color: themeStyles.colorTextSecondary,
                                 fontWeight: '600'
                               }}>
                                 Total des réservations
@@ -3212,7 +3279,7 @@ return (
                               <span style={{
                                 fontSize: '1.1rem',
                                 fontWeight: '800',
-                                background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                                background: `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})`,
                                 backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
@@ -3705,9 +3772,9 @@ return (
                       onClick={handleExportCSV}
                       className="btn"
                       style={{
-                        color: 'var(--color-text-secondary)',
-                        background: 'var(--color-surface)',
-                        border: '2px solid var(--color-border)'
+                        color: themeStyles.colorTextSecondary,
+                        background: themeStyles.colorSurface,
+                        border: `2px solid ${themeStyles.colorBorder}`
                       }}
                     >
                       <span style={{fontSize: '1.2rem'}}>📊</span> Exporter
@@ -3918,11 +3985,11 @@ return (
                             y: [-2, -6, -4],
                             scale: [1, 1.03, 1.02],
                             rotateY: [0, 2, -1, 0],
-                            borderColor: 'var(--color-primary)',
+                            borderColor: themeStyles.colorPrimary,
                             boxShadow: [
                               '0 4px 15px rgba(0,0,0,0.08)',
-                              '0 15px 35px var(--color-primary)',
-                              '0 12px 30px var(--color-primary)'
+                              `0 15px 35px ${themeStyles.colorPrimary}`,
+                              `0 12px 30px ${themeStyles.colorPrimary}`
                             ],
                             filter: [
                               'brightness(1)',
@@ -3945,8 +4012,8 @@ return (
                           }
                         }}
                         style={{
-                          border: isOutOfStock ? '3px solid var(--color-danger)' : 
-                                 isLowStock ? '3px solid var(--color-warning)' : 
+                          border: isOutOfStock ? `3px solid ${themeStyles.colorDanger}` : 
+                                 isLowStock ? `3px solid ${themeStyles.colorWarning}` : 
                                  '3px solid transparent',
                           cursor: draggedItem && draggedItem._id === prod._id ? 'grabbing' : 'grab',
                           position: 'relative',
@@ -4000,7 +4067,7 @@ return (
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            background: 'linear-gradient(110deg, transparent 20%, var(--glass-bg) 40%, var(--glass-border) 50%, var(--glass-bg) 60%, transparent 80%)',
+                            background: `linear-gradient(110deg, transparent 20%, ${themeStyles.glassBackground} 40%, ${themeStyles.glassBorder} 50%, ${themeStyles.glassBackground} 60%, transparent 80%)`,
                             backgroundSize: '200% 100%',
                             backgroundPosition: '-100% 0%',
                             borderRadius: 'inherit',
@@ -4014,11 +4081,11 @@ return (
 
                         {/* En-tête épuré */}
                         <div style={{
-                          background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                          background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                           padding: '1.25rem',
-                          color: 'var(--color-primary)',
+                          color: themeStyles.colorPrimary,
                           position: 'relative',
-                          borderBottom: '1px solid var(--color-primary)'
+                          borderBottom: `1px solid ${themeStyles.colorPrimary}`
                         }}>
                           <div style={{
                             display: 'flex',
@@ -4033,7 +4100,7 @@ return (
                                 margin: 0,
                                 lineHeight: '1.3',
                                 marginBottom: '0.25rem',
-                                color: 'var(--color-primary)', replace_all: true
+                                color: themeStyles.colorPrimary, replace_all: true
                               }}>
                                 {prod.name}
                               </h3>
@@ -4056,7 +4123,7 @@ return (
                                 <div style={{
                                   display: 'flex',
                                   alignItems: 'center',
-                                  background: available > 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                                  background: available > 0 ? themeStyles.colorSuccess : themeStyles.colorDanger,
                                   color: 'white',
                                   padding: '0.25rem 0.6rem',
                                   borderRadius: '12px',
@@ -4080,7 +4147,7 @@ return (
                                 <div style={{
                                   display: 'flex',
                                   alignItems: 'center',
-                                  background: (prod.quantity || 0) > 10 ? 'var(--color-primary)' : 'var(--color-warning)',
+                                  background: (prod.quantity || 0) > 10 ? themeStyles.colorPrimary : themeStyles.colorWarning,
                                   color: 'white',
                                   padding: '0.25rem 0.6rem',
                                   borderRadius: '12px',
@@ -4106,7 +4173,7 @@ return (
                             <div style={{
                               fontSize: '1.25rem',
                               fontWeight: '700',
-                              color: 'var(--color-primary)'
+                              color: themeStyles.colorPrimary
                             }}>
                               €{prod.price ? prod.price.toFixed(2) : '0.00'}
                             </div>
@@ -4137,7 +4204,7 @@ return (
                                 boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
                               }}
                               style={{
-                                background: 'var(--color-primary)',
+                                background: themeStyles.colorPrimary,
                                 border: 'none',
                                 borderRadius: '8px',
                                 padding: '0.5rem',
@@ -4211,9 +4278,9 @@ return (
                           <motion.div 
                             animate={{
                               background: [
-                                'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-                                'linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%)',
-                                'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)'
+                                `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
+                                `linear-gradient(135deg, ${themeStyles.colorBgSecondary} 0%, ${themeStyles.colorBgPrimary} 100%)`,
+                                `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`
                               ]
                             }}
                             transition={{
@@ -4263,7 +4330,7 @@ return (
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontSize: '4rem',
-                                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)'
+                                background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`
                               }}
                             >
                               🌱
@@ -4282,44 +4349,44 @@ return (
                           }}>
                             <div style={{
                               padding: '1rem',
-                              background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                              background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                               borderRadius: '16px',
                               textAlign: 'center',
-                              border: '1px solid var(--color-primary)',
+                              border: `1px solid ${themeStyles.colorPrimary}`,
                               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                             }}>
                               <div style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>📏</div>
                               <div style={{
                                 fontSize: '1.125rem',
                                 fontWeight: '700',
-                                color: 'var(--color-primary)',
+                                color: themeStyles.colorPrimary,
                                 marginBottom: '0.25rem'
                               }}>{prod.height || 0} cm</div>
                               <div style={{
                                 fontSize: '0.75rem',
-                                color: 'var(--color-secondary)',
+                                color: themeStyles.colorSecondary,
                                 fontWeight: '600'
                               }}>Hauteur</div>
                             </div>
                             
                             <div style={{
                               padding: '1rem',
-                              background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                              background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                               borderRadius: '16px',
                               textAlign: 'center',
-                              border: '1px solid var(--color-primary)',
+                              border: `1px solid ${themeStyles.colorPrimary}`,
                               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                             }}>
                               <div style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>⭕</div>
                               <div style={{
                                 fontSize: '1.125rem',
                                 fontWeight: '700',
-                                color: 'var(--color-primary)',
+                                color: themeStyles.colorPrimary,
                                 marginBottom: '0.25rem'
                               }}>{prod.diameter || 0} cm</div>
                               <div style={{
                                 fontSize: '0.75rem',
-                                color: 'var(--color-secondary)',
+                                color: themeStyles.colorSecondary,
                                 fontWeight: '600'
                               }}>Diamètre</div>
                             </div>
@@ -4332,9 +4399,9 @@ return (
                             alignItems: 'center',
                             marginBottom: '1rem',
                             padding: '0.75rem 1rem',
-                            background: 'var(--color-bg-primary)',
+                            background: themeStyles.colorBgPrimary,
                             borderRadius: '12px',
-                            border: '1px solid var(--color-primary)'
+                            border: `1px solid ${themeStyles.colorPrimary}`
                           }}>
                             <div style={{
                               display: 'flex',
@@ -4345,7 +4412,7 @@ return (
                               <div style={{ textAlign: 'center' }}>
                                 <div style={{
                                   fontSize: '0.7rem',
-                                  color: 'var(--color-secondary)',
+                                  color: themeStyles.colorSecondary,
                                   marginBottom: '0.25rem',
                                   fontWeight: '600'
                                 }}>
@@ -4354,7 +4421,7 @@ return (
                                 <div style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
-                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : 'var(--color-primary)'
+                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : themeStyles.colorPrimary
                                 }}>
                                   {available}
                                 </div>
@@ -4365,15 +4432,15 @@ return (
                                 <div style={{
                                   fontSize: '0.7rem',
                                   color: selectedStockDate && stockProjections[prod.reference] 
-                                    ? 'var(--color-primary)' 
-                                    : 'var(--color-secondary)',
+                                    ? themeStyles.colorPrimary 
+                                    : themeStyles.colorSecondary,
                                   marginBottom: '0.25rem',
                                   fontWeight: '600'
                                 }}>{selectedStockDate && stockProjections[prod.reference] ? '📅 Réservés' : 'Réservés'}</div>
                                 <div style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
-                                  color: 'var(--color-accent)'
+                                  color: themeStyles.colorAccent
                                 }}>
                                   {(() => {
                                     const projectedQty = stockProjections[prod.reference];
@@ -4389,7 +4456,7 @@ return (
                               <div style={{ textAlign: 'center' }}>
                                 <div style={{
                                   fontSize: '0.7rem',
-                                  color: 'var(--color-success)',
+                                  color: themeStyles.colorSuccess,
                                   marginBottom: '0.25rem',
                                   fontWeight: '600'
                                 }}>
@@ -4398,7 +4465,7 @@ return (
                                 <div style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
-                                  color: 'var(--color-success)'
+                                  color: themeStyles.colorSuccess
                                 }}>
                                   {(() => {
                                     const reserved = (() => {
@@ -4447,12 +4514,12 @@ return (
                                 style={{
                                   width: '100%',
                                   padding: '1rem',
-                                  background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                                  background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                                   borderRadius: '16px',
-                                  border: '2px solid var(--color-primary)',
+                                  border: `2px solid ${themeStyles.colorPrimary}`,
                                   fontSize: '0.85rem',
                                   fontWeight: '700',
-                                  color: 'var(--color-primary)',
+                                  color: themeStyles.colorPrimary,
                                   cursor: 'pointer',
                                   outline: 'none',
                                   transition: 'all 0.3s ease',
@@ -4494,10 +4561,10 @@ return (
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
-                                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                                background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                                 borderRadius: '16px',
                                 padding: '0.5rem',
-                                border: '2px solid var(--color-primary)',
+                                border: `2px solid ${themeStyles.colorPrimary}`,
                                 minWidth: '120px'
                               }}>
 
@@ -4542,15 +4609,16 @@ return (
 
                               <motion.span 
                                 key={prod.quantity}
-                                initial={{ scale: 1.2, color: 'var(--color-primary)' }}
-                                animate={{ scale: 1, color: 'var(--color-primary)' }}
+                                initial={{ scale: 1.2, color: isDark ? '#f1f5f9' : '#1e293b' }}
+                                animate={{ scale: 1, color: isDark ? '#f1f5f9' : '#1e293b' }}
                                 transition={{ duration: 0.3, ease: "easeOut" }}
                                 style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
                                   minWidth: '32px',
                                   textAlign: 'center',
-                                  flex: 1
+                                  flex: 1,
+                                  color: isDark ? '#f1f5f9' : '#1e293b'
                                 }}>
                                 {prod.quantity || 0}
                               </motion.span>
@@ -4580,7 +4648,7 @@ return (
                                   borderRadius: '8px',
                                   border: 'none',
                                   background: loadingStates[`quantity-${prod._id}`] ? 
-                                    '#94a3b8' : 'var(--color-primary)',
+                                    '#94a3b8' : themeStyles.colorPrimary,
                                   color: 'white',
                                   fontSize: '0.9rem',
                                   fontWeight: 'bold',
@@ -4600,12 +4668,12 @@ return (
                           {isRecentlyModified(prod) && (
                             <div style={{
                               padding: '0.5rem',
-                              background: 'var(--color-bg-secondary)',
+                              background: themeStyles.colorBgSecondary,
                               borderRadius: '8px',
                               fontSize: '0.7rem',
-                              color: 'var(--color-primary)',
+                              color: themeStyles.colorPrimary,
                               textAlign: 'center',
-                              border: '1px solid var(--color-accent)'
+                              border: `1px solid ${themeStyles.colorAccent}`
                             }}>
                               🔄 Modifié récemment
                             </div>
@@ -4658,13 +4726,13 @@ return (
             }}>
               <motion.button
                 onClick={() => setShowHistory(!showHistory)}
-                whileHover={{ scale: 1.05, boxShadow: 'var(--shadow-2xl)' }}
+                whileHover={{ scale: 1.05, boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}
                 whileTap={{ scale: 0.95 }}
                 style={{
                   background: showHistory 
-                    ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' 
-                    : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))',
-                  color: 'var(--color-text-inverse)',
+                    ? `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})` 
+                    : `linear-gradient(135deg, ${themeStyles.colorSecondary}, #6b7280)`,
+                  color: 'white',
                   border: 'none',
                   borderRadius: '20px',
                   padding: '1rem 2rem',
@@ -4672,7 +4740,7 @@ return (
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  boxShadow: 'var(--shadow-lg)',
+                  boxShadow: themeStyles.shadowLg,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
@@ -4724,11 +4792,11 @@ return (
           <motion.section key="operations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">
             {/* En-tête de la section */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+              background: `linear-gradient(135deg, ${themeStyles.colorPrimary}, ${themeStyles.colorAccent})`,
               borderRadius: '20px',
               padding: '2rem',
               textAlign: 'center',
-              boxShadow: 'var(--shadow-xl)',
+              boxShadow: themeStyles.shadowXl,
               color: 'white',
               marginBottom: '3rem'
             }}>
@@ -4761,10 +4829,10 @@ return (
 
             {/* Formulaire de vente entre pôles */}
             <div style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-xl)',
-              boxShadow: 'var(--shadow-lg)',
+              background: themeStyles.colorSurface,
+              border: `1px solid ${themeStyles.colorBorder}`,
+              borderRadius: '16px',
+              boxShadow: themeStyles.shadowLg,
               padding: '2rem',
               position: 'relative',
               overflow: 'hidden',
@@ -4778,18 +4846,18 @@ return (
                 right: '-50%',
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))',
+                background: 'linear-gradient(45deg, rgba(16,185,129,0.2), rgba(59,130,246,0.2))',
                 borderRadius: '50%',
                 pointerEvents: 'none',
                 opacity: 0.1
               }} />
               
               <div style={{
-                background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                 borderRadius: '16px',
                 padding: '2rem',
                 marginBottom: '2rem',
-                border: '1px solid var(--color-primary)',
+                border: `1px solid ${themeStyles.colorPrimary}`,
                 position: 'relative',
                 zIndex: 1,
                 textAlign: 'center'
@@ -4797,14 +4865,14 @@ return (
                 <h3 style={{
                   fontSize: '2rem', 
                   fontWeight: '700',
-                  color: 'var(--color-primary)',
+                  color: themeStyles.colorPrimary,
                   marginBottom: '0.5rem',
                   margin: 0
                 }}>
                   🏢 Vente Inter-Pôles
                 </h3>
                 <p style={{
-                  color: 'var(--color-secondary)',
+                  color: themeStyles.colorSecondary,
                   fontSize: '1rem',
                   fontWeight: '500',
                   margin: 0,
@@ -4829,7 +4897,7 @@ return (
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--color-primary)',
+                    color: themeStyles.colorPrimary,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
@@ -4840,12 +4908,12 @@ return (
                     style={{
                       width: '100%',
                       padding: '1rem 1.5rem',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       borderRadius: '12px',
                       fontSize: '1rem',
                       fontWeight: '500',
-                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-                      color: 'var(--color-text-primary)',
+                      background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
+                      color: themeStyles.colorTextPrimary,
                       opacity: 0.8,
                       cursor: 'not-allowed'
                     }}
@@ -4861,7 +4929,7 @@ return (
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--color-primary)',
+                    color: themeStyles.colorPrimary,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
@@ -4872,34 +4940,34 @@ return (
                     style={{
                       width: '100%',
                       padding: '1rem 1.5rem',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       borderRadius: '12px',
                       fontSize: '1rem',
                       fontWeight: '500',
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)',
+                      background: themeStyles.colorSurface,
+                      color: themeStyles.colorTextPrimary,
                       transition: 'all 0.3s ease',
                       outline: 'none',
                       cursor: 'pointer'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    onFocus={(e) => e.target.style.borderColor = themeStyles.colorPrimary}
+                    onBlur={(e) => e.target.style.borderColor = themeStyles.colorBorder}
                   >
                     <option value="" style={{
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)'
+                      background: themeStyles.colorSurface,
+                      color: themeStyles.colorTextPrimary
                     }}>Sélectionnez un pôle acheteur</option>
                     <option value="creation" style={{
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)'
+                      background: themeStyles.colorSurface,
+                      color: themeStyles.colorTextPrimary
                     }}>🏗️ Création</option>
                     <option value="entretien" style={{
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)'
+                      background: themeStyles.colorSurface,
+                      color: themeStyles.colorTextPrimary
                     }}>🔧 Entretien</option>
                     <option value="upsell" style={{
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)'
+                      background: themeStyles.colorSurface,
+                      color: themeStyles.colorTextPrimary
                     }}>📈 Upsell</option>
                   </select>
                 </div>
@@ -4911,7 +4979,7 @@ return (
                     marginBottom: '1rem',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--color-primary)',
+                    color: themeStyles.colorPrimary,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
@@ -4919,9 +4987,9 @@ return (
                   </label>
                   
                   <div style={{
-                    background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                    background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
                     borderRadius: '16px',
-                    border: '1px solid var(--color-primary)',
+                    border: `1px solid ${themeStyles.colorPrimary}`,
                     padding: '1.5rem',
                     position: 'relative'
                   }}>
@@ -4933,17 +5001,17 @@ return (
                       style={{
                         width: '100%',
                         padding: '1rem 1.5rem',
-                        border: '1px solid var(--color-border)',
+                        border: `1px solid ${themeStyles.colorBorder}`,
                         borderRadius: '12px',
                         fontSize: '1rem',
                         fontWeight: '500',
-                        background: 'var(--color-surface)',
-                        color: 'var(--color-text-primary)',
+                        background: themeStyles.colorSurface,
+                        color: themeStyles.colorTextPrimary,
                         transition: 'all 0.3s ease',
                         outline: 'none'
                       }}
-                      onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-                      onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                      onFocus={(e) => e.target.style.borderColor = themeStyles.colorPrimary}
+                      onBlur={(e) => e.target.style.borderColor = themeStyles.colorBorder}
                     />
 
                     {/* Résultats de recherche */}
@@ -4953,10 +5021,10 @@ return (
                         top: '100%',
                         left: '1.5rem',
                         right: '1.5rem',
-                        background: 'var(--color-surface)',
-                        border: '1px solid var(--color-border)',
+                        background: themeStyles.colorSurface,
+                        border: `1px solid ${themeStyles.colorBorder}`,
                         borderRadius: '12px',
-                        boxShadow: 'var(--shadow-xl)',
+                        boxShadow: themeStyles.shadowXl,
                         zIndex: 10,
                         maxHeight: '400px',
                         overflowY: 'auto',
@@ -4977,7 +5045,7 @@ return (
                               }}
                               style={{
                                 padding: '1rem',
-                                borderBottom: index < operationsStockOptions.length - 1 ? '1px solid var(--color-border)' : 'none',
+                                borderBottom: index < operationsStockOptions.length - 1 ? `1px solid ${themeStyles.colorBorder}` : 'none',
                                 cursor: !isOutOfStock ? 'pointer' : 'not-allowed',
                                 transition: 'all 0.3s ease',
                                 display: 'flex',
@@ -4985,7 +5053,7 @@ return (
                                 gap: '1rem',
                                 opacity: isOutOfStock ? 0.5 : 1
                               }}
-                              onMouseEnter={(e) => !isOutOfStock && (e.target.style.background = 'var(--color-bg-secondary)')}
+                              onMouseEnter={(e) => !isOutOfStock && (e.target.style.background = themeStyles.colorBgSecondary)}
                               onMouseLeave={(e) => !isOutOfStock && (e.target.style.background = 'transparent')}
                             >
                               {/* Image */}
@@ -4994,7 +5062,7 @@ return (
                                 height: '60px',
                                 borderRadius: '12px',
                                 overflow: 'hidden',
-                                background: 'var(--color-bg-secondary)',
+                                background: themeStyles.colorBgSecondary,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -5019,7 +5087,7 @@ return (
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ 
                                   fontWeight: '600', 
-                                  color: 'var(--color-text-primary)', 
+                                  color: themeStyles.colorTextPrimary, 
                                   marginBottom: '0.25rem',
                                   fontSize: '1rem'
                                 }}>
@@ -5027,7 +5095,7 @@ return (
                                 </div>
                                 <div style={{ 
                                   fontSize: '0.85rem', 
-                                  color: 'var(--color-text-secondary)', 
+                                  color: themeStyles.colorTextSecondary, 
                                   marginBottom: '0.5rem' 
                                 }}>
                                   Réf: {item.reference}
@@ -5041,7 +5109,7 @@ return (
                                   <span style={{ 
                                     fontSize: '1.1rem', 
                                     fontWeight: '700', 
-                                    color: 'var(--color-primary)' 
+                                    color: themeStyles.colorPrimary 
                                   }}>
                                     €{item.price ? item.price.toFixed(2) : '0.00'}
                                   </span>
@@ -5053,8 +5121,8 @@ return (
                                     borderRadius: '20px',
                                     fontSize: '0.75rem',
                                     fontWeight: '600',
-                                    background: isOutOfStock ? 'var(--color-danger)' : 
-                                               isLowStock ? 'var(--color-warning)' : 'var(--color-success)',
+                                    background: isOutOfStock ? themeStyles.colorDanger : 
+                                               isLowStock ? themeStyles.colorWarning : themeStyles.colorSuccess,
                                     color: 'white'
                                   }}>
                                     <span>
@@ -5069,7 +5137,7 @@ return (
 
                               {/* Action */}
                               <div style={{
-                                background: isOutOfStock ? 'var(--color-secondary)' : 'var(--color-primary)',
+                                background: isOutOfStock ? themeStyles.colorSecondary : themeStyles.colorPrimary,
                                 color: 'white',
                                 padding: '0.5rem 1rem',
                                 borderRadius: '20px',
@@ -5093,14 +5161,14 @@ return (
                       <div style={{
                         marginTop: '1rem',
                         padding: '1rem',
-                        background: 'var(--color-success-bg)',
-                        border: '1px solid var(--color-success)',
+                        background: themeStyles.colorSuccess + '20',
+                        border: `1px solid ${themeStyles.colorSuccess}`,
                         borderRadius: '12px'
                       }}>
                         <div style={{
                           fontSize: '0.75rem',
                           fontWeight: '700',
-                          color: 'var(--color-success)',
+                          color: themeStyles.colorSuccess,
                           textTransform: 'uppercase',
                           marginBottom: '0.5rem'
                         }}>
@@ -5124,10 +5192,10 @@ return (
                             />
                           )}
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                            <div style={{ fontWeight: '600', color: themeStyles.colorTextPrimary }}>
                               {selectedOperationArticle.name}
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                            <div style={{ fontSize: '0.85rem', color: themeStyles.colorTextSecondary }}>
                               Réf: {selectedOperationArticle.reference} • €{selectedOperationArticle.price?.toFixed(2) || '0.00'}
                             </div>
                           </div>
@@ -5137,7 +5205,7 @@ return (
                               setOperationsStockQuery('');
                             }}
                             style={{
-                              background: 'var(--color-secondary)',
+                              background: themeStyles.colorSecondary,
                               color: 'white',
                               border: 'none',
                               borderRadius: '50%',
@@ -5164,7 +5232,7 @@ return (
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--color-primary)',
+                    color: themeStyles.colorPrimary,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
@@ -5178,17 +5246,17 @@ return (
                     style={{
                       width: '100%',
                       padding: '1rem 1.5rem',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       borderRadius: '12px',
                       fontSize: '1rem',
                       fontWeight: '500',
-                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-                      color: 'var(--color-text-primary)',
+                      background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
+                      color: themeStyles.colorTextPrimary,
                       transition: 'all 0.3s ease',
                       outline: 'none'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    onFocus={(e) => e.target.style.borderColor = themeStyles.colorPrimary}
+                    onBlur={(e) => e.target.style.borderColor = themeStyles.colorBorder}
                   />
                 </div>
 
@@ -5198,7 +5266,7 @@ return (
                     marginBottom: '0.5rem',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--color-primary)',
+                    color: themeStyles.colorPrimary,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
@@ -5213,17 +5281,17 @@ return (
                     style={{
                       width: '100%',
                       padding: '1rem 1.5rem',
-                      border: '1px solid var(--color-border)',
+                      border: `1px solid ${themeStyles.colorBorder}`,
                       borderRadius: '12px',
                       fontSize: '1rem',
                       fontWeight: '500',
-                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-                      color: 'var(--color-text-primary)',
+                      background: `linear-gradient(135deg, ${themeStyles.colorBgPrimary} 0%, ${themeStyles.colorBgSecondary} 100%)`,
+                      color: themeStyles.colorTextPrimary,
                       transition: 'all 0.3s ease',
                       outline: 'none'
                     }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    onFocus={(e) => e.target.style.borderColor = themeStyles.colorPrimary}
+                    onBlur={(e) => e.target.style.borderColor = themeStyles.colorBorder}
                   />
                 </div>
 
@@ -5238,13 +5306,13 @@ return (
                       padding: '1.5rem 2rem',
                       fontSize: '1.2rem',
                       fontWeight: '700',
-                      background: 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))',
+                      background: `linear-gradient(135deg, ${themeStyles.colorSuccess}, #047857)`,
                       color: 'white',
                       border: 'none',
                       borderRadius: '16px',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
-                      boxShadow: 'var(--shadow-lg)',
+                      boxShadow: themeStyles.shadowLg,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -5260,23 +5328,23 @@ return (
 
             {/* Section Historique des opérations */}
             <div style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-xl)',
-              boxShadow: 'var(--shadow-lg)',
+              background: themeStyles.colorSurface,
+              border: `1px solid ${themeStyles.colorBorder}`,
+              borderRadius: '16px',
+              boxShadow: themeStyles.shadowLg,
               padding: '2rem',
               textAlign: 'center'
             }}>
               <h3 style={{
                 fontSize: '1.5rem',
                 fontWeight: '700',
-                color: 'var(--color-primary)',
+                color: themeStyles.colorPrimary,
                 marginBottom: '1rem'
               }}>
                 📊 Historique des opérations
               </h3>
               <p style={{
-                color: 'var(--color-text-secondary)',
+                color: themeStyles.colorTextSecondary,
                 fontSize: '1rem',
                 margin: 0
               }}>
@@ -5386,4 +5454,26 @@ const fetchMovements = async () => {
     await markReturned(id);
     fetchMovements();
   };
-export default Nieuwkoop;
+*/
+
+// ❌ COMPOSANT DÉSACTIVÉ 
+// export default Nieuwkoop;
+
+export default function NieuwkoopObsolete() {
+  return (
+    <div style={{
+      padding: '2rem',
+      textAlign: 'center',
+      color: '#dc2626',
+      background: '#fef2f2',
+      border: '2px solid #dc2626',
+      borderRadius: '12px',
+      margin: '2rem'
+    }}>
+      <h1>⚠️ FICHIER OBSOLÈTE</h1>
+      <p>Ce composant Nieuwkoop est désactivé.</p>
+      <p><strong>Utiliser à la place :</strong></p>
+      <code>frontend/src/features/catalog/pages/Nieuwkoop.jsx</code>
+    </div>
+  );
+}

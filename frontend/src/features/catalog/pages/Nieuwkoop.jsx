@@ -2442,9 +2442,12 @@ return (
       setActiveSection("Stock");
       setActiveCategory("entretien");
     }}
-    className={`pl-4 py-1 text-left rounded ${
-      activeCategory === "entretien" ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-    } hover:bg-gray-100 mb-2`}
+    className={`pl-4 py-1 text-left rounded hover:bg-gray-100 mb-2 ${
+      activeCategory === "entretien" ? "font-semibold bg-green-50" : ""
+    }`}
+    style={{
+      color: activeCategory === "entretien" ? '#22c55e' : (isDark ? '#ffffff' : '#4b5563')
+    }}
   >
     🧰 Entretien
   </button>
@@ -2461,9 +2464,12 @@ return (
       setActiveSection("Stock");
       setActiveCategory("");
     }}
-    className={`pl-4 py-1 text-left rounded ${
-      !activeCategory ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-    } hover:bg-gray-100 border-b border-gray-300 mb-1`}
+    className={`pl-4 py-1 text-left rounded hover:bg-gray-100 border-b border-gray-300 mb-1 ${
+      !activeCategory ? "font-semibold bg-green-50" : ""
+    }`}
+    style={{
+      color: !activeCategory ? '#22c55e' : (isDark ? '#ffffff' : '#4b5563')
+    }}
   >
     📦 Tous les articles
   </button>
@@ -2486,11 +2492,14 @@ return (
           setActiveSection("Stock");
           setActiveCategory(key);
         }}
-        className={`pl-4 py-1 text-left rounded w-full ${
-          activeCategory === key ? "text-green-600 font-semibold bg-green-50" : "text-gray-600"
-        } hover:bg-gray-100 ${
+        className={`pl-4 py-1 text-left rounded w-full hover:bg-gray-100 ${
+          activeCategory === key ? "font-semibold bg-green-50" : ""
+        } ${
           key === 'entretien' ? 'border-b border-gray-300 mb-1' : ''
         }`}
+        style={{
+          color: activeCategory === key ? '#22c55e' : (isDark ? '#ffffff' : '#4b5563')
+        }}
       >
         {label}
       </button>
@@ -2502,9 +2511,12 @@ return (
             setActiveSection("Stock");
             setActiveCategory(subKey);
           }}
-          className={`pl-8 py-1 text-left rounded w-full text-sm ${
-            activeCategory === subKey ? "text-green-500 font-medium bg-green-50" : "text-gray-500"
-          } hover:bg-gray-50`}
+          className={`pl-8 py-1 text-left rounded w-full text-sm hover:bg-gray-50 ${
+            activeCategory === subKey ? "font-medium bg-green-50" : ""
+          }`}
+          style={{
+            color: activeCategory === subKey ? '#10b981' : (isDark ? '#ffffff' : '#6b7280')
+          }}
         >
           {subLabel}
         </button>

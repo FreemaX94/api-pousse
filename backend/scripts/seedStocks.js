@@ -12,6 +12,14 @@ const run = async () => {
   await mongoose.connect(process.env.MONGODB_URI);
   logger.log('📦 Connected to DB');
 
+  // ✅ VÉRIFIER SI DES DONNÉES EXISTENT DÉJÀ
+  const existingCount = await StockEntry.countDocuments();
+  if (existingCount > 0) {
+    logger.log(`ℹ️ ${existingCount} entrées de stock déjà présentes. Aucun seeding nécessaire.`);
+    mongoose.disconnect();
+    return;
+  }
+
   let total = 0;
 
   for (const categorie of CATEGORIES) {
