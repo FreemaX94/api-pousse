@@ -28,6 +28,12 @@ if (Test-Path "backend\uploads") {
     Copy-Item -Recurse backend\uploads "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
 }
 
+# Vérifier que le build frontend existe
+if (-Not (Test-Path "frontend\dist")) {
+    Write-Host "ERREUR: Le build frontend n'existe pas" -ForegroundColor Red
+    exit 1
+}
+
 # Supprimer les anciens builds (mais pas le dossier uploads)
 Remove-Item -Recurse -Force backend\public\* -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend\dist\* -ErrorAction SilentlyContinue
@@ -39,6 +45,8 @@ Copy-Item -Recurse frontend\dist\* backend\dist\
 # RESTAURATION DES IMAGES D'ARTICLES EXTERNES
 if (Test-Path "$env:TEMP\backup_uploads") {
     Write-Host "Restauration des images d'articles externes..." -ForegroundColor Green
+    # Supprimer le dossier uploads actuel et restaurer depuis la sauvegarde
+    Remove-Item -Recurse -Force backend\uploads -ErrorAction SilentlyContinue
     Copy-Item -Recurse "$env:TEMP\backup_uploads" backend\uploads -Force
     Remove-Item -Recurse -Force "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
     Write-Host "Images restaurees avec succes" -ForegroundColor Green
