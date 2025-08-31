@@ -77,6 +77,13 @@ try {
   console.log('⚠️ Middlewares monitoring non disponibles:', error.message);
 }
 
+// Servir les fichiers statiques AVANT les routes de domaines
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Servir les images des articles externes depuis le dossier persistant
+app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
+
 /**
  * ARCHITECTURE DDD - Montage des domaines
  * Chaque domaine gère ses propres routes, contrôleurs, services et modèles
@@ -215,12 +222,7 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// Servir les fichiers statiques AVANT les routes
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, '../dist')));
-
-// Servir les images des articles externes depuis le dossier persistant
-app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
+// Ces middlewares sont maintenant définis au début de l'application
 
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
