@@ -77,15 +77,6 @@ try {
   console.log('⚠️ Middlewares monitoring non disponibles:', error.message);
 }
 
-// Servir les fichiers statiques AVANT les routes de domaines
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, '../dist')));
-
-// Servir spécifiquement le dossier assets avec le bon chemin
-app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
-
-// Servir les images des articles externes depuis le dossier persistant
-app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
 
 /**
  * ARCHITECTURE DDD - Montage des domaines
@@ -183,14 +174,8 @@ function setupDomains() {
     
     // Fallback pour React SPA (doit être en dernier après toutes les routes API)
     app.get('*', (req, res) => {
-      // Ne pas intercepter les requêtes pour les assets (JS, CSS, etc.)
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'Route API non trouvée' });
-      }
-      
-      // Laisser les assets statiques être servis par express.static
-      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
-        return res.status(404).json({ error: 'Asset non trouvé' });
       }
       
       let indexPath = path.join(__dirname, '../dist', 'index.html');
@@ -225,7 +210,15 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// Ces middlewares sont maintenant définis au début de l'application
+// Servir les fichiers statiques AVANT les routes
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Servir spécifiquement le dossier assets avec le bon chemin
+app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
+
+// Servir les images des articles externes depuis le dossier persistant
+app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
 
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
