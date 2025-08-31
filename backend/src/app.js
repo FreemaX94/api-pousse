@@ -173,8 +173,14 @@ function setupDomains() {
     
     // Fallback pour React SPA (doit être en dernier après toutes les routes API)
     app.get('*', (req, res) => {
+      // Ne pas intercepter les requêtes pour les assets (JS, CSS, etc.)
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'Route API non trouvée' });
+      }
+      
+      // Laisser les assets statiques être servis par express.static
+      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
+        return res.status(404).json({ error: 'Asset non trouvé' });
       }
       
       let indexPath = path.join(__dirname, '../dist', 'index.html');
