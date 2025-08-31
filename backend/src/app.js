@@ -81,6 +81,9 @@ try {
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../dist')));
 
+// Servir spécifiquement le dossier assets avec le bon chemin
+app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
+
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
 
