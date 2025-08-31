@@ -9,6 +9,13 @@ backend/.env
 frontend/.env
 
 # Build output
+frontend/dist/
+backend/dist/
+backend/public/
+
+# Uploads d'images (garder la structure mais ignorer le contenu)
+backend/uploads/movements/*
+!backend/uploads/movements/.gitkeep
 
 # Coverage reports
 backend/coverage/

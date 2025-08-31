@@ -8,7 +8,8 @@ const { celebrate, Segments, Joi } = require('celebrate');
 const router = express.Router();
 
 // Configuration multer pour les images de mouvements
-const uploadDir = path.join(__dirname, '../../../../public/movements');
+// Utiliser un dossier persistant en dehors de public/ pour éviter la suppression lors des builds
+const uploadDir = path.join(__dirname, '../../../../uploads/movements');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
