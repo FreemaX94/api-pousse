@@ -6,17 +6,8 @@ services:
       repo: FreemaX94/api-pousse
       branch: main
     run_command: npm start
-    build_command: npm run build
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
     routes:
       - path: /
-  - name: static-files
-    source_dir: backend/public
-    github:
-      repo: FreemaX94/api-pousse
-      branch: main
-    environment_slug: static
-    routes:
-      - path: /assets

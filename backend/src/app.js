@@ -193,12 +193,42 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// Servir les fichiers statiques AVANT les routes - CONFIGURATION SIMPLE QUI MARCHAIT
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, '../dist')));
+// DEBUG FINAL - VOIR EXACTEMENT CE QUI SE PASSE
+console.log('🚨🚨🚨 FINAL DEBUG - STATIC FILES CONFIG 🚨🚨🚨');
+console.log('Current directory:', process.cwd());
+console.log('__dirname:', __dirname);
 
-// Servir spécifiquement le dossier assets avec le bon chemin
+const publicPath = path.join(__dirname, '../public');
+const distPath = path.join(__dirname, '../dist');
+const assetsPath = path.join(__dirname, '../public/assets');
+
+console.log('Public path:', publicPath, '- exists:', fs.existsSync(publicPath));
+console.log('Dist path:', distPath, '- exists:', fs.existsSync(distPath));
+console.log('Assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
+
+// Lister quelques fichiers pour vérifier
+try {
+  if (fs.existsSync(assetsPath)) {
+    const assets = fs.readdirSync(assetsPath).slice(0, 3);
+    console.log('Sample assets:', assets);
+  }
+} catch (e) {
+  console.log('Cannot read assets directory:', e.message);
+}
+
+// Servir les fichiers statiques avec TOUS les chemins possibles
+app.use(express.static(publicPath));
+app.use(express.static(distPath));
+app.use('/assets', express.static(assetsPath));
 app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
+
+// Middleware pour logger toutes les requêtes vers /assets
+app.use('/assets', (req, res, next) => {
+  console.log('🔍 Asset request:', req.url);
+  next();
+});
+
+console.log('🚨🚨🚨 END STATIC FILES CONFIG 🚨🚨🚨');
 
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
