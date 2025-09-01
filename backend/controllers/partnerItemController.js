@@ -3,7 +3,7 @@ const PartnerItem = require('../models/partnerItemModel');
 // 📥 Créer un article partenaire
 exports.createPartnerItem = async (req, res) => {
   try {
-    const { reference, name, quantity, price, image, note } = req.body;
+    const { reference, name, quantity, stockType, price, image, note } = req.body;
 
     if (!reference || !name) {
       return res.status(400).json({ error: 'Nom et référence requis' });
@@ -13,6 +13,7 @@ exports.createPartnerItem = async (req, res) => {
       reference,
       name,
       quantity: quantity || 1,
+      stockType: stockType || 'permanent',
       price: price || 0,
       image,
       note: note || '',

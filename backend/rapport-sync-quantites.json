@@ -1,0 +1,2708 @@
+{
+  "timestamp": "2025-09-01T21:23:26.061Z",
+  "totalExcel": 35,
+  "totalMongo": 33,
+  "synchronized": 33,
+  "matches": 35,
+  "noMatches": 0,
+  "details": {
+    "syncResults": [
+      {
+        "excel": {
+          "ligne": 2,
+          "article": "Vase en céramique framboise Ø10cm H18cm",
+          "quantiteExcel": 6,
+          "nom": "Vase en céramique framboise",
+          "hauteur": 18,
+          "diametre": 10
+        },
+        "mongo": {
+          "_id": "68b54626c9dc8cd57658111e",
+          "reference": "EXT-1756710438037-9O6THTCJF",
+          "name": "Vase en céramique framboise",
+          "description": "Article externe: Vase en céramique framboise",
+          "dimensions": {
+            "height": 18,
+            "diameter": 10,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 5.16,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_j6-000039-vase-en-ceramique-framboise-d12cm-h23cm-p-image-120739-grande_1756710438008.jpg",
+              "alt": "Vase en céramique framboise",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54626c9dc8cd57658111f"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 6,
+            "lastRestocked": "2025-09-01T07:07:18.040Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:07:18.041Z",
+          "createdAt": "2025-09-01T07:07:18.045Z",
+          "updatedAt": "2025-09-01T12:17:59.761Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 6,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 3,
+          "article": "Vase en céramique bleu foncé Ø10cm H18cm",
+          "quantiteExcel": 20,
+          "nom": "Vase en céramique bleu foncé",
+          "hauteur": 18,
+          "diametre": 10
+        },
+        "mongo": {
+          "_id": "68b546bfc9dc8cd576581124",
+          "reference": "EXT-1756710591898-UQT3W4QG7",
+          "name": "Vase en céramique bleu",
+          "description": "Article externe: Vase en céramique bleu",
+          "dimensions": {
+            "height": 18,
+            "diameter": 10,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 5.16,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_j6-000046-vase-en-ceramique-bleu-fonce-d10cm-h18cm-p-image-120736-grande_1756710591864.jpg",
+              "alt": "Vase en céramique bleu",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b546bfc9dc8cd576581125"
+            }
+          ],
+          "stock": {
+            "quantity": 14,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 14,
+            "lastRestocked": "2025-09-01T07:09:51.899Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:09:51.900Z",
+          "createdAt": "2025-09-01T07:09:51.901Z",
+          "updatedAt": "2025-09-01T07:09:51.901Z",
+          "__v": 0
+        },
+        "oldQuantity": 14,
+        "newQuantity": 20,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 4,
+          "article": "Vase en verre strié gris Ø9,5cm H25cm",
+          "quantiteExcel": 14,
+          "nom": "Vase en verre strié gris",
+          "hauteur": 25,
+          "diametre": 9.5
+        },
+        "mongo": {
+          "_id": "68b5473bc9dc8cd57658112b",
+          "reference": "EXT-1756710715751-OXUG8RUB4",
+          "name": "Vase en verre strié gris",
+          "description": "Article externe: Vase en verre strié gris",
+          "dimensions": {
+            "height": 25,
+            "diameter": 9.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 5.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a249nh-vase-en-verre-strie-gris-d95cm-h25cm-p-image-113463-grande_1756710715711.jpg",
+              "alt": "Vase en verre strié gris",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b5473bc9dc8cd57658112c"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 10,
+            "lastRestocked": "2025-09-01T07:11:55.753Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:11:55.753Z",
+          "createdAt": "2025-09-01T07:11:55.754Z",
+          "updatedAt": "2025-09-01T12:18:07.037Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 14,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 5,
+          "article": "Vase en verre fumé noir Ø16cm H19,5cm",
+          "quantiteExcel": 5,
+          "nom": "Vase en verre fumé noir",
+          "hauteur": 19.5,
+          "diametre": 16
+        },
+        "mongo": {
+          "_id": "68b54779c9dc8cd576581131",
+          "reference": "EXT-1756710777614-5AG2FWWBZ",
+          "name": "Vase en verre fumé noir",
+          "description": "Article externe: Vase en verre fumé noir",
+          "dimensions": {
+            "height": 19.5,
+            "diameter": 16,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 19.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a075p5-vase-en-verre-fume-noir-d16cm-h195cm-p-image-119631-grande_1756710777583.jpg",
+              "alt": "Vase en verre fumé noir",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54779c9dc8cd576581132"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 5,
+            "lastRestocked": "2025-09-01T07:12:57.616Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:12:57.616Z",
+          "createdAt": "2025-09-01T07:12:57.617Z",
+          "updatedAt": "2025-09-01T12:18:16.074Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 5,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 6,
+          "article": "Vase en verre bouteille violet Ø6cm H10cm (point)",
+          "quantiteExcel": 24,
+          "nom": "Vase en verre bouteille violet (point)",
+          "hauteur": 10,
+          "diametre": 6
+        },
+        "mongo": {
+          "_id": "68b54a6fc9dc8cd576581432",
+          "reference": "EXT-1756711535523-8K2Y3VUCW",
+          "name": "Vase en verre bouteille violet (point)",
+          "description": "Article externe: Vase en verre bouteille violet (point)",
+          "dimensions": {
+            "height": 10,
+            "diameter": 6,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a275nh-vase-bouteille-en-verre-violet-d6cm-h10cm-p-image-117034-grande_1756711535493.jpg",
+              "alt": "Vase en verre bouteille violet (point)",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54a6fc9dc8cd576581433"
+            }
+          ],
+          "stock": {
+            "quantity": 24,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 24,
+            "lastRestocked": "2025-09-01T07:25:35.526Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:25:35.526Z",
+          "createdAt": "2025-09-01T07:25:35.529Z",
+          "updatedAt": "2025-09-01T07:25:35.529Z",
+          "__v": 0
+        },
+        "oldQuantity": 24,
+        "newQuantity": 24,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 7,
+          "article": "Vase en verre bouteille vert Ø6cm H10cm (point)",
+          "quantiteExcel": 24,
+          "nom": "Vase en verre bouteille vert (point)",
+          "hauteur": 10,
+          "diametre": 6
+        },
+        "mongo": {
+          "_id": "68b54b2ac9dc8cd576581438",
+          "reference": "EXT-1756711722633-AOKAN12IK",
+          "name": "Vase en verre bouteille vert (point)",
+          "description": "Article externe: Vase en verre bouteille vert (point)",
+          "dimensions": {
+            "height": 10,
+            "diameter": 6,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_jo-000021-vase-bouteille-en-verre-vert-olive-d6cm-h10cm-p-image-121032-grande_1_1756711722605.jpg",
+              "alt": "Vase en verre bouteille vert (point)",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54b2ac9dc8cd576581439"
+            }
+          ],
+          "stock": {
+            "quantity": 24,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 24,
+            "lastRestocked": "2025-09-01T07:28:42.635Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:28:42.635Z",
+          "createdAt": "2025-09-01T07:28:42.637Z",
+          "updatedAt": "2025-09-01T07:28:42.637Z",
+          "__v": 0
+        },
+        "oldQuantity": 24,
+        "newQuantity": 24,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 8,
+          "article": "Vase en verre rond bleu Ø10,5cm H8,5cm",
+          "quantiteExcel": 23,
+          "nom": "Vase en verre rond bleu",
+          "hauteur": 8.5,
+          "diametre": 10.5
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "name": "Vase en verre rond bleu foncé",
+          "description": "Article externe: Vase en verre rond bleu foncé",
+          "dimensions": {
+            "height": 8.5,
+            "diameter": 10.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a279nh-vase-bouteille-en-verre-bleu-fonce-d105cm-h85cm-p-image-117040-grande_1756711799863.jpg",
+              "alt": "Vase en verre rond bleu foncé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54b77c9dc8cd57658143e"
+            }
+          ],
+          "stock": {
+            "quantity": 22,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 22,
+            "lastRestocked": "2025-09-01T07:29:59.901Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:29:59.902Z",
+          "createdAt": "2025-09-01T07:29:59.903Z",
+          "updatedAt": "2025-09-01T07:29:59.903Z",
+          "__v": 0
+        },
+        "oldQuantity": 22,
+        "newQuantity": 23,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 9,
+          "article": "Vase en verre rond bleu Ø10,5cm H8,5cm",
+          "quantiteExcel": 24,
+          "nom": "Vase en verre rond bleu",
+          "hauteur": 8.5,
+          "diametre": 10.5
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "name": "Vase en verre rond bleu foncé",
+          "description": "Article externe: Vase en verre rond bleu foncé",
+          "dimensions": {
+            "height": 8.5,
+            "diameter": 10.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a279nh-vase-bouteille-en-verre-bleu-fonce-d105cm-h85cm-p-image-117040-grande_1756711799863.jpg",
+              "alt": "Vase en verre rond bleu foncé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54b77c9dc8cd57658143e"
+            }
+          ],
+          "stock": {
+            "quantity": 22,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 22,
+            "lastRestocked": "2025-09-01T07:29:59.901Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:29:59.902Z",
+          "createdAt": "2025-09-01T07:29:59.903Z",
+          "updatedAt": "2025-09-01T07:29:59.903Z",
+          "__v": 0
+        },
+        "oldQuantity": 22,
+        "newQuantity": 24,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 10,
+          "article": "Vase en verre rond violet Ø10,5cm H8,5cm",
+          "quantiteExcel": 24,
+          "nom": "Vase en verre rond violet",
+          "hauteur": 8.5,
+          "diametre": 10.5
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "name": "Vase en verre rond bleu foncé",
+          "description": "Article externe: Vase en verre rond bleu foncé",
+          "dimensions": {
+            "height": 8.5,
+            "diameter": 10.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a279nh-vase-bouteille-en-verre-bleu-fonce-d105cm-h85cm-p-image-117040-grande_1756711799863.jpg",
+              "alt": "Vase en verre rond bleu foncé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54b77c9dc8cd57658143e"
+            }
+          ],
+          "stock": {
+            "quantity": 22,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 22,
+            "lastRestocked": "2025-09-01T07:29:59.901Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:29:59.902Z",
+          "createdAt": "2025-09-01T07:29:59.903Z",
+          "updatedAt": "2025-09-01T07:29:59.903Z",
+          "__v": 0
+        },
+        "oldQuantity": 22,
+        "newQuantity": 24,
+        "updated": false
+      },
+      {
+        "excel": {
+          "ligne": 11,
+          "article": "Vase en verre rond rouge Ø10,5cm H8,5cm",
+          "quantiteExcel": 36,
+          "nom": "Vase en verre rond rouge",
+          "hauteur": 8.5,
+          "diametre": 10.5
+        },
+        "mongo": {
+          "_id": "68b54f76c9dc8cd576581555",
+          "reference": "EXT-1756712822536-UGAYEVFO2",
+          "name": "Vase en verre rond rouge bordeaux",
+          "description": "Article externe: Vase en verre rond rouge bordeaux",
+          "dimensions": {
+            "height": 8.5,
+            "diameter": 10.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.06,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a280nh-vase-bouteille-en-verre-bordeaux-d105cm-h85cm-p-image-117042-grande_1756712822523.jpg",
+              "alt": "Vase en verre rond rouge bordeaux",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54f76c9dc8cd576581556"
+            }
+          ],
+          "stock": {
+            "quantity": 36,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 36,
+            "lastRestocked": "2025-09-01T07:47:02.537Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:47:02.538Z",
+          "createdAt": "2025-09-01T07:47:02.539Z",
+          "updatedAt": "2025-09-01T07:47:02.539Z",
+          "__v": 0
+        },
+        "oldQuantity": 36,
+        "newQuantity": 36,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 12,
+          "article": "Vase en verre rond vert Ø10,5cm H8,5cm",
+          "quantiteExcel": 36,
+          "nom": "Vase en verre rond vert",
+          "hauteur": 8.5,
+          "diametre": 10.5
+        },
+        "mongo": {
+          "_id": "68b54f5dc9dc8cd576581550",
+          "reference": "EXT-1756712797287-FOPSCTQM6",
+          "name": "Vase en verre rond vert",
+          "description": "Article externe: Vase en verre rond vert",
+          "dimensions": {
+            "height": 8.5,
+            "diameter": 10.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_jo-000003-vase-bouteille-en-verre-vert-olive-d105cm-h85cm-p-image-121017-grande_1756712797260.jpg",
+              "alt": "Vase en verre rond vert",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54f5dc9dc8cd576581551"
+            }
+          ],
+          "stock": {
+            "quantity": 36,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 36,
+            "lastRestocked": "2025-09-01T07:46:37.289Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:46:37.289Z",
+          "createdAt": "2025-09-01T07:46:37.291Z",
+          "updatedAt": "2025-09-01T07:46:37.291Z",
+          "__v": 0
+        },
+        "oldQuantity": 36,
+        "newQuantity": 36,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 13,
+          "article": "Vase bouteille strié bleu Ø6,5cm H11cm",
+          "quantiteExcel": 48,
+          "nom": "Vase bouteille strié bleu",
+          "hauteur": 11,
+          "diametre": 6.5
+        },
+        "mongo": {
+          "_id": "68b54fa9c9dc8cd57658155a",
+          "reference": "EXT-1756712873097-WL3FEQXCY",
+          "name": "Vase bouteille strié bleu pétrole",
+          "description": "Article externe: Vase bouteille strié bleu pétrole",
+          "dimensions": {
+            "height": 11,
+            "diameter": 6.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.06,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a264nh-vase-bouteille-en-verre-bleu-d65cm-h11cm-p-image-115654-grande_1756712873060.jpg",
+              "alt": "Vase bouteille strié bleu pétrole",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54fa9c9dc8cd57658155b"
+            }
+          ],
+          "stock": {
+            "quantity": 43,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 43,
+            "lastRestocked": "2025-09-01T07:47:53.098Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:47:53.099Z",
+          "createdAt": "2025-09-01T07:47:53.100Z",
+          "updatedAt": "2025-09-01T07:47:53.100Z",
+          "__v": 0
+        },
+        "oldQuantity": 43,
+        "newQuantity": 48,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 14,
+          "article": "Vase bouteille strié bleu Ø7cm H12cm",
+          "quantiteExcel": 36,
+          "nom": "Vase bouteille strié bleu",
+          "hauteur": 12,
+          "diametre": 7
+        },
+        "mongo": {
+          "_id": "68b54fe8c9dc8cd57658155f",
+          "reference": "EXT-1756712936148-J1F01C0B6",
+          "name": "Vase bouteille strié bleu pétrole (cylindre)",
+          "description": "Article externe: Vase bouteille strié bleu pétrole (cylindre)",
+          "dimensions": {
+            "height": 12,
+            "diameter": 7,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 3.01,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a268nh-vase-bouteille-en-verre-bleu-d7cm-h12cm-p-image-115653-grande_1756712936113.jpg",
+              "alt": "Vase bouteille strié bleu pétrole (cylindre)",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54fe8c9dc8cd576581560"
+            }
+          ],
+          "stock": {
+            "quantity": 23,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 23,
+            "lastRestocked": "2025-09-01T07:48:56.150Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:48:56.150Z",
+          "createdAt": "2025-09-01T07:48:56.152Z",
+          "updatedAt": "2025-09-01T07:48:56.152Z",
+          "__v": 0
+        },
+        "oldQuantity": 23,
+        "newQuantity": 36,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 15,
+          "article": "Vase bouteille strié rouge Ø7cm H12cm",
+          "quantiteExcel": 24,
+          "nom": "Vase bouteille strié rouge",
+          "hauteur": 12,
+          "diametre": 7
+        },
+        "mongo": {
+          "_id": "68b5502bc9dc8cd576581569",
+          "reference": "EXT-1756713003229-Y00TAM6I5",
+          "name": "Vase bouteille strié rouge",
+          "description": "Article externe: Vase bouteille strié rouge",
+          "dimensions": {
+            "height": 12,
+            "diameter": 7,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a009ih-vase-bouteille-en-verre-rouge-d65cm-h11cm-p-image-117031-grande_1756713003196.jpg",
+              "alt": "Vase bouteille strié rouge",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b5502bc9dc8cd57658156a"
+            }
+          ],
+          "stock": {
+            "quantity": 43,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 43,
+            "lastRestocked": "2025-09-01T07:50:03.231Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:50:03.231Z",
+          "createdAt": "2025-09-01T07:50:03.233Z",
+          "updatedAt": "2025-09-01T07:50:03.233Z",
+          "__v": 0
+        },
+        "oldQuantity": 43,
+        "newQuantity": 24,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 16,
+          "article": "Vase bouteille strié rouge Ø6,5cm H11cm",
+          "quantiteExcel": 23,
+          "nom": "Vase bouteille strié rouge",
+          "hauteur": 11,
+          "diametre": 6.5
+        },
+        "mongo": {
+          "_id": "68b5502bc9dc8cd576581569",
+          "reference": "EXT-1756713003229-Y00TAM6I5",
+          "name": "Vase bouteille strié rouge",
+          "description": "Article externe: Vase bouteille strié rouge",
+          "dimensions": {
+            "height": 12,
+            "diameter": 7,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.56,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a009ih-vase-bouteille-en-verre-rouge-d65cm-h11cm-p-image-117031-grande_1756713003196.jpg",
+              "alt": "Vase bouteille strié rouge",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b5502bc9dc8cd57658156a"
+            }
+          ],
+          "stock": {
+            "quantity": 43,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 43,
+            "lastRestocked": "2025-09-01T07:50:03.231Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:50:03.231Z",
+          "createdAt": "2025-09-01T07:50:03.233Z",
+          "updatedAt": "2025-09-01T07:50:03.233Z",
+          "__v": 0
+        },
+        "oldQuantity": 43,
+        "newQuantity": 23,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 17,
+          "article": "Vase bouteille strié lavande Ø7cm H12cm",
+          "quantiteExcel": 12,
+          "nom": "Vase bouteille strié lavande",
+          "hauteur": 12,
+          "diametre": 7
+        },
+        "mongo": {
+          "_id": "68b58982c9dc8cd576581be6",
+          "reference": "EXT-1756727682802-3WQ86RZIO",
+          "name": "Vase bouteille strié lavande",
+          "description": "Article externe: Vase bouteille strié lavande",
+          "dimensions": {
+            "height": 12,
+            "diameter": 7,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.95,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9711_1756727682723.jpg",
+              "alt": "Vase bouteille strié lavande",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58982c9dc8cd576581be7"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T11:54:42.804Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:54:42.805Z",
+          "createdAt": "2025-09-01T11:54:42.807Z",
+          "updatedAt": "2025-09-01T11:54:42.807Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 18,
+          "article": "Vase en verre fumé vert cannelé Ø13cm H11,5cm",
+          "quantiteExcel": 6,
+          "nom": "Vase en verre fumé vert cannelé",
+          "hauteur": 11.5,
+          "diametre": 13
+        },
+        "mongo": {
+          "_id": "68b589c1c9dc8cd576581beb",
+          "reference": "EXT-1756727745721-04V0RGN9I",
+          "name": "Vase en verre fumé vert cannelé",
+          "description": "Article externe: Vase en verre fumé vert cannelé",
+          "dimensions": {
+            "height": 11.5,
+            "diameter": 13,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 0,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9707_1756727745643.jpg",
+              "alt": "Vase en verre fumé vert cannelé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b589c1c9dc8cd576581bec"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 6,
+            "lastRestocked": "2025-09-01T11:55:45.723Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:55:45.723Z",
+          "createdAt": "2025-09-01T11:55:45.725Z",
+          "updatedAt": "2025-09-01T12:18:28.068Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 6,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 19,
+          "article": "Vase en verre gris fumé cannelé Ø13cm H11,5cm",
+          "quantiteExcel": 5,
+          "nom": "Vase en verre gris fumé cannelé",
+          "hauteur": 11.5,
+          "diametre": 13
+        },
+        "mongo": {
+          "_id": "68b589e5c9dc8cd576581bf0",
+          "reference": "EXT-1756727781777-CQZ3CINNB",
+          "name": "Vase en verre gris fumé cannelé",
+          "description": "Article externe: Vase en verre gris fumé cannelé",
+          "dimensions": {
+            "height": 11.5,
+            "diameter": 13,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 4,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9708_1756727781693.jpg",
+              "alt": "Vase en verre gris fumé cannelé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b589e5c9dc8cd576581bf1"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 5,
+            "lastRestocked": "2025-09-01T11:56:21.779Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:56:21.779Z",
+          "createdAt": "2025-09-01T11:56:21.781Z",
+          "updatedAt": "2025-09-01T12:18:02.368Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 5,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 20,
+          "article": "Vase en verre transparent cannelé Ø13cm H11,5cm",
+          "quantiteExcel": 8,
+          "nom": "Vase en verre transparent cannelé",
+          "hauteur": 11.5,
+          "diametre": 13
+        },
+        "mongo": {
+          "_id": "68b58a1dc9dc8cd576581bf5",
+          "reference": "EXT-1756727837861-TJ4FI84ZY",
+          "name": "Vase en verre transparent cannelé",
+          "description": "Article externe: Vase en verre transparent cannelé",
+          "dimensions": {
+            "height": 11.5,
+            "diameter": 13,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 9.95,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_b138dq-vase-en-verre-d13cm-h115cm-p-image-111958-grande_1756727837832.jpg",
+              "alt": "Vase en verre transparent cannelé",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58a1dc9dc8cd576581bf6"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 8,
+            "lastRestocked": "2025-09-01T11:57:17.862Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:57:17.863Z",
+          "createdAt": "2025-09-01T11:57:17.865Z",
+          "updatedAt": "2025-09-01T12:18:15.013Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 8,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 21,
+          "article": "Vase en verre strié violet Ø13cm H13cm",
+          "quantiteExcel": 5,
+          "nom": "Vase en verre strié violet",
+          "hauteur": 13,
+          "diametre": 13
+        },
+        "mongo": {
+          "_id": "68b58a4bc9dc8cd576581bfa",
+          "reference": "EXT-1756727883220-4P6W1M540",
+          "name": "Vase en verre strié violet",
+          "description": "Article externe: Vase en verre strié violet",
+          "dimensions": {
+            "height": 13,
+            "diameter": 13,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 10.76,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a301w3-vase-en-verre-strie-violet-d13cm-h13cm-p-image-115687-grande_1756727883181.jpg",
+              "alt": "Vase en verre strié violet",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58a4bc9dc8cd576581bfb"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 5,
+            "lastRestocked": "2025-09-01T11:58:03.221Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:58:03.222Z",
+          "createdAt": "2025-09-01T11:58:03.224Z",
+          "updatedAt": "2025-09-01T12:18:08.772Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 5,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 22,
+          "article": "Vase en verre transparent plat Ø9cm H7cm",
+          "quantiteExcel": 8,
+          "nom": "Vase en verre transparent plat",
+          "hauteur": 7,
+          "diametre": 9
+        },
+        "mongo": {
+          "_id": "68b58a78c9dc8cd576581bff",
+          "reference": "EXT-1756727928697-3WY8TDUIE",
+          "name": "Vase en verre transparent plat",
+          "description": "Article externe: Vase en verre transparent plat",
+          "dimensions": {
+            "height": 7,
+            "diameter": 9,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 1.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_jo-000004-vase-bouteille-en-verre-transparent-d9cm-h7cm-p-image-121014-grande_1756727928666.jpg",
+              "alt": "Vase en verre transparent plat",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58a78c9dc8cd576581c00"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 8,
+            "lastRestocked": "2025-09-01T11:58:48.698Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:58:48.698Z",
+          "createdAt": "2025-09-01T11:58:48.700Z",
+          "updatedAt": "2025-09-01T12:18:24.686Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 8,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 23,
+          "article": "Vase en verre transparent Ø9cm H9cm",
+          "quantiteExcel": 8,
+          "nom": "Vase en verre transparent",
+          "hauteur": 9,
+          "diametre": 9
+        },
+        "mongo": {
+          "_id": "68b58a99c9dc8cd576581c04",
+          "reference": "EXT-1756727961008-FFFZRYK8M",
+          "name": "Vase en verre transparent",
+          "description": "Article externe: Vase en verre transparent",
+          "dimensions": {
+            "height": 9,
+            "diameter": 9,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 0,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9710_1756727960926.jpg",
+              "alt": "Vase en verre transparent",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58a99c9dc8cd576581c05"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 8,
+            "lastRestocked": "2025-09-01T11:59:21.009Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T11:59:21.009Z",
+          "createdAt": "2025-09-01T11:59:21.011Z",
+          "updatedAt": "2025-09-01T12:18:27.175Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 8,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 24,
+          "article": "Vase bouteille transparent bombé Ø10cm H14cm",
+          "quantiteExcel": 9,
+          "nom": "Vase bouteille transparent bombé",
+          "hauteur": 14,
+          "diametre": 10
+        },
+        "mongo": {
+          "_id": "68b58cf0c9dc8cd576581d5b",
+          "reference": "EXT-1756728560878-Z2OXD44A9",
+          "name": "Vase en terre cuite naturel mat",
+          "description": "Article externe: Vase en terre cuite naturel mat",
+          "dimensions": {
+            "height": 14,
+            "diameter": 10,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 0,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9715_1756728560843.jpg",
+              "alt": "Vase en terre cuite naturel mat",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58cf0c9dc8cd576581d5c"
+            }
+          ],
+          "stock": {
+            "quantity": 11,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 11,
+            "lastRestocked": "2025-09-01T12:09:20.880Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:09:20.880Z",
+          "createdAt": "2025-09-01T12:09:20.882Z",
+          "updatedAt": "2025-09-01T12:09:20.882Z",
+          "__v": 0
+        },
+        "oldQuantity": 11,
+        "newQuantity": 9,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 25,
+          "article": "Vase en verre bouteille strié transparent Ø5cm H13,5cm",
+          "quantiteExcel": 20,
+          "nom": "Vase en verre bouteille strié transparent",
+          "hauteur": 13.5,
+          "diametre": 5
+        },
+        "mongo": {
+          "_id": "68b54fe8c9dc8cd57658155f",
+          "reference": "EXT-1756712936148-J1F01C0B6",
+          "name": "Vase bouteille strié bleu pétrole (cylindre)",
+          "description": "Article externe: Vase bouteille strié bleu pétrole (cylindre)",
+          "dimensions": {
+            "height": 12,
+            "diameter": 7,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 3.01,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_a268nh-vase-bouteille-en-verre-bleu-d7cm-h12cm-p-image-115653-grande_1756712936113.jpg",
+              "alt": "Vase bouteille strié bleu pétrole (cylindre)",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54fe8c9dc8cd576581560"
+            }
+          ],
+          "stock": {
+            "quantity": 23,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 23,
+            "lastRestocked": "2025-09-01T07:48:56.150Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:48:56.150Z",
+          "createdAt": "2025-09-01T07:48:56.152Z",
+          "updatedAt": "2025-09-01T07:48:56.152Z",
+          "__v": 0
+        },
+        "oldQuantity": 23,
+        "newQuantity": 20,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 26,
+          "article": "Vase en céramique émaillée blanc Ø9cm H17cm",
+          "quantiteExcel": 6,
+          "nom": "Vase en céramique émaillée blanc",
+          "hauteur": 17,
+          "diametre": 9
+        },
+        "mongo": {
+          "_id": "68b54626c9dc8cd57658111e",
+          "reference": "EXT-1756710438037-9O6THTCJF",
+          "name": "Vase en céramique framboise",
+          "description": "Article externe: Vase en céramique framboise",
+          "dimensions": {
+            "height": 18,
+            "diameter": 10,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 5.16,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_j6-000039-vase-en-ceramique-framboise-d12cm-h23cm-p-image-120739-grande_1756710438008.jpg",
+              "alt": "Vase en céramique framboise",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b54626c9dc8cd57658111f"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 6,
+            "lastRestocked": "2025-09-01T07:07:18.040Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T07:07:18.041Z",
+          "createdAt": "2025-09-01T07:07:18.045Z",
+          "updatedAt": "2025-09-01T12:17:59.761Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 6,
+        "updated": false
+      },
+      {
+        "excel": {
+          "ligne": 27,
+          "article": "Vase en céramique émaillée olive Ø23,5cm H20cm",
+          "quantiteExcel": 12,
+          "nom": "Vase en céramique émaillée olive",
+          "hauteur": 20,
+          "diametre": 23.5
+        },
+        "mongo": {
+          "_id": "68b58adcc9dc8cd576581c09",
+          "reference": "EXT-1756728028202-3UDZDDKH0",
+          "name": "Vase en céramique émaillé olive",
+          "description": "Article externe: Vase en céramique émaillé olive",
+          "dimensions": {
+            "height": 20,
+            "diameter": 23.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 23.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_j6-000011-vase-en-ceramique-vert-olive-d235cm-h20cm-p-image-120924-grande_1756728028161.jpg",
+              "alt": "Vase en céramique émaillé olive",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58adcc9dc8cd576581c0a"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T12:00:28.203Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:00:28.203Z",
+          "createdAt": "2025-09-01T12:00:28.205Z",
+          "updatedAt": "2025-09-01T12:00:28.205Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 28,
+          "article": "Vase en céramique émaillée crème Ø23,5cm H20cm",
+          "quantiteExcel": 9,
+          "nom": "Vase en céramique émaillée crème",
+          "hauteur": 20,
+          "diametre": 23.5
+        },
+        "mongo": {
+          "_id": "68b58b08c9dc8cd576581c0e",
+          "reference": "EXT-1756728072973-EPJCV3VIW",
+          "name": "Vase en céramique émaillé crème",
+          "description": "Article externe: Vase en céramique émaillé crème",
+          "dimensions": {
+            "height": 20,
+            "diameter": 23.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 23.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_j6-000009-vase-en-ceramique-creme-d235cm-h20cm-p-image-120925-grande_1756728072939.jpg",
+              "alt": "Vase en céramique émaillé crème",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58b08c9dc8cd576581c0f"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 9,
+            "lastRestocked": "2025-09-01T12:01:12.974Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:01:12.975Z",
+          "createdAt": "2025-09-01T12:01:12.976Z",
+          "updatedAt": "2025-09-01T12:18:17.277Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 9,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 29,
+          "article": "Vase en céramique émaillée crème haut Ø25cm H29,5cm",
+          "quantiteExcel": 2,
+          "nom": "Vase en céramique émaillée crème haut",
+          "hauteur": 29.5,
+          "diametre": 25
+        },
+        "mongo": {
+          "_id": "68b58b43c9dc8cd576581c13",
+          "reference": "EXT-1756728131909-JJV7UUNQR",
+          "name": "Vase en céramique émaillé crème haut",
+          "description": "Article externe: Vase en céramique émaillé crème haut",
+          "dimensions": {
+            "height": 29.5,
+            "diameter": 25,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 38.4,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9703_1756728131834.jpg",
+              "alt": "Vase en céramique émaillé crème haut",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58b43c9dc8cd576581c14"
+            }
+          ],
+          "stock": {
+            "quantity": 2,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 2,
+            "lastRestocked": "2025-09-01T12:02:11.910Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:02:11.910Z",
+          "createdAt": "2025-09-01T12:02:11.911Z",
+          "updatedAt": "2025-09-01T12:33:08.835Z",
+          "__v": 0
+        },
+        "oldQuantity": 2,
+        "newQuantity": 2,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 30,
+          "article": "Vase médicis en céramique blanc brillant Ø19,5cm H25,5cm",
+          "quantiteExcel": 12,
+          "nom": "Vase médicis en céramique blanc brillant",
+          "hauteur": 25.5,
+          "diametre": 19.5
+        },
+        "mongo": {
+          "_id": "68b58b86c9dc8cd576581c18",
+          "reference": "EXT-1756728198183-QLVM14X5P",
+          "name": "Vase médicis en céramique blanc brillant S",
+          "description": "Article externe: Vase médicis en céramique blanc brillant S",
+          "dimensions": {
+            "height": 25.5,
+            "diameter": 19.5,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 13.16,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000303-vase-medicis-en-ceramique-blanc-brillant-d195cm-h255cm-p-image-121412-grande_1756728198155.jpg",
+              "alt": "Vase médicis en céramique blanc brillant S",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58b86c9dc8cd576581c19"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T12:03:18.185Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:03:18.185Z",
+          "createdAt": "2025-09-01T12:03:18.186Z",
+          "updatedAt": "2025-09-01T12:03:18.186Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 31,
+          "article": "Vase médicis en céramique blanc brillant Ø22cm H29,5cm",
+          "quantiteExcel": 12,
+          "nom": "Vase médicis en céramique blanc brillant",
+          "hauteur": 29.5,
+          "diametre": 22
+        },
+        "mongo": {
+          "_id": "68b58bbcc9dc8cd576581c1d",
+          "reference": "EXT-1756728252297-N5GM7IVD0",
+          "name": "Vase médicis en céramique blanc brillant M",
+          "description": "Article externe: Vase médicis en céramique blanc brillant M",
+          "dimensions": {
+            "height": 29.5,
+            "diameter": 22,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 23.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000304-vase-medicis-en-ceramique-blanc-brillant-d22cm-h295cm-p-image-121413-grande_1756728252265.jpg",
+              "alt": "Vase médicis en céramique blanc brillant M",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58bbcc9dc8cd576581c1e"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T12:04:12.298Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:04:12.299Z",
+          "createdAt": "2025-09-01T12:04:12.300Z",
+          "updatedAt": "2025-09-01T12:04:12.300Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 32,
+          "article": "Vase médicis en céramique blanc brillant Ø26cm H35cm",
+          "quantiteExcel": 4,
+          "nom": "Vase médicis en céramique blanc brillant",
+          "hauteur": 35,
+          "diametre": 26
+        },
+        "mongo": {
+          "_id": "68b58bdfc9dc8cd576581c22",
+          "reference": "EXT-1756728287829-E6AZ0WC88",
+          "name": "Vase médicis en céramique blanc brillant L",
+          "description": "Article externe: Vase médicis en céramique blanc brillant L",
+          "dimensions": {
+            "height": 35,
+            "diameter": 26,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 31.2,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000305-vase-medicis-en-ceramique-blanc-brillant-d26cm-h35cm-p-image-121414-grande_1756728287803.jpg",
+              "alt": "Vase médicis en céramique blanc brillant L",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58bdfc9dc8cd576581c23"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 4,
+            "lastRestocked": "2025-09-01T12:04:47.831Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:04:47.831Z",
+          "createdAt": "2025-09-01T12:04:47.832Z",
+          "updatedAt": "2025-09-01T12:18:19.975Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 4,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 33,
+          "article": "Vase médicis en céramique blanc brillant bas Ø20cm H16cm",
+          "quantiteExcel": 12,
+          "nom": "Vase médicis en céramique blanc brillant bas",
+          "hauteur": 16,
+          "diametre": 20
+        },
+        "mongo": {
+          "_id": "68b58c13c9dc8cd576581c27",
+          "reference": "EXT-1756728339575-V0RGFCJEN",
+          "name": "Vase médicis en céramique blanc brillant large S",
+          "description": "Article externe: Vase médicis en céramique blanc brillant large S",
+          "dimensions": {
+            "height": 16.5,
+            "diameter": 21,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 9.96,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000306-vase-medicis-en-ceramique-blanc-brillant-d20cm-h16cm-p-image-121415-grande_1756728339553.jpg",
+              "alt": "Vase médicis en céramique blanc brillant large S",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58c13c9dc8cd576581c28"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T12:05:39.576Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:05:39.576Z",
+          "createdAt": "2025-09-01T12:05:39.578Z",
+          "updatedAt": "2025-09-01T12:05:39.578Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 34,
+          "article": "Vase médicis en céramique blanc brillant bas Ø25cm H19,5cm",
+          "quantiteExcel": 12,
+          "nom": "Vase médicis en céramique blanc brillant bas",
+          "hauteur": 19.5,
+          "diametre": 25
+        },
+        "mongo": {
+          "_id": "68b58c5fc9dc8cd576581c2c",
+          "reference": "EXT-1756728415132-OOU599MMX",
+          "name": "Vase médicis en céramique blanc brillant large M",
+          "description": "Article externe: Vase médicis en céramique blanc brillant large M",
+          "dimensions": {
+            "height": 19.5,
+            "diameter": 25,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 11.4,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000308-vase-medicis-en-ceramique-blanc-brillant-d31cm-h23cm-p-image-121417-grande_1756728415126.jpg",
+              "alt": "Vase médicis en céramique blanc brillant large M",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58c5fc9dc8cd576581c2d"
+            }
+          ],
+          "stock": {
+            "quantity": 12,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 12,
+            "lastRestocked": "2025-09-01T12:06:55.133Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:06:55.133Z",
+          "createdAt": "2025-09-01T12:06:55.135Z",
+          "updatedAt": "2025-09-01T12:06:55.135Z",
+          "__v": 0
+        },
+        "oldQuantity": 12,
+        "newQuantity": 12,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 35,
+          "article": "Vase médicis en céramique blanc brillant bas Ø31cm H23cm",
+          "quantiteExcel": 4,
+          "nom": "Vase médicis en céramique blanc brillant bas",
+          "hauteur": 23,
+          "diametre": 31
+        },
+        "mongo": {
+          "_id": "68b58c91c9dc8cd576581c31",
+          "reference": "EXT-1756728465219-FF1TR9K9J",
+          "name": "Vase médicis en céramique blanc brillant large L",
+          "description": "Article externe: Vase médicis en céramique blanc brillant large L",
+          "dimensions": {
+            "height": 23,
+            "diameter": 31,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 28,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_nm-000308-vase-medicis-en-ceramique-blanc-brillant-d31cm-h23cm-p-image-121417-grande_1_1756728465214.jpg",
+              "alt": "Vase médicis en céramique blanc brillant large L",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58c91c9dc8cd576581c32"
+            }
+          ],
+          "stock": {
+            "quantity": 15,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 4,
+            "lastRestocked": "2025-09-01T12:07:45.220Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:07:45.220Z",
+          "createdAt": "2025-09-01T12:07:45.221Z",
+          "updatedAt": "2025-09-01T12:18:20.691Z",
+          "__v": 0
+        },
+        "oldQuantity": 15,
+        "newQuantity": 4,
+        "updated": true
+      },
+      {
+        "excel": {
+          "ligne": 36,
+          "article": "Vase terre cuite mat naturel Ø10cm H14cm",
+          "quantiteExcel": 11,
+          "nom": "Vase terre cuite mat naturel",
+          "hauteur": 14,
+          "diametre": 10
+        },
+        "mongo": {
+          "_id": "68b58cf0c9dc8cd576581d5b",
+          "reference": "EXT-1756728560878-Z2OXD44A9",
+          "name": "Vase en terre cuite naturel mat",
+          "description": "Article externe: Vase en terre cuite naturel mat",
+          "dimensions": {
+            "height": 14,
+            "diameter": 10,
+            "unit": "cm"
+          },
+          "pricing": {
+            "price": 0,
+            "currency": "EUR",
+            "minimumOrder": 1,
+            "priceRanges": []
+          },
+          "images": [
+            {
+              "url": "/movements/movement_IMG_9715_1756728560843.jpg",
+              "alt": "Vase en terre cuite naturel mat",
+              "isPrimary": true,
+              "type": "product",
+              "_id": "68b58cf0c9dc8cd576581d5c"
+            }
+          ],
+          "stock": {
+            "quantity": 11,
+            "reservedQuantity": 0,
+            "minimumAlert": 0,
+            "availableQuantity": 11,
+            "lastRestocked": "2025-09-01T12:09:20.880Z"
+          },
+          "category": "externe",
+          "tags": [],
+          "specifications": {
+            "season": "toute_saison",
+            "careLevel": "moyen",
+            "lightRequirement": "indirect",
+            "waterRequirement": "moyen",
+            "material": "autre",
+            "isOutdoor": false,
+            "isIndoor": true,
+            "isFragile": false
+          },
+          "supplier": {
+            "name": "Externe",
+            "code": "EXT",
+            "leadTime": 7
+          },
+          "availability": {
+            "status": "available",
+            "isActive": true,
+            "seasonalAvailability": []
+          },
+          "metadata": {
+            "source": "external",
+            "isExternal": true
+          },
+          "salesHistory": [],
+          "lastSync": "2025-09-01T12:09:20.880Z",
+          "createdAt": "2025-09-01T12:09:20.882Z",
+          "updatedAt": "2025-09-01T12:09:20.882Z",
+          "__v": 0
+        },
+        "oldQuantity": 11,
+        "newQuantity": 11,
+        "updated": true
+      }
+    ],
+    "noMatches": []
+  }
+}

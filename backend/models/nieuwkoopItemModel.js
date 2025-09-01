@@ -124,6 +124,11 @@ const nieuwkoopItemSchema = new Schema({
       min: [0, 'La quantité ne peut être négative'],
       index: true
     },
+    stockType: {
+      type: String,
+      enum: ['limité', 'permanent'],
+      default: 'permanent'
+    },
     reservedQuantity: {
       type: Number,
       default: 0,

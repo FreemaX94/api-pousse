@@ -119,7 +119,8 @@ exports.createNieuwkoopItem = async (req, res) => {
         isPrimary: true
       }],
       stock: {
-        quantity: typeof req.body.quantity === 'number' ? req.body.quantity : 1
+        quantity: typeof req.body.quantity === 'number' ? req.body.quantity : 1,
+        stockType: req.body.stockType || 'permanent'
       },
       category: category || 'autre'
     });

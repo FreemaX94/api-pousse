@@ -1,0 +1,915 @@
+{
+  "timestamp": "2025-09-01T21:18:36.242Z",
+  "totalExcel": 35,
+  "totalMongo": 140,
+  "matches": 34,
+  "differences": 22,
+  "excelOnly": 1,
+  "mongoOnly": 108,
+  "details": {
+    "differences": [
+      {
+        "excel": {
+          "ligne": 2,
+          "article": "Vase en céramique framboise Ø10cm H18cm",
+          "quantiteActuelle": 6,
+          "nom": "Vase en céramique framboise Ø10cm cm",
+          "hauteur": 18,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54626c9dc8cd57658111e",
+          "reference": "EXT-1756710438037-9O6THTCJF",
+          "nom": "Vase en céramique framboise",
+          "hauteur": 18,
+          "diametre": 10,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -9
+      },
+      {
+        "excel": {
+          "ligne": 3,
+          "article": "Vase en céramique bleu foncé Ø10cm H18cm",
+          "quantiteActuelle": 20,
+          "nom": "Vase en céramique bleu foncé Ø10cm cm",
+          "hauteur": 18,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b546bfc9dc8cd576581124",
+          "reference": "EXT-1756710591898-UQT3W4QG7",
+          "nom": "Vase en céramique bleu",
+          "hauteur": 18,
+          "diametre": 10,
+          "quantite": 14,
+          "source": "Externe"
+        },
+        "quantiteDiff": 6
+      },
+      {
+        "excel": {
+          "ligne": 4,
+          "article": "Vase en verre strié gris Ø9,5cm H25cm",
+          "quantiteActuelle": 14,
+          "nom": "Vase en verre strié gris Ø9,5cm cm",
+          "hauteur": 25,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b5473bc9dc8cd57658112b",
+          "reference": "EXT-1756710715751-OXUG8RUB4",
+          "nom": "Vase en verre strié gris",
+          "hauteur": 25,
+          "diametre": 9.5,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -1
+      },
+      {
+        "excel": {
+          "ligne": 5,
+          "article": "Vase en verre fumé noir Ø16cm H19,5cm",
+          "quantiteActuelle": 5,
+          "nom": "Vase en verre fumé noir Ø16cm ,5cm",
+          "hauteur": 19,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54779c9dc8cd576581131",
+          "reference": "EXT-1756710777614-5AG2FWWBZ",
+          "nom": "Vase en verre fumé noir",
+          "hauteur": 19.5,
+          "diametre": 16,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -10
+      },
+      {
+        "excel": {
+          "ligne": 8,
+          "article": "Vase en verre rond bleu Ø10,5cm H8,5cm",
+          "quantiteActuelle": 23,
+          "nom": "Vase en verre rond bleu Ø10,5cm ,5cm",
+          "hauteur": 8,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "nom": "Vase en verre rond bleu foncé",
+          "hauteur": 8.5,
+          "diametre": 10.5,
+          "quantite": 22,
+          "source": "Externe"
+        },
+        "quantiteDiff": 1
+      },
+      {
+        "excel": {
+          "ligne": 9,
+          "article": "Vase en verre rond bleu Ø10,5cm H8,5cm",
+          "quantiteActuelle": 24,
+          "nom": "Vase en verre rond bleu Ø10,5cm ,5cm",
+          "hauteur": 8,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "nom": "Vase en verre rond bleu foncé",
+          "hauteur": 8.5,
+          "diametre": 10.5,
+          "quantite": 22,
+          "source": "Externe"
+        },
+        "quantiteDiff": 2
+      },
+      {
+        "excel": {
+          "ligne": 11,
+          "article": "Vase en verre rond rouge Ø10,5cm H8,5cm",
+          "quantiteActuelle": 36,
+          "nom": "Vase en verre rond rouge Ø10,5cm ,5cm",
+          "hauteur": 8,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54b77c9dc8cd57658143d",
+          "reference": "EXT-1756711799900-47D0BZ3ST",
+          "nom": "Vase en verre rond bleu foncé",
+          "hauteur": 8.5,
+          "diametre": 10.5,
+          "quantite": 22,
+          "source": "Externe"
+        },
+        "quantiteDiff": 14
+      },
+      {
+        "excel": {
+          "ligne": 13,
+          "article": "Vase bouteille strié bleu Ø6,5cm H11cm",
+          "quantiteActuelle": 48,
+          "nom": "Vase bouteille strié bleu Ø6,5cm cm",
+          "hauteur": 11,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54fa9c9dc8cd57658155a",
+          "reference": "EXT-1756712873097-WL3FEQXCY",
+          "nom": "Vase bouteille strié bleu pétrole",
+          "hauteur": 11,
+          "diametre": 6.5,
+          "quantite": 43,
+          "source": "Externe"
+        },
+        "quantiteDiff": 5
+      },
+      {
+        "excel": {
+          "ligne": 14,
+          "article": "Vase bouteille strié bleu Ø7cm H12cm",
+          "quantiteActuelle": 36,
+          "nom": "Vase bouteille strié bleu Ø7cm cm",
+          "hauteur": 12,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b54fe8c9dc8cd57658155f",
+          "reference": "EXT-1756712936148-J1F01C0B6",
+          "nom": "Vase bouteille strié bleu pétrole (cylindre)",
+          "hauteur": 12,
+          "diametre": 7,
+          "quantite": 23,
+          "source": "Externe"
+        },
+        "quantiteDiff": 13
+      },
+      {
+        "excel": {
+          "ligne": 15,
+          "article": "Vase bouteille strié rouge Ø7cm H12cm",
+          "quantiteActuelle": 24,
+          "nom": "Vase bouteille strié rouge Ø7cm cm",
+          "hauteur": 12,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b5502bc9dc8cd576581569",
+          "reference": "EXT-1756713003229-Y00TAM6I5",
+          "nom": "Vase bouteille strié rouge",
+          "hauteur": 12,
+          "diametre": 7,
+          "quantite": 43,
+          "source": "Externe"
+        },
+        "quantiteDiff": -19
+      },
+      {
+        "excel": {
+          "ligne": 16,
+          "article": "Vase bouteille strié rouge Ø6,5cm H11cm",
+          "quantiteActuelle": 23,
+          "nom": "Vase bouteille strié rouge Ø6,5cm cm",
+          "hauteur": 11,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b5502bc9dc8cd576581569",
+          "reference": "EXT-1756713003229-Y00TAM6I5",
+          "nom": "Vase bouteille strié rouge",
+          "hauteur": 12,
+          "diametre": 7,
+          "quantite": 43,
+          "source": "Externe"
+        },
+        "quantiteDiff": -20
+      },
+      {
+        "excel": {
+          "ligne": 18,
+          "article": "Vase en verre fumé vert cannelé Ø13cm H11,5cm",
+          "quantiteActuelle": 6,
+          "nom": "Vase en verre fumé vert cannelé Ø13cm ,5cm",
+          "hauteur": 11,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b589c1c9dc8cd576581beb",
+          "reference": "EXT-1756727745721-04V0RGN9I",
+          "nom": "Vase en verre fumé vert cannelé",
+          "hauteur": 11.5,
+          "diametre": 13,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -9
+      },
+      {
+        "excel": {
+          "ligne": 19,
+          "article": "Vase en verre gris fumé cannelé Ø13cm H11,5cm",
+          "quantiteActuelle": 5,
+          "nom": "Vase en verre gris fumé cannelé Ø13cm ,5cm",
+          "hauteur": 11,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b589e5c9dc8cd576581bf0",
+          "reference": "EXT-1756727781777-CQZ3CINNB",
+          "nom": "Vase en verre gris fumé cannelé",
+          "hauteur": 11.5,
+          "diametre": 13,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -10
+      },
+      {
+        "excel": {
+          "ligne": 20,
+          "article": "Vase en verre transparent cannelé Ø13cm H11,5cm",
+          "quantiteActuelle": 8,
+          "nom": "Vase en verre transparent cannelé Ø13cm ,5cm",
+          "hauteur": 11,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58a1dc9dc8cd576581bf5",
+          "reference": "EXT-1756727837861-TJ4FI84ZY",
+          "nom": "Vase en verre transparent cannelé",
+          "hauteur": 11.5,
+          "diametre": 13,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -7
+      },
+      {
+        "excel": {
+          "ligne": 21,
+          "article": "Vase en verre strié violet Ø13cm H13cm",
+          "quantiteActuelle": 5,
+          "nom": "Vase en verre strié violet Ø13cm cm",
+          "hauteur": 13,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58a4bc9dc8cd576581bfa",
+          "reference": "EXT-1756727883220-4P6W1M540",
+          "nom": "Vase en verre strié violet",
+          "hauteur": 13,
+          "diametre": 13,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -10
+      },
+      {
+        "excel": {
+          "ligne": 22,
+          "article": "Vase en verre transparent plat Ø9cm H7cm",
+          "quantiteActuelle": 8,
+          "nom": "Vase en verre transparent plat Ø9cm cm",
+          "hauteur": 7,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58a78c9dc8cd576581bff",
+          "reference": "EXT-1756727928697-3WY8TDUIE",
+          "nom": "Vase en verre transparent plat",
+          "hauteur": 7,
+          "diametre": 9,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -7
+      },
+      {
+        "excel": {
+          "ligne": 23,
+          "article": "Vase en verre transparent Ø9cm H9cm",
+          "quantiteActuelle": 8,
+          "nom": "Vase en verre transparent Ø9cm cm",
+          "hauteur": 9,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58a99c9dc8cd576581c04",
+          "reference": "EXT-1756727961008-FFFZRYK8M",
+          "nom": "Vase en verre transparent",
+          "hauteur": 9,
+          "diametre": 9,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -7
+      },
+      {
+        "excel": {
+          "ligne": 25,
+          "article": "Vase en verre bouteille strié transparent Ø5cm H13,5cm",
+          "quantiteActuelle": 20,
+          "nom": "Vase en verre bouteille strié transparent Ø5cm ,5cm",
+          "hauteur": 13,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58a4bc9dc8cd576581bfa",
+          "reference": "EXT-1756727883220-4P6W1M540",
+          "nom": "Vase en verre strié violet",
+          "hauteur": 13,
+          "diametre": 13,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": 5
+      },
+      {
+        "excel": {
+          "ligne": 26,
+          "article": "Vase en céramique émaillée blanc Ø9cm H17cm",
+          "quantiteActuelle": 6,
+          "nom": "Vase en céramique émaillée blanc Ø9cm cm",
+          "hauteur": 17,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58c13c9dc8cd576581c27",
+          "reference": "EXT-1756728339575-V0RGFCJEN",
+          "nom": "Vase médicis en céramique blanc brillant large S",
+          "hauteur": 16.5,
+          "diametre": 21,
+          "quantite": 12,
+          "source": "Externe"
+        },
+        "quantiteDiff": -6
+      },
+      {
+        "excel": {
+          "ligne": 28,
+          "article": "Vase en céramique émaillée crème Ø23,5cm H20cm",
+          "quantiteActuelle": 9,
+          "nom": "Vase en céramique émaillée crème Ø23,5cm cm",
+          "hauteur": 20,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58adcc9dc8cd576581c09",
+          "reference": "EXT-1756728028202-3UDZDDKH0",
+          "nom": "Vase en céramique émaillé olive",
+          "hauteur": 20,
+          "diametre": 23.5,
+          "quantite": 12,
+          "source": "Externe"
+        },
+        "quantiteDiff": -3
+      },
+      {
+        "excel": {
+          "ligne": 32,
+          "article": "Vase médicis en céramique blanc brillant Ø26cm H35cm",
+          "quantiteActuelle": 4,
+          "nom": "Vase médicis en céramique blanc brillant Ø26cm cm",
+          "hauteur": 35,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58bdfc9dc8cd576581c22",
+          "reference": "EXT-1756728287829-E6AZ0WC88",
+          "nom": "Vase médicis en céramique blanc brillant L",
+          "hauteur": 35,
+          "diametre": 26,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -11
+      },
+      {
+        "excel": {
+          "ligne": 35,
+          "article": "Vase médicis en céramique blanc brillant bas Ø31cm H23cm",
+          "quantiteActuelle": 4,
+          "nom": "Vase médicis en céramique blanc brillant bas Ø31cm cm",
+          "hauteur": 23,
+          "diametre": null
+        },
+        "mongo": {
+          "_id": "68b58c91c9dc8cd576581c31",
+          "reference": "EXT-1756728465219-FF1TR9K9J",
+          "nom": "Vase médicis en céramique blanc brillant large L",
+          "hauteur": 23,
+          "diametre": 31,
+          "quantite": 15,
+          "source": "Externe"
+        },
+        "quantiteDiff": -11
+      }
+    ],
+    "excelOnly": [
+      {
+        "ligne": 24,
+        "article": "Vase bouteille transparent bombé Ø10cm H14cm",
+        "quantiteActuelle": 9,
+        "nom": "Vase bouteille transparent bombé Ø10cm cm",
+        "hauteur": 14,
+        "diametre": null
+      }
+    ],
+    "mongoOnly": [
+      {
+        "_id": "689d909675fe850ff8c53cb4",
+        "reference": "6DLIAW417",
+        "nom": "Grigio",
+        "hauteur": 68,
+        "diametre": 30,
+        "quantite": 2,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d936675fe850ff8c53e06",
+        "reference": "6PURR80LW",
+        "nom": "Pure®",
+        "hauteur": 70,
+        "diametre": 78,
+        "quantite": 10,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9a1f75fe850ff8c53e8e",
+        "reference": "6DLIAB967",
+        "nom": "Argento",
+        "hauteur": 64,
+        "diametre": 26,
+        "quantite": 20,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9ae075fe850ff8c53f1d",
+        "reference": "6DLIAB812",
+        "nom": "Argento",
+        "hauteur": 68,
+        "diametre": 30,
+        "quantite": 14,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9bda75fe850ff8c53fc5",
+        "reference": "6FSTGWJE4",
+        "nom": "Fiberstone",
+        "hauteur": 44,
+        "diametre": 50,
+        "quantite": 14,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9ca575fe850ff8c54033",
+        "reference": "6FSTBWJ08",
+        "nom": "Cement & Stone",
+        "hauteur": 45,
+        "diametre": 50,
+        "quantite": 9,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9e4975fe850ff8c54090",
+        "reference": "6FSTGWBO62",
+        "nom": "Fiberstone",
+        "hauteur": 61,
+        "diametre": 48,
+        "quantite": 7,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689d9f6e75fe850ff8c5412b",
+        "reference": "6BSTC4040",
+        "nom": "B-round",
+        "hauteur": 40,
+        "diametre": 40,
+        "quantite": 9,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da00575fe850ff8c54192",
+        "reference": "6FSTGWB55",
+        "nom": "Fiberstone",
+        "hauteur": 55,
+        "diametre": 40,
+        "quantite": 5,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da07975fe850ff8c541ec",
+        "reference": "6FSTRBG03",
+        "nom": "Fiberstone",
+        "hauteur": 55,
+        "diametre": 40,
+        "quantite": 1,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da0bf75fe850ff8c5420e",
+        "reference": "6CILH4040",
+        "nom": "Cylinder",
+        "hauteur": 40,
+        "diametre": 40,
+        "quantite": 3,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da0fd75fe850ff8c54266",
+        "reference": "6PPNB36BB",
+        "nom": "Bohemian",
+        "hauteur": 36,
+        "diametre": 37,
+        "quantite": 5,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da19775fe850ff8c542c9",
+        "reference": "6PTR62356",
+        "nom": "Jip",
+        "hauteur": 31,
+        "diametre": 37,
+        "quantite": 9,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da80e75fe850ff8c54355",
+        "reference": "6TERPA700",
+        "nom": "Terra Cotta",
+        "hauteur": 70,
+        "diametre": 36,
+        "quantite": 7,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da85c75fe850ff8c543b9",
+        "reference": "6TDBA3532",
+        "nom": "Terra Cotta",
+        "hauteur": 32,
+        "diametre": 35,
+        "quantite": 4,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da89e75fe850ff8c54414",
+        "reference": "6TERDT033",
+        "nom": "Terra Cotta Doppio",
+        "hauteur": 29,
+        "diametre": 33,
+        "quantite": 5,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da8f375fe850ff8c54467",
+        "reference": "6TERKC055",
+        "nom": "Terra Cotta Kevin",
+        "hauteur": 50,
+        "diametre": 55,
+        "quantite": 20,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da92575fe850ff8c54515",
+        "reference": "6TEROC045",
+        "nom": "Terra Cotta Omar",
+        "hauteur": 40,
+        "diametre": 45,
+        "quantite": 6,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da99675fe850ff8c5458e",
+        "reference": "6TS171712",
+        "nom": "Palermo",
+        "hauteur": 32,
+        "diametre": 35,
+        "quantite": 23,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689da9de75fe850ff8c546b3",
+        "reference": "6TS171711",
+        "nom": "Palermo",
+        "hauteur": 28,
+        "diametre": 30,
+        "quantite": 41,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689daada75fe850ff8c547be",
+        "reference": "6TS171710",
+        "nom": "Palermo",
+        "hauteur": 25,
+        "diametre": 27,
+        "quantite": 85,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dab5175fe850ff8c5497d",
+        "reference": "6PPNERC24",
+        "nom": "Rough",
+        "hauteur": 28,
+        "diametre": 32,
+        "quantite": 1,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dad9575fe850ff8c549f8",
+        "reference": "6FSTRD030",
+        "nom": "Fiberstone",
+        "hauteur": 44,
+        "diametre": 34,
+        "quantite": 4,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dadcc75fe850ff8c54a77",
+        "reference": "6TERCX300",
+        "nom": "Terra Cotta",
+        "hauteur": 26,
+        "diametre": 30,
+        "quantite": 34,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dadf275fe850ff8c54b4e",
+        "reference": "6FSTBO002",
+        "nom": "Natural",
+        "hauteur": 33,
+        "diametre": 40,
+        "quantite": 10,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689daeb775fe850ff8c54c74",
+        "reference": "6RDPBE079",
+        "nom": "Baq Raindrop",
+        "hauteur": 79,
+        "diametre": 42,
+        "quantite": 4,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689db13575fe850ff8c54ff8",
+        "reference": "6ARTBOZ29",
+        "nom": "Artstone",
+        "hauteur": 29,
+        "diametre": 33,
+        "quantite": 2,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dc81375fe850ff8c55359",
+        "reference": "6FSTMWMA4",
+        "nom": "Fiberstone",
+        "hauteur": 43,
+        "diametre": 43,
+        "quantite": 6,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dc8ff75fe850ff8c553f0",
+        "reference": "6FSTRMB43",
+        "nom": "Fiberstone",
+        "hauteur": 43,
+        "diametre": 43,
+        "quantite": 11,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dca8575fe850ff8c5550b",
+        "reference": "6TERKT037",
+        "nom": "Terra Cotta Kevin",
+        "hauteur": 34,
+        "diametre": 37,
+        "quantite": 47,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dcbb875fe850ff8c55649",
+        "reference": "6FSTGWBU3",
+        "nom": "Fiberstone",
+        "hauteur": 35,
+        "diametre": 40,
+        "quantite": 19,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dccfc75fe850ff8c556d5",
+        "reference": "6TS171723",
+        "nom": "Palermo",
+        "hauteur": 36,
+        "diametre": 40,
+        "quantite": 30,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dcd3075fe850ff8c557d8",
+        "reference": "6TS171721",
+        "nom": "Palermo",
+        "hauteur": 28,
+        "diametre": 30,
+        "quantite": 20,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dd0bc75fe850ff8c559e5",
+        "reference": "6DLIAB804",
+        "nom": "Argento",
+        "hauteur": 50,
+        "diametre": 50,
+        "quantite": 1,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dd12375fe850ff8c55a97",
+        "reference": "6FSTMWBO2",
+        "nom": "Fiberstone",
+        "hauteur": 45,
+        "diametre": 35,
+        "quantite": 10,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dd15875fe850ff8c55b64",
+        "reference": "6FSTRBOB5",
+        "nom": "Fiberstone",
+        "hauteur": 45,
+        "diametre": 35,
+        "quantite": 1,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dd44475fe850ff8c55ca4",
+        "reference": "6BSTD3842",
+        "nom": "B-round",
+        "hauteur": 42,
+        "diametre": 38,
+        "quantite": 7,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "689dd4ce75fe850ff8c55eb8",
+        "reference": "6BRDC115W",
+        "nom": "B-round",
+        "hauteur": 31,
+        "diametre": 33,
+        "quantite": 19,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6aeecaf1e9c06ade97d28",
+        "reference": "6ARTBOG29",
+        "nom": "Artstone",
+        "hauteur": 29,
+        "diametre": 33,
+        "quantite": 14,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6b4efaf1e9c06ade980fb",
+        "reference": "6TEROC038",
+        "nom": "Terra Cotta Omar",
+        "hauteur": 34,
+        "diametre": 38,
+        "quantite": 20,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6be67af1e9c06ade98611",
+        "reference": "6LIMHUPT6",
+        "nom": "Humus",
+        "hauteur": 43,
+        "diametre": 37,
+        "quantite": 2,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6bf40af1e9c06ade986bb",
+        "reference": "6FSTSBG50",
+        "nom": "Fiberstone",
+        "hauteur": 50,
+        "diametre": 45,
+        "quantite": 2,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6bfa0af1e9c06ade98729",
+        "reference": "6FSTBWJ06",
+        "nom": "Cement & Stone",
+        "hauteur": 36,
+        "diametre": 42,
+        "quantite": 3,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c4b8af1e9c06ade98963",
+        "reference": "6FSTRMB30",
+        "nom": "Fiberstone",
+        "hauteur": 30,
+        "diametre": 30,
+        "quantite": 10,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c557af1e9c06ade989ea",
+        "reference": "6FSTMWMA2",
+        "nom": "Fiberstone",
+        "hauteur": 29,
+        "diametre": 29,
+        "quantite": 2,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c595af1e9c06ade98a33",
+        "reference": "6FSTRMG30",
+        "nom": "Fiberstone",
+        "hauteur": 30,
+        "diametre": 30,
+        "quantite": 3,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c6a6af1e9c06ade98a83",
+        "reference": "6FSTSBG40",
+        "nom": "Fiberstone",
+        "hauteur": 40,
+        "diametre": 38,
+        "quantite": 3,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c7bdaf1e9c06ade98b65",
+        "reference": "6PPNECBXL",
+        "nom": "Rough",
+        "hauteur": 31,
+        "diametre": 32,
+        "quantite": 23,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6c9dfaf1e9c06ade98c9d",
+        "reference": "6TCWC4233",
+        "nom": "Terra Antica",
+        "hauteur": 33,
+        "diametre": 42,
+        "quantite": 9,
+        "source": "Nieuwkoop"
+      },
+      {
+        "_id": "68a6ca41af1e9c06ade98d5a",
+        "reference": "6TCWC3326",
+        "nom": "Terra Antica",
+        "hauteur": 26,
+        "diametre": 33,
+        "quantite": 9,
+        "source": "Nieuwkoop"
+      }
+    ]
+  }
+}

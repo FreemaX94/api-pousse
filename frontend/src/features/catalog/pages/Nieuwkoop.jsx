@@ -4487,21 +4487,11 @@ return (
                                 </div>
 
                                 {/* Pastille Stock Permanent */}
-                                <div 
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    const currentQuantity = prod.quantity || 0;
-                                    const isCurrentlyPermanent = currentQuantity > 10;
-                                    const newQuantity = isCurrentlyPermanent ? 5 : 15; // Bascule entre 5 (limité) et 15 (permanent)
-                                    
-                                    console.log('🏷️ Basculement stock:', isCurrentlyPermanent ? 'Permanent → Limité' : 'Limité → Permanent');
-                                    updateQuantity(prod._id, newQuantity);
-                                  }}
+                                <div
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    background: (prod.quantity || 0) > 10 ? 'var(--color-primary)' : 'var(--color-warning)',
+                                    background: (prod.stockType === 'permanent') ? 'var(--color-primary)' : 'var(--color-warning)',
                                     color: 'white',
                                     padding: '0.25rem 0.6rem',
                                     borderRadius: '12px',
@@ -4509,23 +4499,13 @@ return (
                                     fontWeight: '600',
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.5px',
-                                    boxShadow: (prod.quantity || 0) > 10 ? 
+                                    boxShadow: (prod.stockType === 'permanent') ? 
                                       '0 2px 8px rgba(217, 119, 6, 0.3)' : 
                                       '0 2px 8px rgba(234, 179, 8, 0.3)',
-                                    cursor: 'pointer',
+                                    cursor: 'default',
                                     transition: 'all 0.2s ease'
                                   }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.transform = 'scale(1.05)';
-                                    e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.transform = 'scale(1)';
-                                    e.target.style.boxShadow = (prod.quantity || 0) > 10 ? 
-                                      '0 2px 8px rgba(217, 119, 6, 0.3)' : 
-                                      '0 2px 8px rgba(234, 179, 8, 0.3)';
-                                  }}
-                                  title={`Cliquer pour basculer vers ${(prod.quantity || 0) > 10 ? 'Stock Limité' : 'Stock Permanent'}`}
+                                  title={`Type de stock: ${prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}`}
                                 >
                                   <div style={{
                                     width: '6px',
@@ -4534,7 +4514,7 @@ return (
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     marginRight: '0.4rem'
                                   }}></div>
-                                  {(prod.quantity || 0) > 10 ? 'Stock Permanent' : 'Stock Limité'}
+                                  {prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}
                                 </div>
                               </div>
                             </div>
@@ -5304,9 +5284,9 @@ return (
                                 justifyContent: 'center',
                                 flexShrink: 0
                               }}>
-{item.reference ? (
+{item.image ? (
                                   <img
-                                    src={`/api/catalog/nieuwkoop/items/${item.reference}/image`}
+                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : item.image}
                                     alt={item.name}
                                     style={{
                                       width: '100%',
@@ -5323,7 +5303,7 @@ return (
                                   style={{ 
                                     fontSize: '1.5rem', 
                                     opacity: 0.5,
-                                    display: item.reference ? 'none' : 'flex',
+                                    display: item.image ? 'none' : 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     width: '100%',

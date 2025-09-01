@@ -218,7 +218,7 @@ app.use(express.static(path.join(__dirname, '../dist')));
 app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
 
 // Servir les images des articles externes depuis le dossier persistant
-app.use('/movements', express.static(path.join(__dirname, '../uploads/movements')));
+app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
 
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {

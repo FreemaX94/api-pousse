@@ -7,6 +7,7 @@ const partnerItemSchema = new mongoose.Schema(
     reference: { type: String, required: true },
     name: { type: String, required: true },
     quantity: { type: Number, default: 1, min: 1 },
+    stockType: { type: String, enum: ['limité', 'permanent'], default: 'permanent' },
     price: { type: Number, required: true },
     image: { type: String }, // base64
     note: { type: String, default: '' },

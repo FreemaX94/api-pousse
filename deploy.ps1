@@ -20,12 +20,24 @@ Write-Host "Copie du build dans backend/public et backend/dist..." -ForegroundCo
 Set-Location ..
 
 # SAUVEGARDE DES IMAGES D'ARTICLES EXTERNES
+Write-Host "Sauvegarde des images d'articles externes..." -ForegroundColor Green
+
+# Sauvegarder backend/uploads
 if (Test-Path "backend\uploads") {
-    Write-Host "Sauvegarde des images d'articles externes..." -ForegroundColor Green
     if (Test-Path "$env:TEMP\backup_uploads") {
         Remove-Item -Recurse -Force "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
     }
     Copy-Item -Recurse backend\uploads "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
+    Write-Host "Dossier uploads sauvegarde" -ForegroundColor Yellow
+}
+
+# Sauvegarder backend/src/public/movements (IMAGES VASES EXTERNES)
+if (Test-Path "backend\src\public\movements") {
+    if (Test-Path "$env:TEMP\backup_movements") {
+        Remove-Item -Recurse -Force "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
+    }
+    Copy-Item -Recurse backend\src\public\movements "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
+    Write-Host "Dossier movements (vases externes) sauvegarde" -ForegroundColor Yellow
 }
 
 # Vérifier que le build frontend existe
@@ -43,13 +55,26 @@ Copy-Item -Recurse frontend\dist\* backend\public\
 Copy-Item -Recurse frontend\dist\* backend\dist\
 
 # RESTAURATION DES IMAGES D'ARTICLES EXTERNES
+Write-Host "Restauration des images d'articles externes..." -ForegroundColor Green
+
+# Restaurer backend/uploads
 if (Test-Path "$env:TEMP\backup_uploads") {
-    Write-Host "Restauration des images d'articles externes..." -ForegroundColor Green
-    # Supprimer le dossier uploads actuel et restaurer depuis la sauvegarde
     Remove-Item -Recurse -Force backend\uploads -ErrorAction SilentlyContinue
     Copy-Item -Recurse "$env:TEMP\backup_uploads" backend\uploads -Force
     Remove-Item -Recurse -Force "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
-    Write-Host "Images restaurees avec succes" -ForegroundColor Green
+    Write-Host "Dossier uploads restaure" -ForegroundColor Yellow
+}
+
+# Restaurer backend/src/public/movements (IMAGES VASES EXTERNES)
+if (Test-Path "$env:TEMP\backup_movements") {
+    # S'assurer que le dossier public existe
+    if (-Not (Test-Path "backend\src\public")) {
+        New-Item -ItemType Directory -Force -Path backend\src\public | Out-Null
+    }
+    Remove-Item -Recurse -Force backend\src\public\movements -ErrorAction SilentlyContinue
+    Copy-Item -Recurse "$env:TEMP\backup_movements" backend\src\public\movements -Force
+    Remove-Item -Recurse -Force "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
+    Write-Host "Images vases externes restaurees avec succes" -ForegroundColor Green
 }
 
 Write-Host "Build copie avec succes." -ForegroundColor Green
