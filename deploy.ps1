@@ -58,9 +58,11 @@ if (-Not (Test-Path "backend\dist")) {
 Remove-Item -Recurse -Force backend/public/* -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend/dist/* -ErrorAction SilentlyContinue
 
-# Copier le nouveau build - EXACTEMENT COMME LA MÉTHODE MANUELLE
+# Copier le nouveau build - EXACTEMENT COMME LA MÉTHODE MANUELLE + RACINE
 Copy-Item -Recurse frontend/dist/* backend/public/
 Copy-Item -Recurse frontend/dist/* backend/dist/
+# NOUVEAU: Copier aussi à la racine pour DigitalOcean
+Copy-Item -Recurse frontend/dist/* ./
 
 # Vérifier que les fichiers JS ont été copiés correctement
 $jsFiles = Get-ChildItem backend\public\assets\*.js -ErrorAction SilentlyContinue | Measure-Object

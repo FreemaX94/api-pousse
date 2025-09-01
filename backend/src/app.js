@@ -202,19 +202,23 @@ console.log('   dist path:', path.join(__dirname, '../dist'));
 console.log('   public exists:', fs.existsSync(path.join(__dirname, '../public')));
 console.log('   dist exists:', fs.existsSync(path.join(__dirname, '../dist')));
 
-// ESSAYER TOUS LES CHEMINS POSSIBLES
+// ESSAYER TOUS LES CHEMINS POSSIBLES + RACINE
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../../')));  // RACINE DU PROJET
 app.use(express.static(path.join(process.cwd(), 'public')));
 app.use(express.static(path.join(process.cwd(), 'dist')));
+app.use(express.static(path.join(process.cwd(), 'assets')));  // DIRECT
 app.use(express.static(path.join(process.cwd(), 'backend/public')));
 app.use(express.static(path.join(process.cwd(), 'backend/dist')));
 
-// Assets avec tous les chemins
+// Assets avec tous les chemins possibles
 app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
 app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
+app.use('/assets', express.static(path.join(__dirname, '../../assets')));  // RACINE
 app.use('/assets', express.static(path.join(process.cwd(), 'dist/assets')));
 app.use('/assets', express.static(path.join(process.cwd(), 'public/assets')));
+app.use('/assets', express.static(path.join(process.cwd(), 'assets')));  // DIRECT
 app.use('/assets', express.static(path.join(process.cwd(), 'backend/dist/assets')));
 app.use('/assets', express.static(path.join(process.cwd(), 'backend/public/assets')));
 
