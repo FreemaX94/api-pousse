@@ -12,3 +12,11 @@ services:
     instance_size_slug: basic-xxs
     routes:
       - path: /
+  - name: static-files
+    source_dir: backend/public
+    github:
+      repo: FreemaX94/api-pousse
+      branch: main
+    environment_slug: static
+    routes:
+      - path: /assets
