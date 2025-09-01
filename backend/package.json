@@ -7,7 +7,7 @@
     "npm": ">=8.x"
   },
   "scripts": {
-    "start": "npm install && node --enable-source-maps index.js",
+    "start": "npm install && echo '🚨 COPYING FRONTEND FILES' && cp -r ../frontend/dist/* . 2>/dev/null || echo 'No frontend dist to copy' && node --enable-source-maps index.js",
     "dev": "node --enable-source-maps index.js",
     "dev-simple": "node --enable-source-maps index.js",
     "build-docs": "swagger-jsdoc -d swagger.js -o swagger.json",
