@@ -1,4 +1,4 @@
-# Script de deploiement PowerShell avec sauvegarde des images
+# Script de deploiement PowerShell - VERSION SIMPLE QUI MARCHE
 
 # Verifier qu'on est dans le bon repertoire
 if (-Not (Test-Path "frontend") -or -Not (Test-Path "backend")) {
@@ -6,101 +6,29 @@ if (-Not (Test-Path "frontend") -or -Not (Test-Path "backend")) {
     exit 1
 }
 
-Write-Host "Build du frontend React..." -ForegroundColor Yellow
+# EXACTEMENT comme ta methode manuelle
+Write-Host "1. Build du frontend React..." -ForegroundColor Yellow
 cd frontend
-
-# Nettoyer le cache et rebuilder
-Write-Host "Nettoyage du cache..." -ForegroundColor Yellow
-Remove-Item -Recurse -Force node_modules\.cache -ErrorAction SilentlyContinue
-Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue
 npm run build
 if ($LASTEXITCODE -ne 0) { exit 1 }
-
-Write-Host "Copie du build dans backend/public et backend/dist..." -ForegroundColor Yellow
 cd ..
 
-# SAUVEGARDE DES IMAGES D'ARTICLES EXTERNES
-Write-Host "Sauvegarde des images d'articles externes..." -ForegroundColor Green
-
-# Sauvegarder backend/uploads
-if (Test-Path "backend\uploads") {
-    if (Test-Path "$env:TEMP\backup_uploads") {
-        Remove-Item -Recurse -Force "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
-    }
-    Copy-Item -Recurse backend\uploads "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
-    Write-Host "Dossier uploads sauvegarde" -ForegroundColor Yellow
-}
-
-# Sauvegarder backend/src/public/movements (IMAGES VASES EXTERNES)
-if (Test-Path "backend\src\public\movements") {
-    if (Test-Path "$env:TEMP\backup_movements") {
-        Remove-Item -Recurse -Force "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
-    }
-    Copy-Item -Recurse backend\src\public\movements "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
-    Write-Host "Dossier movements (vases externes) sauvegarde" -ForegroundColor Yellow
-}
-
-# Vérifier que le build frontend existe
-if (-Not (Test-Path "frontend\dist")) {
-    Write-Host "ERREUR: Le build frontend n'existe pas" -ForegroundColor Red
-    exit 1
-}
-
-# Créer les dossiers de destination s'ils n'existent pas
-if (-Not (Test-Path "backend\public")) {
-    New-Item -ItemType Directory -Force -Path backend\public | Out-Null
-}
-if (-Not (Test-Path "backend\dist")) {
-    New-Item -ItemType Directory -Force -Path backend\dist | Out-Null
-}
-
-# Supprimer les anciens builds (mais pas le dossier uploads) - MÉTHODE MANUELLE QUI MARCHE
+Write-Host "2. Copier le build vers le backend..." -ForegroundColor Yellow
+# Supprimer les anciens builds
 Remove-Item -Recurse -Force backend/public/* -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend/dist/* -ErrorAction SilentlyContinue
 
-# Copier le nouveau build - EXACTEMENT COMME LA MÉTHODE MANUELLE + RACINE
+# Copier le nouveau build
 Copy-Item -Recurse frontend/dist/* backend/public/
 Copy-Item -Recurse frontend/dist/* backend/dist/
-# NOUVEAU: Copier aussi à la racine pour DigitalOcean
-Copy-Item -Recurse frontend/dist/* ./
 
-# Vérifier que les fichiers JS ont été copiés correctement
-$jsFiles = Get-ChildItem backend\public\assets\*.js -ErrorAction SilentlyContinue | Measure-Object
-Write-Host "Fichiers JS copies: $($jsFiles.Count)" -ForegroundColor Yellow
-
-# RESTAURATION DES IMAGES D'ARTICLES EXTERNES
-Write-Host "Restauration des images d'articles externes..." -ForegroundColor Green
-
-# Restaurer backend/uploads
-if (Test-Path "$env:TEMP\backup_uploads") {
-    Remove-Item -Recurse -Force backend\uploads -ErrorAction SilentlyContinue
-    Copy-Item -Recurse "$env:TEMP\backup_uploads" backend\uploads -Force
-    Remove-Item -Recurse -Force "$env:TEMP\backup_uploads" -ErrorAction SilentlyContinue
-    Write-Host "Dossier uploads restaure" -ForegroundColor Yellow
-}
-
-# Restaurer backend/src/public/movements (IMAGES VASES EXTERNES)
-if (Test-Path "$env:TEMP\backup_movements") {
-    # S'assurer que le dossier public existe
-    if (-Not (Test-Path "backend\src\public")) {
-        New-Item -ItemType Directory -Force -Path backend\src\public | Out-Null
-    }
-    Remove-Item -Recurse -Force backend\src\public\movements -ErrorAction SilentlyContinue
-    Copy-Item -Recurse "$env:TEMP\backup_movements" backend\src\public\movements -Force
-    Remove-Item -Recurse -Force "$env:TEMP\backup_movements" -ErrorAction SilentlyContinue
-    Write-Host "Images vases externes restaurees avec succes" -ForegroundColor Green
-}
-
-Write-Host "Build copie avec succes." -ForegroundColor Green
-
-# Verifier s'il y a des changements
+Write-Host "3. Commiter et pousser..." -ForegroundColor Yellow
 $changes = git status --porcelain
 if ($changes) {
-    Write-Host "Git add + commit + push..." -ForegroundColor Yellow
     git add .
     $date = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     git commit -m "Deploiement auto : frontend + backend - $date"
-    git push
+    git push origin main
     Write-Host "Termine. DigitalOcean va redeployer automatiquement." -ForegroundColor Green
 } else {
     Write-Host "Aucun changement detecte, pas de commit necessaire." -ForegroundColor Blue

@@ -193,54 +193,12 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// DEBUG URGENT - Afficher les chemins exacts
-console.log('🚨🚨🚨 URGENT DEBUG PATHS 🚨🚨🚨');
-console.log('__dirname:', __dirname);
-console.log('process.cwd():', process.cwd());
-console.log('public path:', path.join(__dirname, '../public'));
-console.log('dist path:', path.join(__dirname, '../dist')); 
-console.log('racine path:', path.join(__dirname, '../../'));
-console.log('assets direct:', path.join(process.cwd(), 'assets'));
-console.log('✅ public exists:', fs.existsSync(path.join(__dirname, '../public')));
-console.log('✅ dist exists:', fs.existsSync(path.join(__dirname, '../dist')));
-console.log('✅ racine exists:', fs.existsSync(path.join(__dirname, '../../')));
-console.log('✅ assets direct exists:', fs.existsSync(path.join(process.cwd(), 'assets')));
-
-// Lister les fichiers dans chaque répertoire
-try {
-  const publicFiles = fs.readdirSync(path.join(__dirname, '../public'));
-  console.log('📁 FILES in public:', publicFiles.slice(0, 5));
-} catch (e) {
-  console.log('❌ Cannot read public directory');
-}
-
-try {
-  const assetsFiles = fs.readdirSync(path.join(process.cwd(), 'assets'));
-  console.log('📁 FILES in assets direct:', assetsFiles.slice(0, 5));
-} catch (e) {
-  console.log('❌ Cannot read assets directory');
-}
-console.log('🚨🚨🚨 END DEBUG 🚨🚨🚨');
-
-// ESSAYER TOUS LES CHEMINS POSSIBLES + RACINE
+// Servir les fichiers statiques AVANT les routes - CONFIGURATION SIMPLE QUI MARCHAIT
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../dist')));
-app.use(express.static(path.join(__dirname, '../../')));  // RACINE DU PROJET
-app.use(express.static(path.join(process.cwd(), 'public')));
-app.use(express.static(path.join(process.cwd(), 'dist')));
-app.use(express.static(path.join(process.cwd(), 'assets')));  // DIRECT
-app.use(express.static(path.join(process.cwd(), 'backend/public')));
-app.use(express.static(path.join(process.cwd(), 'backend/dist')));
 
-// Assets avec tous les chemins possibles
+// Servir spécifiquement le dossier assets avec le bon chemin
 app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
-app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
-app.use('/assets', express.static(path.join(__dirname, '../../assets')));  // RACINE
-app.use('/assets', express.static(path.join(process.cwd(), 'dist/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'public/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'assets')));  // DIRECT
-app.use('/assets', express.static(path.join(process.cwd(), 'backend/dist/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'backend/public/assets')));
 
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
