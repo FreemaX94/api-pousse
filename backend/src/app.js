@@ -193,30 +193,12 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// DEBUG: Afficher les chemins pour diagnostiquer
-console.log('📁 __dirname:', __dirname);
-console.log('📁 Path to public:', path.join(__dirname, '../public'));
-console.log('📁 Path to dist:', path.join(__dirname, '../dist'));
-console.log('📁 Public exists:', fs.existsSync(path.join(__dirname, '../public')));
-console.log('📁 Dist exists:', fs.existsSync(path.join(__dirname, '../dist')));
-
-// Servir les fichiers statiques AVANT les routes avec chemins multiples
+// Servir les fichiers statiques AVANT les routes - CONFIGURATION SIMPLE QUI MARCHAIT
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// Chemins alternatifs pour DigitalOcean (au cas où le working directory est différent)
-app.use(express.static(path.join(process.cwd(), 'public')));
-app.use(express.static(path.join(process.cwd(), 'dist')));
-app.use(express.static(path.join(process.cwd(), 'backend/public')));
-app.use(express.static(path.join(process.cwd(), 'backend/dist')));
-
 // Servir spécifiquement le dossier assets avec le bon chemin
 app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
-app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'dist/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'public/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'backend/dist/assets')));
-app.use('/assets', express.static(path.join(process.cwd(), 'backend/public/assets')));
 
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));

@@ -7,7 +7,7 @@ if (-Not (Test-Path "frontend") -or -Not (Test-Path "backend")) {
 }
 
 Write-Host "Build du frontend React..." -ForegroundColor Yellow
-Set-Location frontend
+cd frontend
 
 # Nettoyer le cache et rebuilder
 Write-Host "Nettoyage du cache..." -ForegroundColor Yellow
@@ -17,7 +17,7 @@ npm run build
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Host "Copie du build dans backend/public et backend/dist..." -ForegroundColor Yellow
-Set-Location ..
+cd ..
 
 # SAUVEGARDE DES IMAGES D'ARTICLES EXTERNES
 Write-Host "Sauvegarde des images d'articles externes..." -ForegroundColor Green
@@ -54,13 +54,13 @@ if (-Not (Test-Path "backend\dist")) {
     New-Item -ItemType Directory -Force -Path backend\dist | Out-Null
 }
 
-# Supprimer les anciens builds (mais pas le dossier uploads)
-Remove-Item -Recurse -Force backend\public\* -ErrorAction SilentlyContinue
-Remove-Item -Recurse -Force backend\dist\* -ErrorAction SilentlyContinue
+# Supprimer les anciens builds (mais pas le dossier uploads) - MÉTHODE MANUELLE QUI MARCHE
+Remove-Item -Recurse -Force backend/public/* -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force backend/dist/* -ErrorAction SilentlyContinue
 
-# Copier le nouveau build
-Copy-Item -Recurse frontend\dist\* backend\public\
-Copy-Item -Recurse frontend\dist\* backend\dist\
+# Copier le nouveau build - EXACTEMENT COMME LA MÉTHODE MANUELLE
+Copy-Item -Recurse frontend/dist/* backend/public/
+Copy-Item -Recurse frontend/dist/* backend/dist/
 
 # Vérifier que les fichiers JS ont été copiés correctement
 $jsFiles = Get-ChildItem backend\public\assets\*.js -ErrorAction SilentlyContinue | Measure-Object
