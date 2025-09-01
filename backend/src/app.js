@@ -228,6 +228,20 @@ app.use('/assets', (req, res, next) => {
   next();
 });
 
+// FALLBACK BRUTAL - Si le fichier n'est pas trouvé, essayer de le servir depuis backend/public
+app.use('/assets', (req, res, next) => {
+  const filePath = path.join(__dirname, '../public/assets', req.url);
+  console.log('🔍 Trying fallback path:', filePath);
+  
+  if (fs.existsSync(filePath)) {
+    console.log('✅ Fallback file found!');
+    res.sendFile(filePath);
+  } else {
+    console.log('❌ Fallback file NOT found');
+    next();
+  }
+});
+
 console.log('🚨🚨🚨 END STATIC FILES CONFIG 🚨🚨🚨');
 
 // Servir les images des articles externes depuis le dossier persistant
