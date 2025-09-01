@@ -16,7 +16,8 @@
       "Bash(find:*)",
       "Bash(npm install:*)",
       "Read(C:\\Users\\FreemaX94\\Desktop/**)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
