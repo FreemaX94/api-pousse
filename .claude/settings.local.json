@@ -15,7 +15,8 @@
       "Bash(pkill:*)",
       "Bash(find:*)",
       "Bash(npm install:*)",
-      "Read(C:\\Users\\FreemaX94\\Desktop/**)"
+      "Read(C:\\Users\\FreemaX94\\Desktop/**)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
