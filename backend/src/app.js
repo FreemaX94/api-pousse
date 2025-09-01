@@ -194,13 +194,33 @@ app.get('/test-route', (req, res) => {
 });
 
 // DEBUG URGENT - Afficher les chemins exacts
-console.log('🚨 URGENT DEBUG:');
-console.log('   __dirname:', __dirname);
-console.log('   process.cwd():', process.cwd());
-console.log('   public path:', path.join(__dirname, '../public'));
-console.log('   dist path:', path.join(__dirname, '../dist'));
-console.log('   public exists:', fs.existsSync(path.join(__dirname, '../public')));
-console.log('   dist exists:', fs.existsSync(path.join(__dirname, '../dist')));
+console.log('🚨🚨🚨 URGENT DEBUG PATHS 🚨🚨🚨');
+console.log('__dirname:', __dirname);
+console.log('process.cwd():', process.cwd());
+console.log('public path:', path.join(__dirname, '../public'));
+console.log('dist path:', path.join(__dirname, '../dist')); 
+console.log('racine path:', path.join(__dirname, '../../'));
+console.log('assets direct:', path.join(process.cwd(), 'assets'));
+console.log('✅ public exists:', fs.existsSync(path.join(__dirname, '../public')));
+console.log('✅ dist exists:', fs.existsSync(path.join(__dirname, '../dist')));
+console.log('✅ racine exists:', fs.existsSync(path.join(__dirname, '../../')));
+console.log('✅ assets direct exists:', fs.existsSync(path.join(process.cwd(), 'assets')));
+
+// Lister les fichiers dans chaque répertoire
+try {
+  const publicFiles = fs.readdirSync(path.join(__dirname, '../public'));
+  console.log('📁 FILES in public:', publicFiles.slice(0, 5));
+} catch (e) {
+  console.log('❌ Cannot read public directory');
+}
+
+try {
+  const assetsFiles = fs.readdirSync(path.join(process.cwd(), 'assets'));
+  console.log('📁 FILES in assets direct:', assetsFiles.slice(0, 5));
+} catch (e) {
+  console.log('❌ Cannot read assets directory');
+}
+console.log('🚨🚨🚨 END DEBUG 🚨🚨🚨');
 
 // ESSAYER TOUS LES CHEMINS POSSIBLES + RACINE
 app.use(express.static(path.join(__dirname, '../public')));
