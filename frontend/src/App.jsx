@@ -5,6 +5,8 @@ import QueryProvider from './shared/providers/QueryProvider';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
+// Force deployment - JS 404 fix
+
 export default function App() {
   return (
     <QueryProvider>
