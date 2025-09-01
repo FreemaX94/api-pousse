@@ -46,6 +46,14 @@ if (-Not (Test-Path "frontend\dist")) {
     exit 1
 }
 
+# Créer les dossiers de destination s'ils n'existent pas
+if (-Not (Test-Path "backend\public")) {
+    New-Item -ItemType Directory -Force -Path backend\public | Out-Null
+}
+if (-Not (Test-Path "backend\dist")) {
+    New-Item -ItemType Directory -Force -Path backend\dist | Out-Null
+}
+
 # Supprimer les anciens builds (mais pas le dossier uploads)
 Remove-Item -Recurse -Force backend\public\* -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend\dist\* -ErrorAction SilentlyContinue
@@ -53,6 +61,10 @@ Remove-Item -Recurse -Force backend\dist\* -ErrorAction SilentlyContinue
 # Copier le nouveau build
 Copy-Item -Recurse frontend\dist\* backend\public\
 Copy-Item -Recurse frontend\dist\* backend\dist\
+
+# Vérifier que les fichiers JS ont été copiés correctement
+$jsFiles = Get-ChildItem backend\public\assets\*.js -ErrorAction SilentlyContinue | Measure-Object
+Write-Host "Fichiers JS copies: $($jsFiles.Count)" -ForegroundColor Yellow
 
 # RESTAURATION DES IMAGES D'ARTICLES EXTERNES
 Write-Host "Restauration des images d'articles externes..." -ForegroundColor Green

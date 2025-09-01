@@ -172,24 +172,7 @@ function setupDomains() {
       console.warn('⚠️ Routes système non disponibles:', error.message);
     }
     
-    // Fallback pour React SPA (doit être en dernier après toutes les routes API)
-    app.get('*', (req, res) => {
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ error: 'Route API non trouvée' });
-      }
-      
-      let indexPath = path.join(__dirname, '../dist', 'index.html');
-      if (!fs.existsSync(indexPath)) {
-        indexPath = path.join(__dirname, '../public', 'index.html');
-      }
-      
-      if (!fs.existsSync(indexPath)) {
-        logger.error(`Fichier index.html non trouvé: ${indexPath}`);
-        return res.status(404).json({ error: 'Frontend non trouvé' });
-      }
-      
-      res.sendFile(indexPath);
-    });
+    console.log('⚠️ Catch-all route déplacée vers la fin de app.js');
     
     console.log('✅ Fallback React SPA configuré');
     
@@ -270,6 +253,31 @@ function initializeDomains() {
     // Ne pas faire crasher l'app, continuer sans les domaines
   }
 }
+
+// Fallback pour React SPA (doit être en dernier après toutes les routes API et fichiers statiques)
+app.get('*', (req, res) => {
+  // Ne pas intercepter les requêtes vers les fichiers statiques (JS, CSS, images)
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Route API non trouvée' });
+  }
+  
+  // Laisser Express.static gérer les fichiers statiques d'abord
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    return res.status(404).json({ error: 'Fichier statique non trouvé' });
+  }
+  
+  let indexPath = path.join(__dirname, '../dist', 'index.html');
+  if (!fs.existsSync(indexPath)) {
+    indexPath = path.join(__dirname, '../public', 'index.html');
+  }
+  
+  if (!fs.existsSync(indexPath)) {
+    logger.error(`Fichier index.html non trouvé: ${indexPath}`);
+    return res.status(404).json({ error: 'Frontend non trouvé' });
+  }
+  
+  res.sendFile(indexPath);
+});
 
 // L'initialisation des domaines se fait dans index.js
 // initializeDomains();
