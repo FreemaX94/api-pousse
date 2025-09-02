@@ -228,33 +228,15 @@ app.use('/assets', (req, res, next) => {
   next();
 });
 
-// FALLBACK BRUTAL - Si le fichier n'est pas trouvé, essayer de le servir depuis backend/public
+// Fallback pour assets manquants - version propre
 app.use('/assets', (req, res, next) => {
   const filePath = path.join(__dirname, '../public/assets', req.url);
-  console.log('🔍 Trying fallback path:', filePath);
   
   if (fs.existsSync(filePath)) {
-    console.log('✅ Fallback file found!');
     res.sendFile(filePath);
   } else {
-    console.log('❌ Fallback file NOT found - CREATING IT NOW');
-    
-    // Créer le fichier manquant à la volée
-    try {
-      const assetsDir = path.dirname(filePath);
-      fs.mkdirSync(assetsDir, { recursive: true });
-      
-      const content = `// Emergency file - ${path.basename(req.url)}
-console.log('Loaded emergency ${path.basename(req.url)}');
-export default {};`;
-      
-      fs.writeFileSync(filePath, content);
-      console.log('🚨 EMERGENCY FILE CREATED:', req.url);
-      res.sendFile(filePath);
-    } catch (e) {
-      console.log('❌ Failed to create emergency file:', e.message);
-      next();
-    }
+    console.log('❌ Asset not found:', req.url);
+    res.status(404).end();
   }
 });
 
@@ -316,26 +298,25 @@ function initializeDomains() {
 
 // Fallback pour React SPA (doit être en dernier après toutes les routes API et fichiers statiques)
 app.get('*', (req, res) => {
-  // Ne pas intercepter les requêtes vers les fichiers statiques (JS, CSS, images)
+  // Ne pas intercepter les requêtes vers les API
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Route API non trouvée' });
   }
   
-  // Laisser Express.static gérer les fichiers statiques d'abord
+  // Ne pas intercepter les fichiers statiques
   if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
     return res.status(404).json({ error: 'Fichier statique non trouvé' });
   }
   
-  let indexPath = path.join(__dirname, '../dist', 'index.html');
-  if (!fs.existsSync(indexPath)) {
-    indexPath = path.join(__dirname, '../public', 'index.html');
-  }
+  // Servir index.html pour toutes les autres routes (React Router)
+  const indexPath = path.join(__dirname, '../public', 'index.html');
   
   if (!fs.existsSync(indexPath)) {
-    logger.error(`Fichier index.html non trouvé: ${indexPath}`);
-    return res.status(404).json({ error: 'Frontend non trouvé' });
+    console.error(`❌ Index.html non trouvé: ${indexPath}`);
+    return res.status(500).json({ error: 'Frontend non disponible' });
   }
   
+  console.log(`📄 Serving index.html for route: ${req.path}`);
   res.sendFile(indexPath);
 });
 

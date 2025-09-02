@@ -23,7 +23,9 @@
       "Bash(Remove-Item -Recurse -Force backend/public/*)",
       "Bash(Remove-Item -Recurse -Force backend/dist/*)",
       "Bash(Copy-Item -Recurse frontend/dist/* backend/public/)",
-      "Bash(Copy-Item -Recurse frontend/dist/* backend/dist/)"
+      "Bash(Copy-Item -Recurse frontend/dist/* backend/dist/)",
+      "Bash(dir:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
