@@ -378,7 +378,38 @@ function addCatchAllRoute() {
   console.log('✅ Route catch-all fallback ajoutée');
 }
 
-// Forcer l'initialisation immédiatement
-initializeDomains();
+// 🚨 DEBUG - Lister toutes les routes montées
+app._router.stack.forEach(function(r){
+  if (r.route && r.route.path){
+    console.log('📍 Route directe:', r.route.path);
+  }
+  else if (r.name === 'router' && r.regexp){
+    console.log('📍 Router pattern:', r.regexp);
+  }
+});
+
+// Forcer l'initialisation immédiatement - SANS CONDITION
+try {
+  console.log('🚀 FORCE: Initialisation domaines sans condition...');
+  setupDomains();
+  console.log('✅ FORCE: Domaines initialisés avec succès');
+  
+  // 🚨 DEBUG - Lister routes après setupDomains
+  console.log('📍 Routes après setupDomains:');
+  app._router.stack.forEach(function(r){
+    if (r.route && r.route.path){
+      console.log('  - Route directe:', r.route.path);
+    }
+    else if (r.name === 'router' && r.regexp){
+      console.log('  - Router pattern:', r.regexp);
+    }
+  });
+  
+} catch (error) {
+  console.error('❌ FORCE: Erreur initialisation domaines:', error.message);
+  console.error('❌ Stack trace:', error.stack);
+  // Même en cas d'erreur, on ajoute le fallback
+  addCatchAllRoute();
+}
 
 module.exports = { app, setupDomains, initializeDomains };
