@@ -216,29 +216,17 @@ try {
   console.log('Cannot read assets directory:', e.message);
 }
 
-// Servir les fichiers statiques avec TOUS les chemins possibles
-app.use(express.static(publicPath));
-app.use(express.static(distPath));
-app.use('/assets', express.static(assetsPath));
-app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
-
-// Middleware pour logger toutes les requêtes vers /assets
+// Middleware pour logger toutes les requêtes vers /assets (AVANT express.static)
 app.use('/assets', (req, res, next) => {
   console.log('🔍 Asset request:', req.url);
   next();
 });
 
-// Fallback pour assets manquants - version propre
-app.use('/assets', (req, res, next) => {
-  const filePath = path.join(__dirname, '../public/assets', req.url);
-  
-  if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
-  } else {
-    console.log('❌ Asset not found:', req.url);
-    res.status(404).end();
-  }
-});
+// Servir les fichiers statiques - ORDRE CORRECT
+app.use(express.static(publicPath));
+app.use(express.static(distPath));
+app.use('/assets', express.static(assetsPath));
+app.use('/assets', express.static(path.join(__dirname, '../dist/assets')));
 
 console.log('🚨🚨🚨 END STATIC FILES CONFIG 🚨🚨🚨');
 
