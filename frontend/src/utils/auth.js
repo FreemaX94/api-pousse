@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Configuration API globale
+// Configuration API globale - SANS /api pour corriger DigitalOcean
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -104,7 +104,7 @@ export const logout = async () => {
     // Nettoyer les données locales
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = '/app/login';
+    window.location.href = '/login';
   }
 };
 
