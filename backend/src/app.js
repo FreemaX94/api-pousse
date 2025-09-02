@@ -316,11 +316,10 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// 🚨 TEST DIRECT - Route login explicite pour diagnostic
+// 🔧 SOLUTION DIRECTE - Redirection login vers racine
 app.get('/login', (req, res) => {
-  const indexPath = path.join(__dirname, '../public', 'index.html');
-  console.log(`🔍 DIRECT LOGIN REQUEST - serving: ${indexPath}`);
-  res.sendFile(indexPath);
+  console.log(`🔄 Login redirect to root with hash`);
+  res.redirect('/#/login');
 });
 
 // Route catch-all sera ajoutée après l'initialisation des domaines
