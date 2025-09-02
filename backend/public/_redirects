@@ -1,2 +1,5 @@
-# Handle client-side routing - all non-API routes serve index.html
+# API routes stay on backend  
+/api/*  /api/:splat  200
+
+# All other routes serve index.html for React Router
 /*    /index.html   200
