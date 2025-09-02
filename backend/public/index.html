@@ -3,15 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <script>
-      // Fallback pour routes 404 - rediriger vers la racine avec le path en hash
-      if (window.location.pathname !== '/' && window.location.search.indexOf('_404') === -1) {
-        var path = window.location.pathname + window.location.search + window.location.hash;
-        window.history.replaceState(null, null, '/' + '?_path=' + encodeURIComponent(path));
-      }
-    </script>
     <title>Pousse</title>
-    <!-- DEPLOY TIMESTAMP: 2025-09-02 17:42:00 -->
     <!-- Charger la v2 Checkbox reCAPTCHA -->
     <script
       src="https://www.google.com/recaptcha/api.js"
