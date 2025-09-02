@@ -1,5 +1,5 @@
 // backend/src/app.js - Application principale avec architecture DDD
-// Force redeploy pour les images movement - 2025-09-02
+// Force redeploy pour correction login - 2025-09-02 20:24
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
