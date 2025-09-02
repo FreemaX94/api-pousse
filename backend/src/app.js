@@ -217,6 +217,42 @@ app.get('/test-route', (req, res) => {
   });
 });
 
+// 🚨 ROUTE DEBUG ASSETS - FORCER LE SERVAGE VIA API
+app.get('/debug/assets/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(__dirname, '../public/assets', filename);
+  
+  console.log('🚨 DEBUG ASSETS REQUEST:', filename);
+  console.log('🚨 File path:', filePath);
+  console.log('🚨 File exists:', fs.existsSync(filePath));
+  
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: 'Asset not found', path: filePath });
+  }
+});
+
+// 🚨 ROUTE ALTERNATIVE POUR SERVIR TOUS LES ASSETS VIA /api/assets
+app.get('/api/assets/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(__dirname, '../public/assets', filename);
+  
+  console.log('🔥 API ASSETS REQUEST:', filename);
+  
+  if (fs.existsSync(filePath)) {
+    // Définir le bon Content-Type
+    if (filename.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filename.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: 'Asset not found' });
+  }
+});
+
 // Static files sont maintenant configurés dans index.js AVANT setupDomains()
 console.log('⚠️ Static files configuration moved to index.js for priority');
 
