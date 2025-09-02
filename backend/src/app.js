@@ -316,29 +316,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// 🚨 ROUTE CATCH-ALL FORCÉE - POUR CORRIGER LE 404 LOGIN
-app.get('*', (req, res) => {
-  // Ne pas intercepter les requêtes vers les API
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Route API non trouvée' });
-  }
-  
-  // Ne pas intercepter les fichiers statiques
-  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-    return res.status(404).json({ error: 'Fichier statique non trouvé' });
-  }
-  
-  // Servir index.html pour toutes les autres routes (React Router)
-  const indexPath = path.join(__dirname, '../public', 'index.html');
-  
-  if (!fs.existsSync(indexPath)) {
-    console.error(`❌ Index.html non trouvé: ${indexPath}`);
-    return res.status(500).json({ error: 'Frontend non disponible' });
-  }
-  
-  console.log(`📄 Serving index.html for route: ${req.path}`);
-  res.sendFile(indexPath);
-});
+// Route catch-all sera ajoutée après l'initialisation des domaines
 
 // Initialiser les domaines immédiatement mais avec gestion d'erreur
 let domainsInitialized = false;
@@ -352,11 +330,36 @@ function initializeDomains() {
     console.log('✅ Domaines DDD configurés');
   } catch (error) {
     console.error('❌ Erreur configuration domaines:', error);
-    // Ne pas faire crasher l'app, continuer sans les domaines
+    // Même en cas d'erreur, on ajoute la route catch-all
+    addCatchAllRoute();
   }
 }
 
-// L'initialisation des domaines se fait dans index.js
-// initializeDomains();
+// Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
+function addCatchAllRoute() {
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'Route API non trouvée' });
+    }
+    
+    if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+      return res.status(404).json({ error: 'Fichier statique non trouvé' });
+    }
+    
+    const indexPath = path.join(__dirname, '../public', 'index.html');
+    
+    if (!fs.existsSync(indexPath)) {
+      console.error(`❌ Index.html non trouvé: ${indexPath}`);
+      return res.status(500).json({ error: 'Frontend non disponible' });
+    }
+    
+    console.log(`📄 Fallback serving index.html for route: ${req.path}`);
+    res.sendFile(indexPath);
+  });
+  console.log('✅ Route catch-all fallback ajoutée');
+}
+
+// Forcer l'initialisation immédiatement
+initializeDomains();
 
 module.exports = { app, setupDomains, initializeDomains };
