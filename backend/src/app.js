@@ -1,5 +1,5 @@
 // backend/src/app.js - Application principale avec architecture DDD
-// Force redeploy final avec routes /api/ - 2025-09-02 22:30
+// FINAL DEPLOY - Configuration commit cbaab8d restaurée - 2025-09-02 23:25
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
