@@ -316,6 +316,13 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
+// 🚨 TEST DIRECT - Route login explicite pour diagnostic
+app.get('/login', (req, res) => {
+  const indexPath = path.join(__dirname, '../public', 'index.html');
+  console.log(`🔍 DIRECT LOGIN REQUEST - serving: ${indexPath}`);
+  res.sendFile(indexPath);
+});
+
 // Route catch-all sera ajoutée après l'initialisation des domaines
 
 // Initialiser les domaines immédiatement mais avec gestion d'erreur
