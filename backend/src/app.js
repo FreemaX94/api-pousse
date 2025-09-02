@@ -316,23 +316,23 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// 🔧 SOLUTION VIA API - Endpoint pour servir l'app depuis /api/app/*
-app.get('/api/app/login', (req, res) => {
+// 🔧 SOLUTION APP - Routes /app/* pour servir l'application
+app.get('/app/login', (req, res) => {
   const indexPath = path.join(__dirname, '../public', 'index.html');
-  console.log(`🔄 Serving app via API route: ${indexPath}`);
+  console.log(`🔄 Serving app via /app/login: ${indexPath}`);
   res.sendFile(indexPath);
 });
 
-app.get('/api/app/*', (req, res) => {
+app.get('/app/*', (req, res) => {
   const indexPath = path.join(__dirname, '../public', 'index.html');
-  console.log(`🔄 Serving app via API route for: ${req.path}`);
+  console.log(`🔄 Serving app via /app route for: ${req.path}`);
   res.sendFile(indexPath);
 });
 
-// 🔧 SOLUTION DIRECTE - Redirection login vers API route
+// 🔧 REDIRECTION - /login vers /app/login
 app.get('/login', (req, res) => {
-  console.log(`🔄 Login redirect to API route`);
-  res.redirect('/api/app/login');
+  console.log(`🔄 Login redirect to /app/login`);
+  res.redirect('/app/login');
 });
 
 // Route catch-all sera ajoutée après l'initialisation des domaines
