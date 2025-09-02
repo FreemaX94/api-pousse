@@ -19,7 +19,11 @@
       "Bash(curl:*)",
       "Bash(git push:*)",
       "Bash(./deploy.ps1)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(Remove-Item -Recurse -Force backend/public/*)",
+      "Bash(Remove-Item -Recurse -Force backend/dist/*)",
+      "Bash(Copy-Item -Recurse frontend/dist/* backend/public/)",
+      "Bash(Copy-Item -Recurse frontend/dist/* backend/dist/)"
     ],
     "deny": [],
     "ask": []
