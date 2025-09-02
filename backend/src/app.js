@@ -272,6 +272,29 @@ app.get('/debug/architecture', (req, res) => {
   });
 });
 
+// Debug endpoint pour lister les fichiers public
+app.get('/debug/public-files', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  try {
+    const publicPath = path.join(__dirname, '../public');
+    const files = fs.readdirSync(publicPath);
+    const movementFiles = files.filter(f => f.startsWith('movement_'));
+    
+    res.json({
+      publicPath,
+      totalFiles: files.length,
+      movementFiles: movementFiles.length,
+      sampleMovementFiles: movementFiles.slice(0, 5),
+      allFiles: files.slice(0, 20),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Validation et gestion d'erreurs
 app.use(errors());
 app.use(validationErrorHandler);
