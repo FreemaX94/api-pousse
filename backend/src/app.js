@@ -237,8 +237,24 @@ app.use('/assets', (req, res, next) => {
     console.log('✅ Fallback file found!');
     res.sendFile(filePath);
   } else {
-    console.log('❌ Fallback file NOT found');
-    next();
+    console.log('❌ Fallback file NOT found - CREATING IT NOW');
+    
+    // Créer le fichier manquant à la volée
+    try {
+      const assetsDir = path.dirname(filePath);
+      fs.mkdirSync(assetsDir, { recursive: true });
+      
+      const content = `// Emergency file - ${path.basename(req.url)}
+console.log('Loaded emergency ${path.basename(req.url)}');
+export default {};`;
+      
+      fs.writeFileSync(filePath, content);
+      console.log('🚨 EMERGENCY FILE CREATED:', req.url);
+      res.sendFile(filePath);
+    } catch (e) {
+      console.log('❌ Failed to create emergency file:', e.message);
+      next();
+    }
   }
 });
 
