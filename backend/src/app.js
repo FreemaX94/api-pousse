@@ -172,9 +172,33 @@ function setupDomains() {
       console.warn('⚠️ Routes système non disponibles:', error.message);
     }
     
-    console.log('⚠️ Catch-all route déplacée vers la fin de app.js');
+    console.log('✅ Toutes les routes domaines montées');
     
-    console.log('✅ Fallback React SPA configuré');
+    // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
+    app.get('*', (req, res) => {
+      // Ne pas intercepter les requêtes vers les API
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Route API non trouvée' });
+      }
+      
+      // Ne pas intercepter les fichiers statiques
+      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+        return res.status(404).json({ error: 'Fichier statique non trouvé' });
+      }
+      
+      // Servir index.html pour toutes les autres routes (React Router)
+      const indexPath = path.join(__dirname, '../public', 'index.html');
+      
+      if (!fs.existsSync(indexPath)) {
+        console.error(`❌ Index.html non trouvé: ${indexPath}`);
+        return res.status(500).json({ error: 'Frontend non disponible' });
+      }
+      
+      console.log(`📄 Serving index.html for route: ${req.path}`);
+      res.sendFile(indexPath);
+    });
+    
+    console.log('✅ Route catch-all React SPA configurée EN DERNIER');
     
   } catch (error) {
     console.error('❌ Erreur chargement domaines:', error.message);
@@ -284,29 +308,7 @@ function initializeDomains() {
   }
 }
 
-// Fallback pour React SPA (doit être en dernier après toutes les routes API et fichiers statiques)
-app.get('*', (req, res) => {
-  // Ne pas intercepter les requêtes vers les API
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Route API non trouvée' });
-  }
-  
-  // Ne pas intercepter les fichiers statiques
-  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-    return res.status(404).json({ error: 'Fichier statique non trouvé' });
-  }
-  
-  // Servir index.html pour toutes les autres routes (React Router)
-  const indexPath = path.join(__dirname, '../public', 'index.html');
-  
-  if (!fs.existsSync(indexPath)) {
-    console.error(`❌ Index.html non trouvé: ${indexPath}`);
-    return res.status(500).json({ error: 'Frontend non disponible' });
-  }
-  
-  console.log(`📄 Serving index.html for route: ${req.path}`);
-  res.sendFile(indexPath);
-});
+// La route catch-all pour React SPA sera définie dans setupDomains() pour être VRAIMENT en dernier
 
 // L'initialisation des domaines se fait dans index.js
 // initializeDomains();
