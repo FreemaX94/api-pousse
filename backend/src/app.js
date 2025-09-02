@@ -316,7 +316,29 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// Le fallback pour React SPA sera défini dans setupDomains() après le montage des routes API
+// 🚨 ROUTE CATCH-ALL FORCÉE - POUR CORRIGER LE 404 LOGIN
+app.get('*', (req, res) => {
+  // Ne pas intercepter les requêtes vers les API
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Route API non trouvée' });
+  }
+  
+  // Ne pas intercepter les fichiers statiques
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    return res.status(404).json({ error: 'Fichier statique non trouvé' });
+  }
+  
+  // Servir index.html pour toutes les autres routes (React Router)
+  const indexPath = path.join(__dirname, '../public', 'index.html');
+  
+  if (!fs.existsSync(indexPath)) {
+    console.error(`❌ Index.html non trouvé: ${indexPath}`);
+    return res.status(500).json({ error: 'Frontend non disponible' });
+  }
+  
+  console.log(`📄 Serving index.html for route: ${req.path}`);
+  res.sendFile(indexPath);
+});
 
 // Initialiser les domaines immédiatement mais avec gestion d'erreur
 let domainsInitialized = false;
@@ -333,8 +355,6 @@ function initializeDomains() {
     // Ne pas faire crasher l'app, continuer sans les domaines
   }
 }
-
-// La route catch-all pour React SPA sera définie dans setupDomains() pour être VRAIMENT en dernier
 
 // L'initialisation des domaines se fait dans index.js
 // initializeDomains();
