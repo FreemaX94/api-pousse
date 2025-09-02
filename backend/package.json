@@ -7,8 +7,8 @@
     "npm": ">=8.x"
   },
   "scripts": {
-    "start": "npm install && node setup-static-files.js && node --enable-source-maps index-minimal.js",
-    "start-full": "npm install && node setup-static-files.js && node --enable-source-maps index.js",
+    "start": "npm install && node setup-static-files.js && node --enable-source-maps index.js",
+    "start-minimal": "npm install && node setup-static-files.js && node --enable-source-maps index-minimal.js",
     "dev": "node --enable-source-maps index.js",
     "dev-simple": "node --enable-source-maps index.js",
     "build-docs": "swagger-jsdoc -d swagger.js -o swagger.json",
