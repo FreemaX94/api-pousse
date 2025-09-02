@@ -14,13 +14,24 @@ if ($LASTEXITCODE -ne 0) { exit 1 }
 cd ..
 
 Write-Host "2. Copier le build vers le backend..." -ForegroundColor Yellow
-# Supprimer les anciens builds
-Remove-Item -Recurse -Force backend/public/* -ErrorAction SilentlyContinue
+# Sauvegarder les images movement avant nettoyage
+$movementFiles = @()
+if (Test-Path "backend/public") {
+    $movementFiles = Get-ChildItem "backend/public/movement_*" -ErrorAction SilentlyContinue
+}
+
+# Supprimer les anciens builds (SAUF les images movement)
+Get-ChildItem "backend/public/*" -Exclude "movement_*" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend/dist/* -ErrorAction SilentlyContinue
 
 # Copier le nouveau build
 Copy-Item -Recurse frontend/dist/* backend/public/
 Copy-Item -Recurse frontend/dist/* backend/dist/
+
+# Restaurer les images movement si elles ont été supprimées accidentellement
+if ($movementFiles.Count -gt 0) {
+    Write-Host "Images movement préservées: $($movementFiles.Count) fichiers" -ForegroundColor Green
+}
 
 Write-Host "3. Commiter et pousser..." -ForegroundColor Yellow
 $changes = git status --porcelain
