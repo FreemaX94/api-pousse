@@ -295,6 +295,39 @@ app.get('/debug/public-files', (req, res) => {
   }
 });
 
+// 🚨 DEBUG ROUTES - Pour diagnostiquer problème DigitalOcean
+app.get('/debug/routes', (req, res) => {
+  try {
+    const routes = [];
+    app._router.stack.forEach(function(r){
+      if (r.route && r.route.path){
+        routes.push({
+          type: 'route',
+          path: r.route.path,
+          methods: Object.keys(r.route.methods)
+        });
+      }
+      else if (r.name === 'router' && r.regexp){
+        routes.push({
+          type: 'router',
+          regexp: r.regexp.toString(),
+          keys: r.keys ? r.keys.map(k => k.name) : []
+        });
+      }
+    });
+    
+    res.json({
+      totalRoutes: routes.length,
+      routes: routes,
+      domainsInitialized: domainsInitialized,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'not set'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Validation et gestion d'erreurs
 app.use(errors());
 app.use(validationErrorHandler);

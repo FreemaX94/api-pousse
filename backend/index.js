@@ -97,18 +97,33 @@ if (process.env.NODE_ENV !== 'test') {
       
       console.log('✅ Static files mounted FIRST');
       
+      // 🚨 DEBUG: Vérification avant initialisation domaines
+      console.log('🔍 État avant initialisation domaines:');
+      console.log('  - initializeDomains function:', typeof initializeDomains);
+      console.log('  - Routes actuelles dans app:', app._router ? app._router.stack.length : 'Pas de router');
+      
       // S'assurer que les domaines sont initialisés avant de démarrer
       if (initializeDomains) {
-        initializeDomains();
+        console.log('🔄 Appel initializeDomains()...');
+        try {
+          initializeDomains();
+          console.log('✅ initializeDomains() terminé');
+        } catch (err) {
+          console.error('❌ Erreur initializeDomains():', err.message);
+        }
       }
       
-      // Forcer l'initialisation des domaines avec setupDomains
+      // Double vérification avec setupDomains - UNIQUEMENT si pas déjà fait
       try {
+        console.log('🔄 Vérification setupDomains...');
         const { setupDomains } = require('./src/app.js');
-        setupDomains();
-        console.log('✅ Domaines initialisés avec setupDomains');
+        // Ne pas rappeler setupDomains s'il a déjà été appelé
+        console.log('  - Routes après initializeDomains:', app._router ? app._router.stack.length : 'Pas de router');
+        
+        // setupDomains();
+        console.log('✅ Domaines vérifiés - setupDomains non rappelé pour éviter les doublons');
       } catch (err) {
-        console.error('❌ Erreur initialisation domaines:', err.message);
+        console.error('❌ Erreur vérification domaines:', err.message);
       }
       
       app.listen(PORT, () => {
