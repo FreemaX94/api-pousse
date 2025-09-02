@@ -370,23 +370,6 @@ app.get('/login', (req, res) => {
 
 // Route catch-all sera ajoutée après l'initialisation des domaines
 
-// Initialiser les domaines immédiatement mais avec gestion d'erreur
-let domainsInitialized = false;
-
-function initializeDomains() {
-  if (domainsInitialized) return;
-  
-  try {
-    setupDomains();
-    domainsInitialized = true;
-    console.log('✅ Domaines DDD configurés');
-  } catch (error) {
-    console.error('❌ Erreur configuration domaines:', error);
-    // Même en cas d'erreur, on ajoute la route catch-all
-    addCatchAllRoute();
-  }
-}
-
 // Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
 function addCatchAllRoute() {
   app.get('*', (req, res) => {
