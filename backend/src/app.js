@@ -427,33 +427,75 @@ app._router.stack.forEach(function(r){
 console.log('🚀 SIMPLE: Initialisation domaines directe...');
 
 try {
-  // Auth domain - PRIORITÉ ABSOLUE
+  console.log('🔄 Tentative chargement Auth domain...');
   const authDomain = require('./domains/auth');
   app.use('/api/auth', authDomain.routes);
   console.log('✅ Auth domain monté directement sur /api/auth');
   
-  // Catalog domain
+} catch (error) {
+  console.error('❌ ERREUR AUTH DOMAIN:', error.message);
+  console.error('❌ Stack:', error.stack);
+  // Continuer même en cas d'erreur
+}
+
+try {
+  console.log('🔄 Tentative chargement Catalog domain...');
   const catalogDomain = require('./domains/catalog');
   app.use('/api/catalog', catalogDomain.routes);
   console.log('✅ Catalog domain monté directement');
   
-  // Nieuwkoop routes
+} catch (error) {
+  console.error('❌ ERREUR CATALOG DOMAIN:', error.message);
+  // Continuer même en cas d'erreur
+}
+
+try {
+  console.log('🔄 Tentative chargement Nieuwkoop routes...');
   app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
   console.log('✅ Nieuwkoop routes montées directement');
   
-  // Autres domaines
-  app.use('/api/inventory', require('./domains/inventory').routes);
-  app.use('/api/finance', require('./domains/finance').routes);
-  app.use('/api/fleet', require('./domains/fleet').routes);
-  app.use('/api/projects', require('./domains/projects').routes);
-  app.use('/api/calendar', require('./domains/calendar').routes);
-  console.log('✅ Tous domaines montés directement');
-  
-  domainsInitialized = true;
-  
 } catch (error) {
-  console.error('❌ SIMPLE: Erreur montage domaines:', error.message);
-  console.error('❌ Stack:', error.stack);
+  console.error('❌ ERREUR NIEUWKOOP:', error.message);
+  // Continuer même en cas d'erreur
 }
+
+// Continuer avec les autres domaines individuellement
+try {
+  app.use('/api/inventory', require('./domains/inventory').routes);
+  console.log('✅ Inventory domain monté');
+} catch (error) {
+  console.error('❌ ERREUR INVENTORY:', error.message);
+}
+
+try {
+  app.use('/api/finance', require('./domains/finance').routes);
+  console.log('✅ Finance domain monté');
+} catch (error) {
+  console.error('❌ ERREUR FINANCE:', error.message);
+}
+
+try {
+  app.use('/api/fleet', require('./domains/fleet').routes);
+  console.log('✅ Fleet domain monté');
+} catch (error) {
+  console.error('❌ ERREUR FLEET:', error.message);
+}
+
+try {
+  app.use('/api/projects', require('./domains/projects').routes);
+  console.log('✅ Projects domain monté');
+} catch (error) {
+  console.error('❌ ERREUR PROJECTS:', error.message);
+}
+
+try {
+  app.use('/api/calendar', require('./domains/calendar').routes);
+  console.log('✅ Calendar domain monté');
+} catch (error) {
+  console.error('❌ ERREUR CALENDAR:', error.message);
+}
+
+console.log('🔚 Fin chargement domaines - serveur va continuer');
+domainsInitialized = true;
 
 module.exports = { app, setupDomains, initializeDomains };
