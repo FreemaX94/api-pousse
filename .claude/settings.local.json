@@ -17,7 +17,9 @@
       "Bash(npm install:*)",
       "Read(C:\\Users\\FreemaX94\\Desktop/**)",
       "Bash(curl:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(./deploy.ps1)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []
