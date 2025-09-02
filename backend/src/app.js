@@ -423,28 +423,37 @@ app._router.stack.forEach(function(r){
   }
 });
 
-// Forcer l'initialisation immédiatement - SANS CONDITION
+// 🚨 SIMPLE: Initialiser domaines directement sans try/catch complexe
+console.log('🚀 SIMPLE: Initialisation domaines directe...');
+
 try {
-  console.log('🚀 FORCE: Initialisation domaines sans condition...');
-  setupDomains();
-  console.log('✅ FORCE: Domaines initialisés avec succès');
+  // Auth domain - PRIORITÉ ABSOLUE
+  const authDomain = require('./domains/auth');
+  app.use('/api/auth', authDomain.routes);
+  console.log('✅ Auth domain monté directement sur /api/auth');
   
-  // 🚨 DEBUG - Lister routes après setupDomains
-  console.log('📍 Routes après setupDomains:');
-  app._router.stack.forEach(function(r){
-    if (r.route && r.route.path){
-      console.log('  - Route directe:', r.route.path);
-    }
-    else if (r.name === 'router' && r.regexp){
-      console.log('  - Router pattern:', r.regexp);
-    }
-  });
+  // Catalog domain
+  const catalogDomain = require('./domains/catalog');
+  app.use('/api/catalog', catalogDomain.routes);
+  console.log('✅ Catalog domain monté directement');
+  
+  // Nieuwkoop routes
+  app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
+  console.log('✅ Nieuwkoop routes montées directement');
+  
+  // Autres domaines
+  app.use('/api/inventory', require('./domains/inventory').routes);
+  app.use('/api/finance', require('./domains/finance').routes);
+  app.use('/api/fleet', require('./domains/fleet').routes);
+  app.use('/api/projects', require('./domains/projects').routes);
+  app.use('/api/calendar', require('./domains/calendar').routes);
+  console.log('✅ Tous domaines montés directement');
+  
+  domainsInitialized = true;
   
 } catch (error) {
-  console.error('❌ FORCE: Erreur initialisation domaines:', error.message);
-  console.error('❌ Stack trace:', error.stack);
-  // Même en cas d'erreur, on ajoute le fallback
-  addCatchAllRoute();
+  console.error('❌ SIMPLE: Erreur montage domaines:', error.message);
+  console.error('❌ Stack:', error.stack);
 }
 
 module.exports = { app, setupDomains, initializeDomains };
