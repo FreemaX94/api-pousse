@@ -378,6 +378,17 @@ function addCatchAllRoute() {
   console.log('✅ Route catch-all fallback ajoutée');
 }
 
+// 🚨 TEST ROUTES DIRECTES - Pour bypasser le problème de routing
+app.get('/test-auth-me', (req, res) => {
+  console.log('📍 Test route /test-auth-me appelée');
+  res.json({ test: 'Route de test fonctionne', timestamp: Date.now() });
+});
+
+app.post('/test-auth-login', (req, res) => {
+  console.log('📍 Test route /test-auth-login appelée');
+  res.json({ test: 'Login test fonctionne', body: req.body, timestamp: Date.now() });
+});
+
 // 🚨 DEBUG - Lister toutes les routes montées
 app._router.stack.forEach(function(r){
   if (r.route && r.route.path){
