@@ -423,79 +423,151 @@ app._router.stack.forEach(function(r){
   }
 });
 
-// 🚨 SIMPLE: Initialiser domaines directement sans try/catch complexe
-console.log('🚀 SIMPLE: Initialisation domaines directe...');
+/**
+ * ARCHITECTURE DDD - Montage des domaines
+ * Chaque domaine gère ses propres routes, contrôleurs, services et modèles
+ */
+function setupDomains() {
+  try {
+    console.log('🔄 Chargement des domaines...');
+    
+    // Charger les domaines maintenant qu'Express est initialisé
+    authDomain = require('./domains/auth');
+    console.log('✅ Auth domain chargé');
+    catalogDomain = require('./domains/catalog');
+    console.log('✅ Catalog domain chargé');
+    inventoryDomain = require('./domains/inventory');
+    console.log('✅ Inventory domain chargé');
+    financeDomain = require('./domains/finance');
+    console.log('✅ Finance domain chargé');
+    fleetDomain = require('./domains/fleet');
+    console.log('✅ Fleet domain chargé');
+    projectsDomain = require('./domains/projects');
+    console.log('✅ Projects domain chargé');
+    calendarDomain = require('./domains/calendar');
+    console.log('✅ Calendar domain chargé');
+    
+    console.log('🔄 Montage des routes...');
+    
+    // Authentification sans rate limiting pour les tests
+    app.use('/api/auth', authDomain.routes);
+    console.log('✅ Routes auth montées sur /api/auth (rate limiting désactivé)');
+    
+    // Domaines métier
+    app.use('/api/catalog', catalogDomain.routes);
+    app.use('/api/inventory', inventoryDomain.routes);
+    app.use('/api/finance', financeDomain.routes);
+    app.use('/api/fleet', fleetDomain.routes);
+    app.use('/api/projects', projectsDomain.routes);
+    app.use('/api/calendar', calendarDomain.routes);
+    
+    // Route Nieuwkoop legacy pour compatibilité avec l'ancien système
+    app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
+    
+    // Route Opérations diverses pour ventes inter-pôles
+    app.use('/api/internal-operations', require('../routes/internalOperations'));
+    
+    // Routes legacy pour compatibilité avec l'ancien frontend
+    // Rediriger /api/projets vers le domaine projects
+    app.use('/api/projets', (req, res, next) => {
+      req.url = '/projets' + req.url;
+      projectsDomain.routes(req, res, next);
+    });
+    
+    // Rediriger /api/projects vers le domaine projects/projets  
+    app.use('/api/projects', (req, res, next) => {
+      req.url = '/projets' + req.url;
+      projectsDomain.routes(req, res, next);
+    });
+    
+    // Rediriger /api/concepteurs vers le domaine projects
+    app.use('/api/concepteurs', (req, res, next) => {
+      req.url = '/concepteurs' + req.url;
+      projectsDomain.routes(req, res, next);
+    });
+    
+    // Rediriger /api/movements vers le domaine inventory
+    app.use('/api/movements', (req, res, next) => {
+      req.url = '/movements' + req.url;
+      inventoryDomain.routes(req, res, next);
+    });
+    
+    // Rediriger /api/mouvements vers le domaine inventory
+    app.use('/api/mouvements', (req, res, next) => {
+      req.url = '/movements' + req.url;
+      inventoryDomain.routes(req, res, next);
+    });
+    
+    // Rediriger /api/stock-items vers nieuwkoop/stock
+    app.get('/api/stock-items', async (req, res, next) => {
+      try {
+        req.url = '/stock';
+        const nieuwkoopRoute = require('./domains/catalog/routes/nieuwkoop');
+        nieuwkoopRoute(req, res, next);
+      } catch (error) {
+        next(error);
+      }
+    });
+    
+    // Routes système et monitoring
+    try {
+      app.use('/api/health', require('../routes/health'));
+      app.use('/api/security-monitoring', require('../routes/securityMonitoring'));
+    } catch (error) {
+      console.warn('⚠️ Routes système non disponibles:', error.message);
+    }
+    
+    console.log('✅ Toutes les routes domaines montées');
+    
+  } catch (error) {
+    console.error('❌ Erreur chargement domaines:', error.message);
+    throw error;
+  }
+}
 
-try {
-  console.log('🔄 Tentative chargement Auth domain...');
-  const authDomain = require('./domains/auth');
-  app.use('/api/auth', authDomain.routes);
-  console.log('✅ Auth domain monté directement sur /api/auth');
+// Ne pas appeler setupDomains immédiatement
+
+// Route catch-all sera ajoutée après l'initialisation des domaines
+
+// Initialiser les domaines immédiatement mais avec gestion d'erreur
+let domainsInitialized = false;
+
+function initializeDomains() {
+  if (domainsInitialized) return;
   
-} catch (error) {
-  console.error('❌ ERREUR AUTH DOMAIN:', error.message);
-  console.error('❌ Stack:', error.stack);
-  // Continuer même en cas d'erreur
+  try {
+    setupDomains();
+    domainsInitialized = true;
+    console.log('✅ Domaines DDD configurés');
+  } catch (error) {
+    console.error('❌ Erreur configuration domaines:', error);
+    // Même en cas d'erreur, on ajoute la route catch-all
+    addCatchAllRoute();
+  }
 }
 
-try {
-  console.log('🔄 Tentative chargement Catalog domain...');
-  const catalogDomain = require('./domains/catalog');
-  app.use('/api/catalog', catalogDomain.routes);
-  console.log('✅ Catalog domain monté directement');
-  
-} catch (error) {
-  console.error('❌ ERREUR CATALOG DOMAIN:', error.message);
-  // Continuer même en cas d'erreur
+// Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
+function addCatchAllRoute() {
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'Route API non trouvée' });
+    }
+    
+    if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+      return res.status(404).json({ error: 'Fichier statique non trouvé' });
+    }
+    
+    const indexPath = path.join(__dirname, '../public', 'index.html');
+    
+    if (!fs.existsSync(indexPath)) {
+      console.error(`❌ Index.html non trouvé: ${indexPath}`);
+      return res.status(500).json({ error: 'Frontend non disponible' });
+    }
+    
+    console.log(`📄 Fallback serving index.html for route: ${req.path}`);
+    res.sendFile(indexPath);
+  });
+  console.log('✅ Route catch-all fallback ajoutée');
 }
-
-try {
-  console.log('🔄 Tentative chargement Nieuwkoop routes...');
-  app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
-  console.log('✅ Nieuwkoop routes montées directement');
-  
-} catch (error) {
-  console.error('❌ ERREUR NIEUWKOOP:', error.message);
-  // Continuer même en cas d'erreur
-}
-
-// Continuer avec les autres domaines individuellement
-try {
-  app.use('/api/inventory', require('./domains/inventory').routes);
-  console.log('✅ Inventory domain monté');
-} catch (error) {
-  console.error('❌ ERREUR INVENTORY:', error.message);
-}
-
-try {
-  app.use('/api/finance', require('./domains/finance').routes);
-  console.log('✅ Finance domain monté');
-} catch (error) {
-  console.error('❌ ERREUR FINANCE:', error.message);
-}
-
-try {
-  app.use('/api/fleet', require('./domains/fleet').routes);
-  console.log('✅ Fleet domain monté');
-} catch (error) {
-  console.error('❌ ERREUR FLEET:', error.message);
-}
-
-try {
-  app.use('/api/projects', require('./domains/projects').routes);
-  console.log('✅ Projects domain monté');
-} catch (error) {
-  console.error('❌ ERREUR PROJECTS:', error.message);
-}
-
-try {
-  app.use('/api/calendar', require('./domains/calendar').routes);
-  console.log('✅ Calendar domain monté');
-} catch (error) {
-  console.error('❌ ERREUR CALENDAR:', error.message);
-}
-
-console.log('🔚 Fin chargement domaines - serveur va continuer');
-domainsInitialized = true;
 
 module.exports = { app, setupDomains, initializeDomains };

@@ -97,9 +97,10 @@ if (process.env.NODE_ENV !== 'test') {
       
       console.log('✅ Static files mounted FIRST');
       
-      // 🚨 SIMPLE: Les domaines sont déjà montés dans app.js
-      console.log('🔍 Domaines déjà montés dans app.js - pas de double initialisation');
-      console.log('  - Routes disponibles:', app._router ? app._router.stack.length : 'Pas de router');
+      // S'assurer que les domaines sont initialisés avant de démarrer
+      if (initializeDomains) {
+        initializeDomains();
+      }
       
       app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
