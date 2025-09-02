@@ -378,14 +378,7 @@ function addCatchAllRoute() {
   console.log('✅ Route catch-all fallback ajoutée');
 }
 
-// 🚨 SOLUTION URGENTE - Routes auth DIRECTES sans /api/
-const { authMiddleware } = require('./shared/middleware/authMiddleware');
-const { login, me } = require('./domains/auth/controllers/authController');
-
-app.post('/auth/login', login);
-app.get('/auth/me', authMiddleware(), me);
-
-console.log('✅ URGENT: Routes auth directes montées - /auth/login et /auth/me');
+// Routes API supprimées - seront montées dans setupDomains()
 
 // 🚨 DEBUG - Lister toutes les routes montées
 app._router.stack.forEach(function(r){

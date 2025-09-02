@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Configuration API globale - SANS /api pour corriger DigitalOcean
+// Configuration API globale
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
