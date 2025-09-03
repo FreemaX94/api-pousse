@@ -25,7 +25,9 @@
       "Bash(Copy-Item -Recurse frontend/dist/* backend/public/)",
       "Bash(Copy-Item -Recurse frontend/dist/* backend/dist/)",
       "Bash(dir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npm start)",
+      "WebFetch(domain:api-pousse-app-5y2wo.ondigitalocean.app)"
     ],
     "deny": [],
     "ask": []

@@ -284,23 +284,36 @@ app._router.stack.forEach(function(r){
  */
 function setupDomains() {
   try {
-    console.log('🔄 Chargement des domaines...');
+    console.log('🔄 [SETUP] Début chargement des domaines...');
     
     // Charger les domaines maintenant qu'Express est initialisé
+    console.log('🔄 [SETUP] Chargement Auth domain...');
     authDomain = require('./domains/auth');
-    console.log('✅ Auth domain chargé');
+    console.log('✅ [SETUP] Auth domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Catalog domain...');
     catalogDomain = require('./domains/catalog');
-    console.log('✅ Catalog domain chargé');
+    console.log('✅ [SETUP] Catalog domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Inventory domain...');
     inventoryDomain = require('./domains/inventory');
-    console.log('✅ Inventory domain chargé');
+    console.log('✅ [SETUP] Inventory domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Finance domain...');
     financeDomain = require('./domains/finance');
-    console.log('✅ Finance domain chargé');
+    console.log('✅ [SETUP] Finance domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Fleet domain...');
     fleetDomain = require('./domains/fleet');
-    console.log('✅ Fleet domain chargé');
+    console.log('✅ [SETUP] Fleet domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Projects domain...');
     projectsDomain = require('./domains/projects');
-    console.log('✅ Projects domain chargé');
+    console.log('✅ [SETUP] Projects domain chargé avec succès');
+    
+    console.log('🔄 [SETUP] Chargement Calendar domain...');
     calendarDomain = require('./domains/calendar');
-    console.log('✅ Calendar domain chargé');
+    console.log('✅ [SETUP] Calendar domain chargé avec succès');
     
     console.log('🔄 Montage des routes...');
     
@@ -410,16 +423,26 @@ function setupDomains() {
 let domainsInitialized = false;
 
 function initializeDomains() {
-  if (domainsInitialized) return;
+  if (domainsInitialized) {
+    console.log('⚠️ Domaines déjà initialisés, ignoré');
+    return;
+  }
+  
+  console.log('🔄 Début initialisation des domaines...');
   
   try {
     setupDomains();
     domainsInitialized = true;
-    console.log('✅ Domaines DDD configurés');
+    console.log('✅ Domaines DDD configurés avec succès');
   } catch (error) {
-    console.error('❌ Erreur configuration domaines:', error);
-    // Même en cas d'erreur, on ajoute la route catch-all
+    console.error('❌ ERREUR CRITIQUE lors de la configuration des domaines:');
+    console.error('❌ Message:', error.message);
+    console.error('❌ Stack:', error.stack);
+    
+    // En cas d'erreur, on ajoute au moins la route catch-all
+    console.log('⚡ Ajout route catch-all de secours...');
     addCatchAllRoute();
+    console.log('✅ Route catch-all de secours ajoutée');
   }
 }
 
