@@ -19,7 +19,10 @@ const router = express.Router();
 // 🔓 Routes publiques
 router.post('/register', register);
 router.post('/activate', activate);
-router.post('/login', login);
+router.post('/login', (req, res, next) => {
+  console.log('🔥 ROUTE LOGIN HIT - Method:', req.method, 'URL:', req.url);
+  login(req, res, next);
+});
 router.post('/refresh', refresh);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);

@@ -130,8 +130,9 @@ exports.activate = [celebrate(activateSchema), async (req, res, next) => {
   }
 }];
 
-exports.login = [celebrate(loginSchema), async (req, res, next) => {
+exports.login = async (req, res, next) => {
   try {
+    console.log('🚀 LOGIN CALLED - Method:', req.method, 'Body:', req.body);
     const { username, password } = req.body;
     
     // Toujours ajouter un délai pour éviter les timing attacks
