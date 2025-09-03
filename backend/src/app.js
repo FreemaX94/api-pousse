@@ -271,6 +271,11 @@ function addCatchAllRoute() {
       return res.status(404).json({ error: 'Route API non trouvée' });
     }
     
+    if (req.path.startsWith('/backend/')) {
+      console.log(`❌ Route backend non trouvée: ${req.path}`);
+      return res.status(404).json({ error: 'Route backend non trouvée', path: req.path });
+    }
+    
     if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
       return res.status(404).json({ error: 'Fichier statique non trouvé' });
     }
@@ -419,9 +424,20 @@ function setupDomains() {
     console.log('Public path:', publicPath, '- exists:', fs.existsSync(publicPath));
     console.log('Assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
     
-    // Static files APRÈS les routes API
-    app.use(express.static(publicPath));
-    app.use(express.static(distPath));
+    // Static files APRÈS les routes API - mais EXCLUS les routes /backend/*
+    app.use((req, res, next) => {
+      // Skip static files for /backend/* routes - let them go to API handlers
+      if (req.path.startsWith('/backend/')) {
+        return next();
+      }
+      express.static(publicPath)(req, res, next);
+    });
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/backend/')) {
+        return next();
+      }
+      express.static(distPath)(req, res, next);
+    });
     app.use('/assets', express.static(assetsPath));
     
     console.log('✅ Static files mounted AFTER API routes');
@@ -431,6 +447,12 @@ function setupDomains() {
       // Ne pas intercepter les requêtes vers les API
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'Route API non trouvée' });
+      }
+      
+      // Ne pas intercepter les requêtes /backend/* - laissez-les passer aux handlers API
+      if (req.path.startsWith('/backend/')) {
+        console.log(`❌ Route backend non trouvée: ${req.path}`);
+        return res.status(404).json({ error: 'Route backend non trouvée', path: req.path });
       }
       
       // Ne pas intercepter les fichiers statiques
@@ -496,6 +518,11 @@ function addCatchAllRoute() {
   app.get('*', (req, res) => {
     if (req.path.startsWith('/api/')) {
       return res.status(404).json({ error: 'Route API non trouvée' });
+    }
+    
+    if (req.path.startsWith('/backend/')) {
+      console.log(`❌ Route backend non trouvée: ${req.path}`);
+      return res.status(404).json({ error: 'Route backend non trouvée', path: req.path });
     }
     
     if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
