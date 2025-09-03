@@ -78,24 +78,7 @@ if (process.env.NODE_ENV !== 'test') {
       
       console.log(`🚀 Démarrage serveur sur le port ${PORT}...`);
       
-      // 🚨 STATIC FILES EN PREMIER - AVANT TOUT LE RESTE
-      const path = require('path');
-      const fs = require('fs');
-      
-      console.log('🚨 Mounting static files FIRST...');
-      const publicPath = path.join(__dirname, 'public');
-      const distPath = path.join(__dirname, 'dist');
-      const assetsPath = path.join(__dirname, 'public/assets');
-      
-      console.log('Public path:', publicPath, '- exists:', fs.existsSync(publicPath));
-      console.log('Assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
-      
-      // Static files avec priorité absolue
-      app.use(require('express').static(publicPath));
-      app.use(require('express').static(distPath));
-      app.use('/assets', require('express').static(assetsPath));
-      
-      console.log('✅ Static files mounted FIRST');
+      console.log('⚠️ Static files will be mounted AFTER API routes');
       
       // S'assurer que les domaines sont initialisés avant de démarrer
       if (initializeDomains) {

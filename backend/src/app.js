@@ -405,6 +405,25 @@ function setupDomains() {
     
     console.log('✅ Toutes les routes domaines montées');
     
+    // 🚨 STATIC FILES APRÈS LES API ROUTES
+    const path = require('path');
+    const fs = require('fs');
+    
+    console.log('📁 Mounting static files AFTER API routes...');
+    const publicPath = path.join(__dirname, '../public');
+    const distPath = path.join(__dirname, '../dist');
+    const assetsPath = path.join(__dirname, '../public/assets');
+    
+    console.log('Public path:', publicPath, '- exists:', fs.existsSync(publicPath));
+    console.log('Assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
+    
+    // Static files APRÈS les routes API
+    app.use(express.static(publicPath));
+    app.use(express.static(distPath));
+    app.use('/assets', express.static(assetsPath));
+    
+    console.log('✅ Static files mounted AFTER API routes');
+    
     // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
     app.get('*', (req, res) => {
       // Ne pas intercepter les requêtes vers les API
