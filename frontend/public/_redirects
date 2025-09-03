@@ -1,3 +1,6 @@
+# FORCE REDIRECT to backend component for API routes
+/api/* https://api-pousse-app-5y2wo.ondigitalocean.app/api/:splat 301!
+
 # Handle client-side routing - all non-API routes serve index.html
 /app/*    /index.html   200
 /dashboard/*    /index.html   200
