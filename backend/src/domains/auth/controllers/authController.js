@@ -81,7 +81,7 @@ const constantTimeDelay = () => promisify(setTimeout)(Math.random() * 100 + 50);
 const generateToken = (payload, expiresIn) =>
   jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
 
-exports.register = [registerLimiter, celebrate(registerSchema), async (req, res, next) => {
+exports.register = [celebrate(registerSchema), async (req, res, next) => {
   try {
     const { username, password, email, fullname } = req.body;
     
@@ -130,7 +130,7 @@ exports.activate = [celebrate(activateSchema), async (req, res, next) => {
   }
 }];
 
-exports.login = [loginLimiter, celebrate(loginSchema), async (req, res, next) => {
+exports.login = [celebrate(loginSchema), async (req, res, next) => {
   try {
     const { username, password } = req.body;
     
