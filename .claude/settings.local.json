@@ -27,7 +27,8 @@
       "Bash(dir:*)",
       "Bash(cp:*)",
       "Bash(npm start)",
-      "WebFetch(domain:api-pousse-app-5y2wo.ondigitalocean.app)"
+      "WebFetch(domain:api-pousse-app-5y2wo.ondigitalocean.app)",
+      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/test-route)"
     ],
     "deny": [],
     "ask": []

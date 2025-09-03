@@ -446,6 +446,10 @@ function initializeDomains() {
   }
 }
 
+// 🚨 FORCE L'INITIALISATION IMMÉDIATE - Ne pas attendre MongoDB
+console.log('🚀 INITIALISATION FORCÉE DES DOMAINES...');
+initializeDomains();
+
 // Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
 function addCatchAllRoute() {
   app.get('*', (req, res) => {
