@@ -1,4 +1,4 @@
-# Handle client-side routing - all non-backend routes serve index.html
+# Handle client-side routing - all non-API routes serve index.html
 /app/*    /index.html   200
 /dashboard/*    /index.html   200
 /login    /index.html   200
