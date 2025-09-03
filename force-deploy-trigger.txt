@@ -1,0 +1,3 @@
+FORCE DEPLOYMENT TRIGGER - Wed Sep 03 2025 23:04:00
+This file forces DigitalOcean to detect changes and redeploy.
+Critical syntax fix is ready for deployment.
