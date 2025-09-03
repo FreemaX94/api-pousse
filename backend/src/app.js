@@ -457,7 +457,7 @@ function setupDomains() {
       }
       
       // 🚨 SOLUTION ULTIME: Servir index.html dynamiquement avec les bons assets
-      const indexHTML = \`<!DOCTYPE html>
+      const indexHTML = `<!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -492,9 +492,9 @@ function setupDomains() {
   <body>
     <div id="root"></div>
   </body>
-</html>\`;
+</html>`;
       
-      console.log(\`📄 Serving dynamic index.html for: \${req.path}\`);
+      console.log(`📄 Serving dynamic index.html for: ${req.path}`);
       res.setHeader('Content-Type', 'text/html');
       res.send(indexHTML);
     });
