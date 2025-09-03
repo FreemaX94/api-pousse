@@ -311,7 +311,7 @@ app.get('*', (req, res) => {
   </body>
 </html>`;
   
-  console.log(\`📄 Serving dynamic index.html for: \${req.path}\`);
+  console.log(`📄 Serving dynamic index.html for: ${req.path}`);
   res.setHeader('Content-Type', 'text/html');
   res.send(indexHTML);
 });
