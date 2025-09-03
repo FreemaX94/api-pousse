@@ -266,55 +266,7 @@ app.get('/login', (req, res) => {
   res.redirect('/app/login');
 });
 
-// 🚨 SOLUTION ULTIME: Servir index.html dynamiquement avec les bons assets
-app.get('*', (req, res) => {
-  // Ne pas intercepter les API
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Route API non trouvée' });
-  }
-  
-  // Servir index.html dynamiquement pour toutes les autres routes
-  const indexHTML = `<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Pousse</title>
-    <!-- Charger la v2 Checkbox reCAPTCHA -->
-    <script
-      src="https://www.google.com/recaptcha/api.js"
-      async
-      defer
-    ></script>
-    <script type="module" crossorigin src="/assets/index-CWAIILuS.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-BY7hhJt0.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CTBTcUdd.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-Dqmdiez3.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-inventory-Bz3h1SfW.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-charts-BWHACLm3.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-finance-DYSv7s5h.js">
-    <link rel="modulepreload" crossorigin href="/assets/shared-components-D8IF0pNP.js">
-    <link rel="modulepreload" crossorigin href="/assets/shared-utils-BMJnrQ1Q.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-catalog-CeU-9cFK.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-planning-CjETejaB.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-dashboard-CAM9AKkQ.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-auth-BDEDhFqF.js">
-    <link rel="stylesheet" crossorigin href="/assets/vendor-react-BkfLhY3T.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-inventory-Dc126vDB.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-catalog-BoYMRYbS.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-planning-DkVz8MEQ.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-auth-DDC_Gf9p.css">
-    <link rel="stylesheet" crossorigin href="/assets/index-ucxLJyTB.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>`;
-  
-  console.log(`📄 Serving dynamic index.html for: ${req.path}`);
-  res.setHeader('Content-Type', 'text/html');
-  res.send(indexHTML);
-});
+// Route catch-all sera ajoutée APRÈS setupDomains() pour ne pas intercepter les API
 
 // Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
 function addCatchAllRoute() {
@@ -493,29 +445,58 @@ function setupDomains() {
     
     // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
     app.get('*', (req, res) => {
-      // Ne pas intercepter les requêtes vers les API
+      // Ne pas intercepter les requêtes vers les API - elles sont déjà montées AVANT
       if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ error: 'Route API non trouvée' });
+        console.log(`❌ Route API non trouvée (catch-all): ${req.path}`);
+        return res.status(404).json({ error: 'Route API non trouvée', path: req.path });
       }
-      
-      // Routes API sont maintenant sur /api/* - ne pas intercepter
-      // /backend/* n'existe plus
       
       // Ne pas intercepter les fichiers statiques
       if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
         return res.status(404).json({ error: 'Fichier statique non trouvé' });
       }
       
-      // Servir index.html pour toutes les autres routes (React Router)
-      const indexPath = path.join(__dirname, '../public', 'index.html');
+      // 🚨 SOLUTION ULTIME: Servir index.html dynamiquement avec les bons assets
+      const indexHTML = \`<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Pousse</title>
+    <!-- Charger la v2 Checkbox reCAPTCHA -->
+    <script
+      src="https://www.google.com/recaptcha/api.js"
+      async
+      defer
+    ></script>
+    <script type="module" crossorigin src="/assets/index-CWAIILuS.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-BY7hhJt0.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CTBTcUdd.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-Dqmdiez3.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-inventory-Bz3h1SfW.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-charts-BWHACLm3.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-finance-DYSv7s5h.js">
+    <link rel="modulepreload" crossorigin href="/assets/shared-components-D8IF0pNP.js">
+    <link rel="modulepreload" crossorigin href="/assets/shared-utils-BMJnrQ1Q.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-catalog-CeU-9cFK.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-planning-CjETejaB.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-dashboard-CAM9AKkQ.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-auth-BDEDhFqF.js">
+    <link rel="stylesheet" crossorigin href="/assets/vendor-react-BkfLhY3T.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-inventory-Dc126vDB.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-catalog-BoYMRYbS.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-planning-DkVz8MEQ.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-auth-DDC_Gf9p.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-ucxLJyTB.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>\`;
       
-      if (!fs.existsSync(indexPath)) {
-        console.error(`❌ Index.html non trouvé: ${indexPath}`);
-        return res.status(500).json({ error: 'Frontend non disponible' });
-      }
-      
-      console.log(`📄 Serving index.html for route: ${req.path}`);
-      res.sendFile(indexPath);
+      console.log(\`📄 Serving dynamic index.html for: \${req.path}\`);
+      res.setHeader('Content-Type', 'text/html');
+      res.send(indexHTML);
     });
     
     console.log('✅ Route catch-all React SPA configurée EN DERNIER');
