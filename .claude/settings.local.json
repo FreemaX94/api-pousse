@@ -29,7 +29,10 @@
       "Bash(npm start)",
       "WebFetch(domain:api-pousse-app-5y2wo.ondigitalocean.app)",
       "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/test-route)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/backend/auth/login)",
+      "Bash(timeout 10 curl -s -X POST -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test\"\",\"\"password\"\":\"\"test\"\"}' https://api-pousse-app-5y2wo.ondigitalocean.app/backend/auth/login)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/backend/auth/me)"
     ],
     "deny": [],
     "ask": []

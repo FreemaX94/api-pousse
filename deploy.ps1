@@ -24,8 +24,8 @@ if (Test-Path "backend/public") {
 Get-ChildItem "backend/public/*" -Exclude "movement_*" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force backend/dist/* -ErrorAction SilentlyContinue
 
-# Copier le nouveau build
-Copy-Item -Recurse frontend/dist/* backend/public/
+# Copier le nouveau build UNIQUEMENT vers backend/dist (pas backend/public)
+# Le composant backend ne doit PAS servir les fichiers frontend
 Copy-Item -Recurse frontend/dist/* backend/dist/
 
 # Restaurer les images movement si elles ont été supprimées accidentellement
