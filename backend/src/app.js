@@ -62,6 +62,8 @@ app.use(sanitizeData);
 // Debug middleware pour toutes les requêtes
 app.use((req, res, next) => {
   console.log(`🌐 ${req.method} ${req.url} - User-Agent: ${req.get('User-Agent')?.substring(0, 50)}...`);
+  res.setHeader('X-Served-By', 'api-pousse-backend');
+  res.setHeader('X-Debug-Path', req.url);
   next();
 });
 
