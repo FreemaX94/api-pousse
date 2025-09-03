@@ -247,24 +247,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// 🔧 SOLUTION APP - Routes /app/* pour servir l'application
-app.get('/app/login', (req, res) => {
-  const indexPath = path.join(__dirname, '../public', 'index.html');
-  console.log(`🔄 Serving app via /app/login: ${indexPath}`);
-  res.sendFile(indexPath);
-});
-
-app.get('/app/*', (req, res) => {
-  const indexPath = path.join(__dirname, '../public', 'index.html');
-  console.log(`🔄 Serving app via /app route for: ${req.path}`);
-  res.sendFile(indexPath);
-});
-
-// 🔧 REDIRECTION - /login vers /app/login
-app.get('/login', (req, res) => {
-  console.log(`🔄 Login redirect to /app/login`);
-  res.redirect('/app/login');
-});
 
 // Route catch-all sera ajoutée APRÈS setupDomains() pour ne pas intercepter les API
 
