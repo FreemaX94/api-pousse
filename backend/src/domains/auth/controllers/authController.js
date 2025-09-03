@@ -106,7 +106,7 @@ exports.register = [celebrate(registerSchema), async (req, res, next) => {
     logger.error('❌ Erreur register:', err.message);
     next(err);
   }
-}];
+};
 
 exports.activate = [celebrate(activateSchema), async (req, res, next) => {
   try {
@@ -180,7 +180,7 @@ exports.login = async (req, res, next) => {
     logger.error('❌ Erreur login:', err.message);
     next(err);
   }
-}];
+};
 
 exports.refresh = [celebrate(refreshSchema), async (req, res, next) => {
   try {
