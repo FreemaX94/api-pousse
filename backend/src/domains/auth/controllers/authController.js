@@ -128,7 +128,7 @@ exports.activate = [celebrate(activateSchema), async (req, res, next) => {
     logger.error('❌ Erreur activate:', err.message);
     next(err);
   }
-}];
+};
 
 exports.login = async (req, res, next) => {
   try {
