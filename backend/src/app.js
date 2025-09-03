@@ -79,135 +79,7 @@ try {
 }
 
 
-/**
- * ARCHITECTURE DDD - Montage des domaines
- * Chaque domaine gère ses propres routes, contrôleurs, services et modèles
- */
-function setupDomains() {
-  try {
-    console.log('🔄 Chargement des domaines...');
-    
-    // Charger les domaines maintenant qu'Express est initialisé
-    authDomain = require('./domains/auth');
-    console.log('✅ Auth domain chargé');
-    catalogDomain = require('./domains/catalog');
-    console.log('✅ Catalog domain chargé');
-    inventoryDomain = require('./domains/inventory');
-    console.log('✅ Inventory domain chargé');
-    financeDomain = require('./domains/finance');
-    console.log('✅ Finance domain chargé');
-    fleetDomain = require('./domains/fleet');
-    console.log('✅ Fleet domain chargé');
-    projectsDomain = require('./domains/projects');
-    console.log('✅ Projects domain chargé');
-    calendarDomain = require('./domains/calendar');
-    console.log('✅ Calendar domain chargé');
-    
-    console.log('🔄 Montage des routes...');
-    
-    // Authentification sans rate limiting pour les tests
-    app.use('/api/auth', authDomain.routes);
-    console.log('✅ Routes auth montées sur /api/auth (rate limiting désactivé)');
-    
-    // Domaines métier
-    app.use('/api/catalog', catalogDomain.routes);
-    app.use('/api/inventory', inventoryDomain.routes);
-    app.use('/api/finance', financeDomain.routes);
-    app.use('/api/fleet', fleetDomain.routes);
-    app.use('/api/projects', projectsDomain.routes);
-    app.use('/api/calendar', calendarDomain.routes);
-    
-    // Route Nieuwkoop legacy pour compatibilité avec l'ancien système
-    app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
-    
-    // Route Opérations diverses pour ventes inter-pôles
-    app.use('/api/internal-operations', require('../routes/internalOperations'));
-    
-    // Routes legacy pour compatibilité avec l'ancien frontend
-    // Rediriger /api/projets vers le domaine projects
-    app.use('/api/projets', (req, res, next) => {
-      req.url = '/projets' + req.url;
-      projectsDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/projects vers le domaine projects/projets  
-    app.use('/api/projects', (req, res, next) => {
-      req.url = '/projets' + req.url;
-      projectsDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/concepteurs vers le domaine projects
-    app.use('/api/concepteurs', (req, res, next) => {
-      req.url = '/concepteurs' + req.url;
-      projectsDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/movements vers le domaine inventory
-    app.use('/api/movements', (req, res, next) => {
-      req.url = '/movements' + req.url;
-      inventoryDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/mouvements vers le domaine inventory
-    app.use('/api/mouvements', (req, res, next) => {
-      req.url = '/movements' + req.url;
-      inventoryDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/stock-items vers nieuwkoop/stock
-    app.get('/api/stock-items', async (req, res, next) => {
-      try {
-        req.url = '/stock';
-        const nieuwkoopRoute = require('./domains/catalog/routes/nieuwkoop');
-        nieuwkoopRoute(req, res, next);
-      } catch (error) {
-        next(error);
-      }
-    });
-    
-    // Routes système et monitoring
-    try {
-      app.use('/api/health', require('../routes/health'));
-      app.use('/api/security-monitoring', require('../routes/securityMonitoring'));
-    } catch (error) {
-      console.warn('⚠️ Routes système non disponibles:', error.message);
-    }
-    
-    console.log('✅ Toutes les routes domaines montées');
-    
-    // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
-    app.get('*', (req, res) => {
-      // Ne pas intercepter les requêtes vers les API
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ error: 'Route API non trouvée' });
-      }
-      
-      // Ne pas intercepter les fichiers statiques
-      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-        return res.status(404).json({ error: 'Fichier statique non trouvé' });
-      }
-      
-      // Servir index.html pour toutes les autres routes (React Router)
-      const indexPath = path.join(__dirname, '../public', 'index.html');
-      
-      if (!fs.existsSync(indexPath)) {
-        console.error(`❌ Index.html non trouvé: ${indexPath}`);
-        return res.status(500).json({ error: 'Frontend non disponible' });
-      }
-      
-      console.log(`📄 Serving index.html for route: ${req.path}`);
-      res.sendFile(indexPath);
-    });
-    
-    console.log('✅ Route catch-all React SPA configurée EN DERNIER');
-    
-  } catch (error) {
-    console.error('❌ Erreur chargement domaines:', error.message);
-    throw error;
-  }
-}
-
-// Ne pas appeler setupDomains immédiatement
+// Routes API supprimées - seront montées dans setupDomains()
 
 // Route de test DigitalOcean
 app.get('/test-route', (req, res) => {
@@ -448,17 +320,15 @@ function setupDomains() {
     app.use('/api/nieuwkoop', require('./domains/catalog/routes/nieuwkoop'));
     
     // Route Opérations diverses pour ventes inter-pôles
-    app.use('/api/internal-operations', require('../routes/internalOperations'));
+    try {
+      app.use('/api/internal-operations', require('../routes/internalOperations'));
+    } catch (error) {
+      console.warn('⚠️ Internal operations route non disponible:', error.message);
+    }
     
     // Routes legacy pour compatibilité avec l'ancien frontend
     // Rediriger /api/projets vers le domaine projects
     app.use('/api/projets', (req, res, next) => {
-      req.url = '/projets' + req.url;
-      projectsDomain.routes(req, res, next);
-    });
-    
-    // Rediriger /api/projects vers le domaine projects/projets  
-    app.use('/api/projects', (req, res, next) => {
       req.url = '/projets' + req.url;
       projectsDomain.routes(req, res, next);
     });
@@ -502,13 +372,37 @@ function setupDomains() {
     
     console.log('✅ Toutes les routes domaines montées');
     
+    // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
+    app.get('*', (req, res) => {
+      // Ne pas intercepter les requêtes vers les API
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Route API non trouvée' });
+      }
+      
+      // Ne pas intercepter les fichiers statiques
+      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+        return res.status(404).json({ error: 'Fichier statique non trouvé' });
+      }
+      
+      // Servir index.html pour toutes les autres routes (React Router)
+      const indexPath = path.join(__dirname, '../public', 'index.html');
+      
+      if (!fs.existsSync(indexPath)) {
+        console.error(`❌ Index.html non trouvé: ${indexPath}`);
+        return res.status(500).json({ error: 'Frontend non disponible' });
+      }
+      
+      console.log(`📄 Serving index.html for route: ${req.path}`);
+      res.sendFile(indexPath);
+    });
+    
+    console.log('✅ Route catch-all React SPA configurée EN DERNIER');
+    
   } catch (error) {
     console.error('❌ Erreur chargement domaines:', error.message);
     throw error;
   }
 }
-
-// Ne pas appeler setupDomains immédiatement
 
 // Route catch-all sera ajoutée après l'initialisation des domaines
 
