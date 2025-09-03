@@ -81,7 +81,7 @@ const constantTimeDelay = () => promisify(setTimeout)(Math.random() * 100 + 50);
 const generateToken = (payload, expiresIn) =>
   jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
 
-exports.register = [celebrate(registerSchema), async (req, res, next) => {
+exports.register = async (req, res, next) => {
   try {
     const { username, password, email, fullname } = req.body;
     
@@ -108,7 +108,7 @@ exports.register = [celebrate(registerSchema), async (req, res, next) => {
   }
 };
 
-exports.activate = [celebrate(activateSchema), async (req, res, next) => {
+exports.activate = async (req, res, next) => {
   try {
     const { username } = req.body;
     const user = await User.findOneAndUpdate(
@@ -182,7 +182,7 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.refresh = [celebrate(refreshSchema), async (req, res, next) => {
+exports.refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
 
@@ -212,9 +212,9 @@ exports.refresh = [celebrate(refreshSchema), async (req, res, next) => {
     logger.error('❌ Erreur refresh:', err.message);
     next(err);
   }
-}];
+};
 
-exports.forgotPassword = [celebrate(forgotPasswordSchema), async (req, res, next) => {
+exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     
@@ -246,9 +246,9 @@ exports.forgotPassword = [celebrate(forgotPasswordSchema), async (req, res, next
     logger.error('❌ Erreur forgotPassword:', err.message);
     next(err);
   }
-}];
+};
 
-exports.resetPassword = [celebrate(resetPasswordSchema), async (req, res, next) => {
+exports.resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
     
@@ -276,7 +276,7 @@ exports.resetPassword = [celebrate(resetPasswordSchema), async (req, res, next) 
     logger.error('❌ Erreur resetPassword:', err.message);
     next(err);
   }
-}];
+};
 
 exports.me = async (req, res, next) => {
   try {
