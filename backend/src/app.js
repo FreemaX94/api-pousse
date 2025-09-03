@@ -154,6 +154,10 @@ console.log('⚠️ Static files configuration moved to index.js for priority');
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
 
+// 🚨 SOLUTION ULTIME: Servir assets depuis le code source
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+console.log('✅ Assets served from:', path.join(__dirname, 'assets'));
+
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
   res.json({
@@ -262,7 +266,55 @@ app.get('/login', (req, res) => {
   res.redirect('/app/login');
 });
 
-// Route catch-all sera ajoutée après l'initialisation des domaines
+// 🚨 SOLUTION ULTIME: Servir index.html dynamiquement avec les bons assets
+app.get('*', (req, res) => {
+  // Ne pas intercepter les API
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Route API non trouvée' });
+  }
+  
+  // Servir index.html dynamiquement pour toutes les autres routes
+  const indexHTML = `<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Pousse</title>
+    <!-- Charger la v2 Checkbox reCAPTCHA -->
+    <script
+      src="https://www.google.com/recaptcha/api.js"
+      async
+      defer
+    ></script>
+    <script type="module" crossorigin src="/assets/index-CWAIILuS.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-BY7hhJt0.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CTBTcUdd.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-Dqmdiez3.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-inventory-Bz3h1SfW.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-charts-BWHACLm3.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-finance-DYSv7s5h.js">
+    <link rel="modulepreload" crossorigin href="/assets/shared-components-D8IF0pNP.js">
+    <link rel="modulepreload" crossorigin href="/assets/shared-utils-BMJnrQ1Q.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-catalog-CeU-9cFK.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-planning-CjETejaB.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-dashboard-CAM9AKkQ.js">
+    <link rel="modulepreload" crossorigin href="/assets/feature-auth-BDEDhFqF.js">
+    <link rel="stylesheet" crossorigin href="/assets/vendor-react-BkfLhY3T.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-inventory-Dc126vDB.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-catalog-BoYMRYbS.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-planning-DkVz8MEQ.css">
+    <link rel="stylesheet" crossorigin href="/assets/feature-auth-DDC_Gf9p.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-ucxLJyTB.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`;
+  
+  console.log(\`📄 Serving dynamic index.html for: \${req.path}\`);
+  res.setHeader('Content-Type', 'text/html');
+  res.send(indexHTML);
+});
 
 // Fonction de fallback pour ajouter la route catch-all si setupDomains() échoue
 function addCatchAllRoute() {

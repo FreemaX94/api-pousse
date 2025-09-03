@@ -35,7 +35,8 @@
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/backend/auth/me)",
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/login)",
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/assets/index-CWAIILuS.js)",
-      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/debug/public-files)"
+      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/debug/public-files)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/assets/)"
     ],
     "deny": [],
     "ask": []
