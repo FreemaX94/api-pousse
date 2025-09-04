@@ -448,47 +448,16 @@ function setupDomains() {
         return res.status(404).json({ error: 'Fichier statique non trouvé' });
       }
       
-      // 🚨 SOLUTION ULTIME: Servir index.html dynamiquement avec les bons assets
-      const indexHTML = `<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Pousse</title>
-    <!-- Charger la v2 Checkbox reCAPTCHA -->
-    <script
-      src="https://www.google.com/recaptcha/api.js"
-      async
-      defer
-    ></script>
-    <script type="module" crossorigin src="/assets/index-CWAIILuS.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-BY7hhJt0.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CTBTcUdd.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-Dqmdiez3.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-inventory-Bz3h1SfW.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-charts-BWHACLm3.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-finance-DYSv7s5h.js">
-    <link rel="modulepreload" crossorigin href="/assets/shared-components-D8IF0pNP.js">
-    <link rel="modulepreload" crossorigin href="/assets/shared-utils-BMJnrQ1Q.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-catalog-CeU-9cFK.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-planning-CjETejaB.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-dashboard-CAM9AKkQ.js">
-    <link rel="modulepreload" crossorigin href="/assets/feature-auth-BDEDhFqF.js">
-    <link rel="stylesheet" crossorigin href="/assets/vendor-react-BkfLhY3T.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-inventory-Dc126vDB.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-catalog-BoYMRYbS.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-planning-DkVz8MEQ.css">
-    <link rel="stylesheet" crossorigin href="/assets/feature-auth-DDC_Gf9p.css">
-    <link rel="stylesheet" crossorigin href="/assets/index-ucxLJyTB.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>`;
+      // 🚨 SERVIR LE VRAI INDEX.HTML DEPUIS PUBLIC
+      const indexPath = path.join(__dirname, '../public', 'index.html');
       
-      console.log(`📄 Serving dynamic index.html for: ${req.path}`);
-      res.setHeader('Content-Type', 'text/html');
-      res.send(indexHTML);
+      if (!fs.existsSync(indexPath)) {
+        console.error(`❌ Index.html non trouvé: ${indexPath}`);
+        return res.status(500).json({ error: 'Frontend non disponible' });
+      }
+      
+      console.log(`📄 Serving index.html for SPA route: ${req.path}`);
+      res.sendFile(indexPath);
     });
     
     console.log('✅ Route catch-all React SPA configurée EN DERNIER');
