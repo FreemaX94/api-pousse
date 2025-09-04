@@ -80,7 +80,6 @@ try {
   console.log('⚠️ Middlewares monitoring non disponibles:', error.message);
 }
 
-
 // Routes API supprimées - seront montées dans setupDomains()
 
 // Route de test DigitalOcean
@@ -92,25 +91,7 @@ app.get('/test-route', (req, res) => {
   });
 });
 
-// 🚨 TEST SIMPLE API - BYPASS TOUS LES DOMAINES
-app.post('/api/auth/login', (req, res) => {
-  console.log('🔥 DIRECT API ROUTE HIT - Method:', req.method, 'Body:', req.body);
-  res.json({ 
-    success: true, 
-    message: 'Route API directe fonctionne !',
-    method: req.method,
-    body: req.body,
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get('/api/auth/test', (req, res) => {
-  console.log('🔥 DIRECT API GET ROUTE HIT');
-  res.json({ 
-    message: 'Route API GET directe fonctionne !',
-    timestamp: new Date().toISOString()
-  });
-});
+// Routes de test supprimées pour utiliser les vrais contrôleurs d'authentification
 
 // 🚨 ROUTE DEBUG ASSETS - FORCER LE SERVAGE VIA API
 app.get('/debug/assets/:filename', (req, res) => {
