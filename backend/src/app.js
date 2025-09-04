@@ -80,7 +80,36 @@ try {
   console.log('⚠️ Middlewares monitoring non disponibles:', error.message);
 }
 
-// Routes API supprimées - seront montées dans setupDomains()
+// 🚨 ROUTE AUTH EN DUR POUR DEBUG DIGITALOCEAN
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    console.log('🔥 ROUTE LOGIN HARD-CODED HIT');
+    
+    const { login } = require('../controllers/authController');
+    await login(req, res);
+  } catch (error) {
+    console.error('❌ Auth controller error:', error);
+    res.status(500).json({ error: 'Auth controller error: ' + error.message });
+  }
+});
+
+// 🚨 ROUTE AUTH/ME EN DUR POUR DEBUG DIGITALOCEAN
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    console.log('🔥 ROUTE ME HARD-CODED HIT');
+    
+    const { me } = require('../controllers/authController');
+    const { authMiddleware } = require('../middlewares/authMiddleware');
+    
+    // Apply auth middleware first
+    authMiddleware()(req, res, async () => {
+      await me(req, res);
+    });
+  } catch (error) {
+    console.error('❌ Auth/me error:', error);
+    res.status(500).json({ error: 'Auth/me error: ' + error.message });
+  }
+});
 
 // Route de test DigitalOcean
 app.get('/test-route', (req, res) => {
