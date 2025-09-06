@@ -224,6 +224,23 @@ app.get('/movement_*', (req, res) => {
   }
 });
 
+// 🚨 SOLUTION ALTERNATIVE: Route pour images movement_ servies comme fichiers statiques
+app.use('/movement_:filename(*)', (req, res) => {
+  const filename = `movement_${req.params.filename}`;
+  const publicPath = path.join(__dirname, '../public', filename);
+  const assetsPath = path.join(__dirname, '../assets', filename);
+  
+  console.log('🖼️ STATIC MOVEMENT REQUEST:', filename);
+  
+  if (fs.existsSync(publicPath)) {
+    res.sendFile(publicPath);
+  } else if (fs.existsSync(assetsPath)) {
+    res.sendFile(assetsPath);
+  } else {
+    res.status(404).end();
+  }
+});
+
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
   res.json({
