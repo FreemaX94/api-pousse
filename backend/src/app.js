@@ -224,19 +224,22 @@ app.get('/movement_*', (req, res) => {
   }
 });
 
-// 🚨 SOLUTION ALTERNATIVE: Route pour images movement_ servies comme fichiers statiques
-app.use('/movement_:filename(*)', (req, res) => {
-  const filename = `movement_${req.params.filename}`;
+// 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin
+app.use('*/movement_*', (req, res) => {
+  const filename = req.path.split('/').pop(); // Récupérer juste le nom du fichier
   const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   
-  console.log('🖼️ STATIC MOVEMENT REQUEST:', filename);
+  console.log('🎯 WILDCARD MOVEMENT REQUEST:', req.path, '->', filename);
   
   if (fs.existsSync(publicPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(publicPath);
   } else if (fs.existsSync(assetsPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(assetsPath);
   } else {
+    console.log('❌ Movement file not found:', filename);
     res.status(404).end();
   }
 });
