@@ -4865,7 +4865,8 @@ return (
                                   fontWeight: '700',
                                   minWidth: '32px',
                                   textAlign: 'center',
-                                  flex: 1
+                                  flex: 1,
+                                  color: 'var(--color-text-primary)'
                                 }}>
                                 {prod.quantity || 0}
                               </span>
