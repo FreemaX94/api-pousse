@@ -5286,7 +5286,7 @@ return (
                               }}>
 {item.image ? (
                                   <img
-                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : item.image}
+                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : (item.image?.startsWith('movement_') ? `/${item.image}` : item.image)}
                                     alt={item.name}
                                     style={{
                                       width: '100%',
