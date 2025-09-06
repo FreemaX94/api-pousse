@@ -5286,7 +5286,11 @@ return (
                               }}>
 {item.image ? (
                                   <img
-                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : (item.image?.includes('movement_') ? item.image.replace('/movements/', '/') : item.image)}
+                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : (() => {
+                                      if (!item.image || !item.image.includes('movement_')) return item.image;
+                                      const cleanPath = item.image.replace('/movements/', '');
+                                      return cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+                                    })()}
                                     alt={item.name}
                                     style={{
                                       width: '100%',
