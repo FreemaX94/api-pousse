@@ -205,16 +205,22 @@ console.log('✅ Assets served from:', path.join(__dirname, 'assets'));
 // 🚨 Route pour servir les images movement_ directement à la racine
 app.get('/movement_*', (req, res) => {
   const filename = req.path.substring(1); // Enlever le / du début
+  const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🖼️ MOVEMENT IMAGE REQUEST:', filename);
+  console.log('🖼️ Public path:', publicPath);
   console.log('🖼️ Assets path:', assetsPath);
   
-  if (fs.existsSync(assetsPath)) {
+  // Essayer d'abord dans public, puis dans assets
+  if (fs.existsSync(publicPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(publicPath);
+  } else if (fs.existsSync(assetsPath)) {
     res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(assetsPath);
   } else {
-    res.status(404).json({ error: 'Movement image not found', path: filename });
+    res.status(404).json({ error: 'Movement image not found', path: filename, triedPaths: [publicPath, assetsPath] });
   }
 });
 

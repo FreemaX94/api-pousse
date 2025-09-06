@@ -37,7 +37,15 @@
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/assets/index-CWAIILuS.js)",
       "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/debug/public-files)",
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/assets/)",
-      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/me)"
+      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/me)",
+      "Bash(timeout 10 curl -s -X POST -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@test.com\"\",\"\"password\"\":\"\"test123\"\"}' https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/login)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/app/login)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/)",
+      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/app/login)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/me)",
+      "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/debug/routes)",
+      "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/test-route)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

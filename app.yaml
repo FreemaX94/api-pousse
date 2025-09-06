@@ -1,0 +1,67 @@
+name: api-pousse-app
+region: ams
+domains:
+- domain: api-pousse-app-5y2wo.ondigitalocean.app
+
+# Configuration des services
+services:
+  # 🚀 Backend - Service Node.js API
+  - name: backend
+    source_dir: /backend
+    github:
+      repo: FreemaX94/api-pousse
+      branch: main
+      deploy_on_push: true
+    build_command: npm install
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 3001
+    
+    # Variables d'environnement pour le backend
+    envs:
+    - key: NODE_ENV
+      value: production
+    - key: PORT
+      value: "3001"
+    
+    # Health check
+    health_check:
+      http_path: /test-route
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+  # 🎨 Frontend - Site statique React
+  - name: frontend
+    type: static_site
+    source_dir: /frontend
+    github:
+      repo: FreemaX94/api-pousse
+      branch: main
+      deploy_on_push: true
+    build_command: npm install && npm run build
+    output_dir: /dist
+    environment_slug: node-js
+    
+# 🚨 ROUTES - ORDRE CRITIQUE !
+routes:
+  # Route API (PREMIÈRE - priorité haute)
+  - path: /api
+    component: backend
+    preserve_path_prefix: true
+  
+  # Route catch-all frontend (DERNIÈRE)
+  - path: /
+    component: frontend
+    preserve_path_prefix: true
+
+# Configuration optionnelle
+alerts:
+- rule: CPU_UTILIZATION
+  disabled: false
+- rule: MEM_UTILIZATION  
+  disabled: false

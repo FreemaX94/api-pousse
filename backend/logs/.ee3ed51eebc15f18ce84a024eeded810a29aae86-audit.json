@@ -6,16 +6,6 @@
     "auditLog": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\.ee3ed51eebc15f18ce84a024eeded810a29aae86-audit.json",
     "files": [
         {
-            "date": 1755810721194,
-            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-08-21.log",
-            "hash": "1af4b101a80906d33fc152deb5f4e05bced3f09282a65040b5a6b96f7f1ffd7f"
-        },
-        {
-            "date": 1755813654013,
-            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-08-22.log",
-            "hash": "1a4ddea6a547db966fe363be0941242547464885a47f4b39be8727017671547c"
-        },
-        {
             "date": 1755945997716,
             "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-08-23.log",
             "hash": "c494570cd57d2efcfa55b9c5a650bd5c26cefb27affbace4960dd475bd7efa4b"
@@ -64,6 +54,16 @@
             "date": 1756936806246,
             "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-09-04.log",
             "hash": "9e774d92fe75dd5cd152b017db619e86593a8dbffe9b34a32f7afc024a9cb588"
+        },
+        {
+            "date": 1757023205884,
+            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-09-05.log",
+            "hash": "64b48688e12622f465cbd8d5d5e71c716dfb84472ad9ded00b76acf7707e5cbd"
+        },
+        {
+            "date": 1757124947012,
+            "name": "C:\\Users\\FreemaX94\\Desktop\\api-pousse-main\\backend\\logs\\api-pousse-2025-09-06.log",
+            "hash": "770b481a3e4a3eea9a57a9662281013e56e6cb0bcdc8c209a5095cd53291d3f5"
         }
     ],
     "hashType": "sha256"
