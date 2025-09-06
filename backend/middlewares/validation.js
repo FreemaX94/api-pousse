@@ -151,7 +151,7 @@ const baseSchemas = {
 const authSchemas = {
   login: celebrate({
     [Segments.BODY]: Joi.object({
-      email: baseSchemas.email,
+      username: baseSchemas.username,
       password: customJoi.string().min(1).max(128).required(),
       rememberMe: Joi.boolean().default(false)
     })

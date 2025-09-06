@@ -81,12 +81,37 @@ try {
 }
 
 // 🚨 ROUTE AUTH EN DUR POUR DEBUG DIGITALOCEAN
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', async (req, res, next) => {
   try {
     console.log('🔥 ROUTE LOGIN HARD-CODED HIT');
     
-    const { login } = require('../controllers/authController');
-    await login(req, res);
+    const authController = require('../controllers/authController');
+    const loginMiddlewares = authController.login;
+    
+    // Exécuter les middlewares séquentiellement
+    let currentIndex = 0;
+    
+    const executeNext = (err) => {
+      if (err) {
+        console.error('❌ Auth middleware error:', err);
+        return res.status(500).json({ error: 'Auth middleware error: ' + err.message });
+      }
+      
+      if (currentIndex >= loginMiddlewares.length) {
+        return;
+      }
+      
+      const currentMiddleware = loginMiddlewares[currentIndex++];
+      
+      if (typeof currentMiddleware === 'function') {
+        currentMiddleware(req, res, executeNext);
+      } else {
+        executeNext();
+      }
+    };
+    
+    executeNext();
+    
   } catch (error) {
     console.error('❌ Auth controller error:', error);
     res.status(500).json({ error: 'Auth controller error: ' + error.message });

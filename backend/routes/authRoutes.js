@@ -1,33 +1,23 @@
 const express = require('express');
-const {
-  register,
-  activate,
-  login,
-  refresh,
-  me,
-  logout,
-  forgotPassword,
-  resetPassword,
-  getAllUsers,
-} = require('../controllers/authController');
+const authController = require('../controllers/authController');
 const { authMiddleware } = require('../middlewares/authMiddleware');
 const { authSchemas, userSchemas } = require('../middlewares/validation');
 
 const router = express.Router();
 
 // 🔓 Routes publiques avec validation renforcée
-router.post('/register', authSchemas.register, register);
-router.post('/activate', activate); // TODO: Ajouter validation pour le token
-router.post('/login', authSchemas.login, login);
-router.post('/refresh', refresh); // TODO: Ajouter validation pour refresh token
-router.post('/forgot-password', authSchemas.resetPassword, forgotPassword);
-router.post('/reset-password', authSchemas.confirmResetPassword, resetPassword);
+router.post('/register', ...authController.register);
+router.post('/activate', ...authController.activate); // TODO: Ajouter validation pour le token
+router.post('/login', authSchemas.login, ...authController.login);
+router.post('/refresh', ...authController.refresh); // TODO: Ajouter validation pour refresh token
+router.post('/forgot-password', ...authController.forgotPassword);
+router.post('/reset-password', ...authController.resetPassword);
 
 // 🔒 Routes protégées
-router.get('/me', authMiddleware(), me);
-router.post('/logout', authMiddleware(), logout);
+router.get('/me', authMiddleware(), authController.me);
+router.post('/logout', authMiddleware(), authController.logout);
 
 // 🔒 Routes admin avec validation
-router.get('/users', authMiddleware('admin'), userSchemas.listUsers, getAllUsers);
+router.get('/users', authMiddleware('admin'), userSchemas.listUsers, authController.getAllUsers);
 
 module.exports = router;
