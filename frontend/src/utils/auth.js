@@ -87,9 +87,15 @@ api.interceptors.response.use(
 // Fonction pour vérifier l'authentification
 export const checkAuth = async () => {
   try {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/auth/me', {
+      headers: {
+        'X-No-Auto-Redirect': 'true' // Éviter les redirections automatiques
+      },
+      timeout: 5000 // Timeout de 5 secondes
+    });
     return { isAuth: true, user: response.data };
   } catch (error) {
+    console.log('checkAuth: Utilisateur non authentifié', error.response?.status);
     return { isAuth: false, user: null };
   }
 };
