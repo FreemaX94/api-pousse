@@ -125,6 +125,32 @@ exports.createNieuwkoopItem = async (req, res) => {
   }
 };
 
+exports.getMovementImage = async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const fs = require('fs');
+    const path = require('path');
+    
+    const publicPath = path.join(__dirname, '../../../public', filename);
+    const assetsPath = path.join(__dirname, '../../../assets', filename);
+    
+    console.log('🎯 API MOVEMENT IMAGE:', filename);
+    
+    if (fs.existsSync(publicPath)) {
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.sendFile(publicPath);
+    } else if (fs.existsSync(assetsPath)) {
+      res.setHeader('Content-Type', 'image/jpeg'); 
+      res.sendFile(assetsPath);
+    } else {
+      res.status(404).json({ error: 'Movement image not found', filename });
+    }
+  } catch (err) {
+    console.error('❌ Erreur getMovementImage:', err);
+    res.status(500).json({ error: 'Erreur serveur movement image' });
+  }
+};
+
 exports.getNieuwkoopItems = async (req, res) => {
   try {
     const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
@@ -138,10 +164,14 @@ exports.getNieuwkoopItems = async (req, res) => {
         description: item.description,
         // Extraire le prix de pricing.price pour le frontend
         price: item.pricing?.price || 0,
-        // Extraire l'image primaire pour le frontend avec URL relative
+        // Extraire l'image primaire pour le frontend avec URL ABSOLUE
         image: (() => {
           const imageUrl = item.images?.find(img => img.isPrimary)?.url || item.images?.[0]?.url || null;
-          // Garder l'URL relative pour que le frontend gère l'URL de base
+          // FORCER URL ABSOLUE pour articles EXT
+          if (imageUrl && imageUrl.includes('movement_')) {
+            const filename = imageUrl.split('/').pop();
+            return `/api/catalog/nieuwkoop/movement-image/${filename}`;
+          }
           return imageUrl;
         })(),
         // Conserver la structure stock

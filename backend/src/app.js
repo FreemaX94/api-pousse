@@ -224,6 +224,26 @@ app.get('/movement_*', (req, res) => {
   }
 });
 
+// 🚨 SOLUTION API FINALE: Route API pour images movement
+app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const publicPath = path.join(__dirname, '../public', filename);
+  const assetsPath = path.join(__dirname, '../assets', filename);
+  
+  console.log('🎯 API MOVEMENT IMAGE REQUEST:', filename);
+  
+  if (fs.existsSync(publicPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(publicPath);
+  } else if (fs.existsSync(assetsPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(assetsPath);
+  } else {
+    console.log('❌ Movement file not found:', filename);
+    res.status(404).json({ error: 'Movement image not found', filename });
+  }
+});
+
 // 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin
 app.use('*/movement_*', (req, res) => {
   const filename = req.path.split('/').pop(); // Récupérer juste le nom du fichier
