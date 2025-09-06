@@ -166,11 +166,20 @@ app.get('/debug/assets/:filename', (req, res) => {
 // 🚨 ROUTE ALTERNATIVE POUR SERVIR TOUS LES ASSETS VIA /api/assets
 app.get('/api/assets/:filename', (req, res) => {
   const { filename } = req.params;
-  const filePath = path.join(__dirname, '../public/assets', filename);
+  const publicAssetsPath = path.join(__dirname, '../public/assets', filename);
+  const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🔥 API ASSETS REQUEST:', filename);
   
-  if (fs.existsSync(filePath)) {
+  // Vérifier d'abord dans public/assets, puis dans assets/
+  let filePath;
+  if (fs.existsSync(publicAssetsPath)) {
+    filePath = publicAssetsPath;
+  } else if (fs.existsSync(assetsPath)) {
+    filePath = assetsPath;
+  }
+  
+  if (filePath) {
     // Définir le bon Content-Type
     if (filename.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript');
@@ -192,6 +201,22 @@ app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
 // 🚨 SOLUTION ULTIME: Servir assets depuis le code source
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 console.log('✅ Assets served from:', path.join(__dirname, 'assets'));
+
+// 🚨 Route pour servir les images movement_ directement à la racine
+app.get('/movement_*', (req, res) => {
+  const filename = req.path.substring(1); // Enlever le / du début
+  const assetsPath = path.join(__dirname, '../assets', filename);
+  
+  console.log('🖼️ MOVEMENT IMAGE REQUEST:', filename);
+  console.log('🖼️ Assets path:', assetsPath);
+  
+  if (fs.existsSync(assetsPath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(assetsPath);
+  } else {
+    res.status(404).json({ error: 'Movement image not found', path: filename });
+  }
+});
 
 // Debug endpoint
 app.get('/debug/architecture', (req, res) => {
