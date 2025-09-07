@@ -198,9 +198,7 @@ console.log('⚠️ Static files configuration moved to index.js for priority');
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
 
-// Servir les fichiers uploadés des projets depuis le dossier uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-console.log('✅ Uploads served from:', path.join(__dirname, '../uploads'));
+// UPLOADS sera configuré dans setupDomains() après les routes API
 
 // 🚨 SOLUTION ULTIME: Servir assets depuis le code source
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -568,6 +566,16 @@ function setupDomains() {
       express.static(distPath)(req, res, next);
     });
     app.use('/assets', express.static(assetsPath));
+    
+    // 🚨 UPLOADS - Configuration APRÈS les routes API mais AVANT catch-all
+    const uploadsPath = path.join(__dirname, '../uploads');
+    app.use('/uploads', (req, res, next) => {
+      if (req.path.startsWith('/api/')) {
+        return next();
+      }
+      express.static(uploadsPath)(req, res, next);
+    });
+    console.log('✅ Uploads served from:', uploadsPath, '- exists:', fs.existsSync(uploadsPath));
     
     console.log('✅ Static files mounted AFTER API routes');
     
