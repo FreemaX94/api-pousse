@@ -306,7 +306,7 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                     {p.files.map((f, i) => (
                       <a
                         key={i}
-                        href={`/uploads/${f}`}
+                        href={`/api/uploads/${f}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{

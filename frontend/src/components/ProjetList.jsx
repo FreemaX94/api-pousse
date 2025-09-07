@@ -415,7 +415,7 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                     {p.documents.map((doc, i) => (
                       <a
                         key={i}
-                        href={doc.path || `/uploads/${doc.name || doc}`}
+                        href={doc.path || `/api/uploads/${doc.name || doc}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
