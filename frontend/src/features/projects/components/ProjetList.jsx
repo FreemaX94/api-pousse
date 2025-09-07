@@ -307,7 +307,7 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                     {(p.files || []).map((f, i) => (
                       <a
                         key={i}
-                        href={`/api/uploads/${f}`}
+                        href={`${window.location.origin}/api/uploads/${f}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -338,7 +338,7 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                     {(p.documents || []).map((doc, i) => (
                       <a
                         key={`doc-${i}`}
-                        href={`/api/uploads/${doc.path}`}
+                        href={`${window.location.origin}/api/uploads/${doc.path}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
