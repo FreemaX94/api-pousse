@@ -682,6 +682,32 @@ function setupDomains() {
       }
     });
     
+    // 🚨 DIAGNOSTIC: Route pour inspecter les projets et leurs fichiers
+    app.get('/api/debug/projects', async (req, res) => {
+      try {
+        const { default: Projet } = await import('../models/Projet.js');
+        const projects = await Projet.find().sort({ createdAt: -1 }).limit(5);
+        
+        res.json({
+          success: true,
+          totalProjects: projects.length,
+          projects: projects.map(p => ({
+            _id: p._id,
+            client: p.client,
+            description: p.description,
+            files: p.files || [],
+            documents: p.documents || [],
+            materials: p.materials || {},
+            createdAt: p.createdAt,
+            updatedAt: p.updatedAt
+          }))
+        });
+      } catch (error) {
+        console.error('Erreur debug projects:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+    
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
     app.get('/api/debug/test', (req, res) => {
       res.json({ 

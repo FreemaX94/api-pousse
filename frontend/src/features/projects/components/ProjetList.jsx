@@ -283,7 +283,7 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
               </div>
 
               {/* Fichiers premium */}
-              {p.files?.length > 0 && (
+              {(p.files?.length > 0 || p.documents?.length > 0) && (
                 <div style={{
                   background: 'linear-gradient(135deg, rgba(59,130,246,0.05), rgba(16,185,129,0.05))',
                   padding: '1rem',
@@ -298,12 +298,13 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
                     marginBottom: '0.75rem'
-                  }}>📎 Fichiers ({p.files.length})</div>
+                  }}>📎 Fichiers ({(p.files?.length || 0) + (p.documents?.length || 0)})</div>
                   <div style={{
                     display: 'grid',
                     gap: '0.5rem'
                   }}>
-                    {p.files.map((f, i) => (
+                    {/* Afficher les anciens files et les nouveaux documents */}
+                    {(p.files || []).map((f, i) => (
                       <a
                         key={i}
                         href={`/api/uploads/${f}`}
@@ -331,6 +332,37 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                         }}
                       >
                         📄 {f}
+                      </a>
+                    ))}
+                    {/* Afficher les nouveaux documents */}
+                    {(p.documents || []).map((doc, i) => (
+                      <a
+                        key={`doc-${i}`}
+                        href={`/api/uploads/${doc.path}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '0.5rem 0.75rem',
+                          background: 'rgba(255,255,255,0.8)',
+                          borderRadius: '8px',
+                          fontSize: '0.9rem',
+                          fontWeight: '500',
+                          color: '#3b82f6',
+                          textDecoration: 'none',
+                          transition: 'all 0.3s ease',
+                          border: '1px solid rgba(59,130,246,0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'rgba(59,130,246,0.1)';
+                          e.target.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'rgba(255,255,255,0.8)';
+                          e.target.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        📄 {doc.name}
                       </a>
                     ))}
                   </div>

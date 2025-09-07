@@ -21,9 +21,15 @@ const getProjetById = async (req, res, next) => {
 
 const createProjet = async (req, res, next) => {
   try {
-    // Multer place les fichiers dans req.files
-    const files = Array.isArray(req.files)
-      ? req.files.map(f => f.filename)
+    // Multer place les fichiers dans req.files - mapper vers le format documents
+    const documents = Array.isArray(req.files)
+      ? req.files.map(f => ({
+          name: f.originalname || f.filename,
+          path: f.filename,
+          type: 'photo', // Défaut pour les images uploadées
+          size: f.size,
+          mimeType: f.mimetype
+        }))
       : [];
 
     // Traiter les plantes/materials si elles sont présentes
@@ -71,7 +77,7 @@ const createProjet = async (req, res, next) => {
       status: req.body.statut === 'En cours' ? 'active' : 
               req.body.statut === 'Terminé' ? 'completed' : 
               req.body.statut === 'Archivé' ? 'archived' : 'planning',
-      files,
+      documents,
       materials: plants.length > 0 ? plants.map(plant => {
         const price = plant.unitPrice || plant.Price || plant.price || 0;
         const qty = plant.quantity || 1;
