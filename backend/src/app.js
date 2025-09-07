@@ -198,6 +198,10 @@ console.log('⚠️ Static files configuration moved to index.js for priority');
 // Servir les images des articles externes depuis le dossier persistant
 app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
 
+// Servir les fichiers uploadés des projets depuis le dossier uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+console.log('✅ Uploads served from:', path.join(__dirname, '../uploads'));
+
 // 🚨 SOLUTION ULTIME: Servir assets depuis le code source
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 console.log('✅ Assets served from:', path.join(__dirname, 'assets'));

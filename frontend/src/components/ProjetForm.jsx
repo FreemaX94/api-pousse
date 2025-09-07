@@ -24,6 +24,34 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
     setSelectedFiles(Array.from(e.target.files));
   };
 
+  // Fonctions pour le drag & drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = Array.from(e.dataTransfer.files);
+    const validFiles = files.filter(file => {
+      return file.type.startsWith('image/') || file.type === 'application/pdf';
+    });
+    
+    setSelectedFiles(validFiles);
+  };
+
   // Recherche stock avec enrichissement des dimensions
   useEffect(() => {
     if (stockQuery.length < 2) {
@@ -931,15 +959,21 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
         >
           📎 Fichiers (PDF, JPG, PNG...)
         </label>
-        <div style={{
-          position: 'relative',
-          background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-          borderRadius: '16px',
-          border: '2px dashed var(--color-border)',
-          padding: '2rem',
-          textAlign: 'center',
-          transition: 'all 0.3s ease'
-        }}>
+        <div 
+          style={{
+            position: 'relative',
+            background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+            borderRadius: '16px',
+            border: '2px dashed var(--color-border)',
+            padding: '2rem',
+            textAlign: 'center',
+            transition: 'all 0.3s ease'
+          }}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <input
             type="file"
             id="files"
