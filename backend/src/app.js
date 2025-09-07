@@ -602,29 +602,12 @@ function setupDomains() {
     
     console.log('✅ Static files mounted AFTER API routes');
     
-    // 🚨 ROUTE SPÉCIFIQUE POUR /app/nieuwkoop - PRESERVE CONTEXT
+    // 🚨 ROUTE SPÉCIFIQUE POUR /app/nieuwkoop - REDIRECT TO ROOT
     app.get('/app/nieuwkoop', (req, res) => {
-      console.log('🎯 ROUTE /app/nieuwkoop HIT - Trying to serve index.html');
-      
-      // Essayer différents chemins possibles pour index.html en production
-      const possiblePaths = [
-        path.join(__dirname, '../public/index.html'),     // Standard
-        path.join(__dirname, '../dist/index.html'),       // Build dist
-        path.join(__dirname, '../../frontend/dist/index.html'), // Frontend build
-        path.join(process.cwd(), 'public/index.html'),    // CWD public
-        path.join(process.cwd(), 'index.html')            // CWD root
-      ];
-      
-      for (const indexPath of possiblePaths) {
-        if (fs.existsSync(indexPath)) {
-          console.log(`✅ Found index.html at: ${indexPath}`);
-          return res.sendFile(indexPath);
-        }
-      }
-      
-      // Si aucun index.html trouvé, redirection avec préservation de l'URL
-      console.log('❌ No index.html found, redirecting with URL preservation');
-      res.redirect('/?return=' + encodeURIComponent(req.path));
+      console.log('🎯 ROUTE /app/nieuwkoop HIT - Redirecting to preserve assets');
+      // Redirection vers la racine pour que les assets JS/CSS soient correctement chargés
+      // React Router gérera ensuite le routing vers /app/nieuwkoop
+      res.redirect('/#/app/nieuwkoop');
     });
     
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
