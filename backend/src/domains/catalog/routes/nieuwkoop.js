@@ -12,8 +12,8 @@ router.get('/stock', (req, res, next) => {
 });
 router.get('/items/:productId/image', controller.getItemImage);
 
-// 🔒 Protéger le reste des routes - TEMPORAIREMENT DÉSACTIVÉ POUR DEBUG
-// router.use(authMiddleware());
+// 🔒 Protéger le reste des routes
+router.use(authMiddleware());
 
 // 🔍 Produits (API Nieuwkoop)
 router.get('/items', controller.getItems);

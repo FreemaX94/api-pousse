@@ -475,6 +475,16 @@ function setupDomains() {
     app.use('/api/auth', authDomain.routes);
     console.log('✅ Routes auth montées sur /api/auth (rate limiting désactivé)');
     
+    // 🚨 ROUTES PUBLIQUES NIEUWKOOP - AVANT DOMAINE CATALOG POUR ÉVITER AUTH
+    const nieuwkoopController = require('./domains/catalog/controllers/nieuwkoopController');
+    app.get('/api/catalog/nieuwkoop/prices/:productId', nieuwkoopController.getItemPrice);
+    app.get('/api/catalog/nieuwkoop/stock', (req, res, next) => {
+      console.log('🔍 Route GET /api/catalog/nieuwkoop/stock appelée (PUBLIC - BYPASS AUTH)');
+      nieuwkoopController.getNieuwkoopItems(req, res, next);
+    });
+    app.get('/api/catalog/nieuwkoop/items/:productId/image', nieuwkoopController.getItemImage);
+    console.log('✅ Routes publiques nieuwkoop montées AVANT domaine catalog');
+
     // Domaines métier
     app.use('/api/catalog', catalogDomain.routes);
     app.use('/api/inventory', inventoryDomain.routes);
