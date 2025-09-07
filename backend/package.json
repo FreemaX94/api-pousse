@@ -7,7 +7,7 @@
     "npm": ">=8.x"
   },
   "scripts": {
-    "start": "npm install && node setup-static-files.js && node --enable-source-maps index.js",
+    "start": "npm install && node prepare-uploads.js && node setup-static-files.js && node --enable-source-maps index.js",
     "start-minimal": "npm install && node setup-static-files.js && node --enable-source-maps index-minimal.js",
     "dev": "node --enable-source-maps index.js",
     "dev-simple": "node --enable-source-maps index.js",

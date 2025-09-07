@@ -578,27 +578,44 @@ function setupDomains() {
     });
     app.use('/assets', express.static(assetsPath));
     
-    // 🚨 UPLOADS - Configuration APRÈS les routes API mais AVANT catch-all
+    // 🚨 SOLUTION 1: UPLOADS - Configuration statique simple et robuste
     const uploadsPath = path.join(__dirname, '../uploads');
+    console.log('🔍 UPLOADS PATH:', uploadsPath);
+    console.log('🔍 __dirname:', __dirname);
+    console.log('🔍 process.cwd():', process.cwd());
     
-    // Créer le dossier uploads s'il n'existe pas
-    if (!fs.existsSync(uploadsPath)) {
-      console.log('⚠️ Dossier uploads inexistant, création...');
-      try {
+    // Créer le dossier uploads s'il n'existe pas - VERSION ROBUSTE
+    try {
+      if (!fs.existsSync(uploadsPath)) {
+        console.log('⚠️ Création dossier uploads:', uploadsPath);
         fs.mkdirSync(uploadsPath, { recursive: true });
-        console.log('✅ Dossier uploads créé:', uploadsPath);
-      } catch (error) {
-        console.error('❌ Erreur création dossier uploads:', error.message);
       }
+      
+      // Créer sous-dossiers si nécessaires
+      const subDirs = ['movements', 'backup_uploads'];
+      subDirs.forEach(dir => {
+        const subPath = path.join(uploadsPath, dir);
+        if (!fs.existsSync(subPath)) {
+          fs.mkdirSync(subPath, { recursive: true });
+        }
+      });
+      
+      console.log('✅ Dossier uploads exists:', fs.existsSync(uploadsPath));
+      console.log('✅ Dossier contents:', fs.readdirSync(uploadsPath).length, 'files');
+    } catch (error) {
+      console.error('❌ Erreur uploads setup:', error.message);
     }
     
-    app.use('/uploads', (req, res, next) => {
-      if (req.path.startsWith('/api/')) {
-        return next();
-      }
-      express.static(uploadsPath)(req, res, next);
-    });
-    console.log('✅ Uploads served from:', uploadsPath, '- exists:', fs.existsSync(uploadsPath));
+    // CONFIGURATION STATIQUE DIRECTE - SANS CONDITIONS  
+    app.use('/uploads', express.static(uploadsPath));
+    console.log('✅ Route /uploads configurée vers:', uploadsPath);
+    
+    // SOLUTION BACKUP: Upload depuis public/ aussi (au cas où uploads/ ne serait pas déployé)
+    const publicUploadsPath = path.join(publicPath, 'uploads');
+    if (fs.existsSync(publicUploadsPath)) {
+      app.use('/public-uploads', express.static(publicUploadsPath));
+      console.log('✅ Route /public-uploads backup configurée vers:', publicUploadsPath);
+    }
     
     console.log('✅ Static files mounted AFTER API routes');
     
@@ -610,13 +627,48 @@ function setupDomains() {
       res.redirect('/#/app/nieuwkoop');
     });
     
+    // 🚨 ROUTES DIAGNOSTIC - FORCE DEPLOY VERSION 3
+    app.get('/DIAGNOSTIC-UPLOAD-V3', (req, res) => {
+      const uploadsPath = path.join(__dirname, '../uploads');
+      try {
+        const exists = fs.existsSync(uploadsPath);
+        const files = exists ? fs.readdirSync(uploadsPath) : [];
+        res.json({ 
+          success: true,
+          timestamp: new Date().toISOString(),
+          uploadsPath,
+          exists,
+          files: files.slice(0, 5), // Premiers 5 fichiers
+          totalFiles: files.length,
+          deployVersion: 'V3-2025-09-07-12h00',
+          paths: {
+            __dirname,
+            cwd: process.cwd(),
+            uploadsRelative: '../uploads'
+          }
+        });
+      } catch (error) {
+        res.json({
+          success: false,
+          error: error.message,
+          uploadsPath,
+          deployVersion: 'V3-2025-09-07-12h00'
+        });
+      }
+    });
+    
+    // Route test simple
+    app.get('/test-upload-route', (req, res) => {
+      res.send('UPLOAD ROUTE TEST OK - V3');
+    });
+    
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
     app.get('/debug/test', (req, res) => {
       res.json({ 
-        message: 'Route debug fonctionne - Deploy forced!', 
+        message: 'Route debug fonctionne - Deploy forced V3!', 
         timestamp: new Date().toISOString(),
         path: req.path,
-        deployVersion: '2025-09-07-02h00' // Force new deployment
+        deployVersion: '2025-09-07-12h00' // Force new deployment
       });
     });
     
