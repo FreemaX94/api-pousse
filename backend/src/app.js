@@ -604,20 +604,10 @@ function setupDomains() {
     
     // 🚨 ROUTE SPÉCIFIQUE POUR /app/nieuwkoop - CORRIGE LE REFRESH
     app.get('/app/nieuwkoop', (req, res) => {
-      console.log('🎯 ROUTE /app/nieuwkoop HIT - Serving index.html');
-      const indexPath = path.join(__dirname, '../public', 'index.html');
-      
-      if (!fs.existsSync(indexPath)) {
-        console.error(`❌ Index.html non trouvé: ${indexPath}`);
-        return res.status(500).json({ 
-          error: 'Frontend non disponible', 
-          indexPath,
-          cwd: process.cwd(),
-          __dirname 
-        });
-      }
-      
-      res.sendFile(indexPath);
+      console.log('🎯 ROUTE /app/nieuwkoop HIT - Redirecting to root');
+      // En production DigitalOcean, on redirige vers la racine
+      // Le frontend gérera le routing
+      res.redirect('/');
     });
     
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
