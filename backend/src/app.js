@@ -721,7 +721,8 @@ function setupDomains() {
     // 🚨 DIAGNOSTIC: Route pour inspecter les projets et leurs fichiers
     app.get('/api/debug/projects', async (req, res) => {
       try {
-        const { default: Projet } = await import('../models/Projet.js');
+        const mongoose = require('mongoose');
+        const Projet = mongoose.models.Projet || require('../domains/projects/models/Projet');
         const projects = await Projet.find().sort({ createdAt: -1 }).limit(5);
         
         res.json({
