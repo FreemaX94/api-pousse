@@ -416,9 +416,10 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                       <button
                         key={i}
                         onClick={() => {
-                          const url = doc.path || `${window.location.origin}/api/uploads/${doc.name || doc}`;
-                          console.log('🔗 Opening document URL:', url);
-                          window.open(url, '_blank', 'noopener,noreferrer');
+                          const fullUrl = `https://api-pousse-app-5y2wo.ondigitalocean.app/api/uploads/${doc.path || doc.name || doc}`;
+                          console.log('🔗 Opening document URL HARD CODED:', fullUrl);
+                          console.log('🔗 doc.path:', doc.path);
+                          window.open(fullUrl, '_blank', 'noopener,noreferrer');
                         }}
                         style={{
                           display: 'block',
