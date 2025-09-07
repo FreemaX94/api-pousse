@@ -490,6 +490,14 @@ function setupDomains() {
     });
     console.log('✅ Routes publiques nieuwkoop montées AVANT domaine catalog');
 
+    // 🚨 ROUTE TEST TEMPORAIRE POUR DEBUG MOVEMENTS
+    const movementController = require('./domains/inventory/controllers/movementController');
+    app.post('/api/test-movement', (req, res, next) => {
+      console.log('🔍 Route TEST movement appelée - Body:', req.body);
+      movementController.createMovement(req, res, next);
+    });
+    console.log('✅ Route test movement créée pour debug');
+
     // Domaines métier
     app.use('/api/catalog', catalogDomain.routes);
     app.use('/api/inventory', inventoryDomain.routes);
