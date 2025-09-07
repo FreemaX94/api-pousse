@@ -666,19 +666,30 @@ function setupDomains() {
     app.get('/api/uploads/:filename', (req, res) => {
       try {
         const filename = req.params.filename;
+        console.log(`🔥 ROUTE /api/uploads/${filename} APPELÉE DIRECTEMENT`);
+        console.log(`🔍 Headers:`, req.headers);
+        console.log(`🔍 User-Agent:`, req.get('User-Agent'));
+        console.log(`🔍 Origin:`, req.get('Origin'));
+        console.log(`🔍 Referer:`, req.get('Referer'));
+        
         const uploadsPath = path.join(__dirname, '../uploads');
         const filePath = path.join(uploadsPath, filename);
         
+        console.log(`📁 Cherche fichier:`, filePath);
+        console.log(`📁 Existe:`, fs.existsSync(filePath));
+        
         // Vérifier que le fichier existe et est dans le dossier uploads (sécurité)
         if (!fs.existsSync(filePath) || !filePath.startsWith(uploadsPath)) {
-          return res.status(404).json({ error: 'Fichier non trouvé' });
+          console.log(`❌ Fichier non trouvé ou hors du dossier uploads`);
+          return res.status(404).json({ error: 'Fichier non trouvé', filename, path: filePath });
         }
         
+        console.log(`✅ Serving fichier:`, filePath);
         // Servir le fichier
         res.sendFile(filePath);
       } catch (error) {
-        console.error('Erreur serving upload:', error);
-        res.status(500).json({ error: 'Erreur serveur' });
+        console.error('❌ Erreur serving upload:', error);
+        res.status(500).json({ error: 'Erreur serveur', details: error.message });
       }
     });
     
