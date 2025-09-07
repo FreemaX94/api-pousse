@@ -591,7 +591,35 @@ function setupDomains() {
     
     console.log('✅ Static files mounted AFTER API routes');
     
-    console.log('✅ Routes React SPA gérées par catch-all amélioré');
+    // 🚨 ROUTE TEST SPÉCIFIQUE POUR DEBUG
+    app.get('/app/nieuwkoop', (req, res) => {
+      console.log('🎯 ROUTE SPÉCIFIQUE /app/nieuwkoop HIT');
+      const indexPath = path.join(__dirname, '../public', 'index.html');
+      
+      if (!fs.existsSync(indexPath)) {
+        console.error(`❌ Index.html non trouvé: ${indexPath}`);
+        return res.status(500).json({ 
+          error: 'Frontend non disponible', 
+          indexPath,
+          cwd: process.cwd(),
+          __dirname 
+        });
+      }
+      
+      console.log(`📄 Serving index.html for /app/nieuwkoop: ${indexPath}`);
+      res.sendFile(indexPath);
+    });
+    
+    // 🚨 ROUTE DEBUG POUR TESTER
+    app.get('/debug/test', (req, res) => {
+      res.json({ 
+        message: 'Route debug fonctionne!', 
+        timestamp: new Date().toISOString(),
+        path: req.path 
+      });
+    });
+    
+    console.log('✅ Routes de debug ajoutées');
     
     // 🚨 ROUTE CATCH-ALL UNIVERSELLE - GÈRE TOUTES LES ROUTES SPA
     app.use('*', (req, res) => {
