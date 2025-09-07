@@ -4506,6 +4506,7 @@ return (
                                     transition: 'all 0.2s ease'
                                   }}
                                   title={`Type de stock: ${prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}`}
+                                  onClick={(e) => e.stopPropagation()}
                                 >
                                   <div style={{
                                     width: '6px',
