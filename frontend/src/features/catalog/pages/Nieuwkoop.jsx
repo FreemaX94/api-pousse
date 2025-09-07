@@ -1746,6 +1746,42 @@ const Nieuwkoop = () => {
     }
   };
 
+  const updateStockType = async (id, currentStockType) => {
+    setLoading(`stockType-${id}`, true);
+    
+    // Basculer entre 'permanent' et 'limited' 
+    const newStockType = currentStockType === 'permanent' ? 'limited' : 'permanent';
+    
+    // Mise à jour optimiste immédiate
+    setAddedItems(prev => prev.map(item => 
+      item._id === id ? { ...item, stockType: newStockType } : item
+    ));
+    
+    try {
+      // Mettre à jour le type de stock dans la base
+      const response = await axiosApi.put(`/catalog/nieuwkoop/stock/${id}`, { stockType: newStockType });
+      const updated = response.data;
+      
+      // Mise à jour avec les données du serveur
+      setAddedItems(prev => prev.map(item => 
+        item._id === id ? { ...item, ...updated } : item
+      ));
+      
+      showNotification(
+        `Type de stock modifié: ${newStockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}`, 
+        'success'
+      );
+      
+    } catch (error) {
+      console.error('❌ Erreur lors de la mise à jour du type de stock:', error);
+      // Annuler la mise à jour optimiste en cas d'erreur
+      fetchAddedItems();
+      showNotification('Erreur lors de la mise à jour du type de stock', 'error');
+    } finally {
+      setLoading(`stockType-${id}`, false);
+    }
+  };
+
   const updateNote = (id, note) => {
     axiosApi.put(`/catalog/nieuwkoop/stock/${id}/note`, { note })
       .then(response => {
@@ -4488,6 +4524,12 @@ return (
 
                                 {/* Pastille Stock Permanent */}
                                 <div
+                                  title={`Type de stock: ${prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'} - Cliquer pour basculer`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    updateStockType(prod._id, prod.stockType);
+                                  }}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -4502,11 +4544,10 @@ return (
                                     boxShadow: (prod.stockType === 'permanent') ? 
                                       '0 2px 8px rgba(217, 119, 6, 0.3)' : 
                                       '0 2px 8px rgba(234, 179, 8, 0.3)',
-                                    cursor: 'default',
+                                    cursor: loadingStates[`stockType-${prod._id}`] ? 'not-allowed' : 'pointer',
+                                    opacity: loadingStates[`stockType-${prod._id}`] ? 0.6 : 1,
                                     transition: 'all 0.2s ease'
                                   }}
-                                  title={`Type de stock: ${prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}`}
-                                  onClick={(e) => e.stopPropagation()}
                                 >
                                   <div style={{
                                     width: '6px',
@@ -4515,7 +4556,7 @@ return (
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     marginRight: '0.4rem'
                                   }}></div>
-                                  {prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité'}
+                                  {loadingStates[`stockType-${prod._id}`] ? '⏳' : (prod.stockType === 'permanent' ? 'Stock Permanent' : 'Stock Limité')}
                                 </div>
                               </div>
                             </div>
