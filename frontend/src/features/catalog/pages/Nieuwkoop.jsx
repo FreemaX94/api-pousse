@@ -5397,8 +5397,11 @@ return (
                                   <img
                                     src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : (() => {
                                       if (!item.image || !item.image.includes('movement_')) return item.image;
-                                      const cleanPath = item.image.replace('/movements/', '');
-                                      return cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+                                      const filename = item.image.replace('/movements/', '').replace('/', '');
+                                      const baseUrl = window.location.hostname === 'localhost' 
+                                        ? 'http://localhost:3001' 
+                                        : 'https://api-pousse-app-5y2wo.ondigitalocean.app';
+                                      return `${baseUrl}/api/uploads/${filename}`;
                                     })()}
                                     alt={item.name}
                                     style={{
