@@ -700,6 +700,52 @@ const Nieuwkoop = () => {
   const handleEntrySaved = () => setRefreshEntries(f => !f);
   const handleExitSaved  = () => setRefreshExits(f => !f);
 
+  // Fonction pour vider tout l'historique des entrées
+  const clearAllEntries = async () => {
+    if (!window.confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUT l\'historique des entrées ? Cette action est irréversible !')) {
+      return;
+    }
+
+    setLoading('clearAllEntries', true);
+    
+    try {
+      // Récupérer toutes les entrées
+      const response = await axiosApi.get('/movements');
+      const allMovements = Array.isArray(response.data) ? response.data : [];
+      const entries = allMovements.filter(m => m.type === 'entrée');
+      
+      if (entries.length === 0) {
+        showNotification('Aucune entrée à supprimer', 'info');
+        return;
+      }
+
+      // Supprimer toutes les entrées une par une
+      let deletedCount = 0;
+      for (const entry of entries) {
+        try {
+          await axiosApi.delete(`/movements/${entry._id}`);
+          deletedCount++;
+        } catch (error) {
+          console.warn(`⚠️ Erreur suppression entrée ${entry._id}:`, error);
+        }
+      }
+      
+      // Déclencher le refresh de la liste
+      setRefreshEntries(f => !f);
+      
+      showNotification(
+        `✅ ${deletedCount} entrée${deletedCount > 1 ? 's' : ''} supprimée${deletedCount > 1 ? 's' : ''}`,
+        'success'
+      );
+
+    } catch (error) {
+      console.error('❌ Erreur lors du vidage de l\'historique:', error);
+      showNotification('Erreur lors du vidage de l\'historique', 'error');
+    } finally {
+      setLoading('clearAllEntries', false);
+    }
+  };
+
   // Fonction de soumission pour les opérations diverses
   // Fonction pour supprimer toutes les opérations locales
   const clearLocalOperations = () => {
@@ -2825,6 +2871,26 @@ return (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h2>{entrySubTab === 'formulaire' ? '📥 Formulaire d\'Entrée' : entrySubTab === 'historique' ? '📋 Historique des Entrées' : '📤 Entrée externe'}</h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
+                  {entrySubTab === 'historique' && (
+                    <button
+                      onClick={clearAllEntries}
+                      disabled={loadingStates['clearAllEntries']}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: loadingStates['clearAllEntries'] ? '#ef4444' : '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: loadingStates['clearAllEntries'] ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        opacity: loadingStates['clearAllEntries'] ? 0.6 : 1
+                      }}
+                      title="Supprimer tout l'historique des entrées"
+                    >
+                      {loadingStates['clearAllEntries'] ? '⏳' : '🗑️'} Tout vider
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       console.log('🔄 Clic bouton Entrée externe');
