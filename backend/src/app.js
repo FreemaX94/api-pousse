@@ -662,6 +662,26 @@ function setupDomains() {
       res.send('UPLOAD ROUTE TEST OK - V3');
     });
     
+    // 🚨 SOLUTION DÉFINITIVE: Route API pour servir les uploads
+    app.get('/api/uploads/:filename', (req, res) => {
+      try {
+        const filename = req.params.filename;
+        const uploadsPath = path.join(__dirname, '../uploads');
+        const filePath = path.join(uploadsPath, filename);
+        
+        // Vérifier que le fichier existe et est dans le dossier uploads (sécurité)
+        if (!fs.existsSync(filePath) || !filePath.startsWith(uploadsPath)) {
+          return res.status(404).json({ error: 'Fichier non trouvé' });
+        }
+        
+        // Servir le fichier
+        res.sendFile(filePath);
+      } catch (error) {
+        console.error('Erreur serving upload:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+      }
+    });
+    
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
     app.get('/api/debug/test', (req, res) => {
       res.json({ 
