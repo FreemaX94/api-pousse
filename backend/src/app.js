@@ -685,6 +685,32 @@ function setupDomains() {
         }
         
         console.log(`✅ Serving fichier:`, filePath);
+        
+        // Déterminer le Content-Type selon l'extension
+        const path = require('path');
+        const ext = path.extname(filename).toLowerCase();
+        const mimeTypes = {
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg', 
+          '.png': 'image/png',
+          '.gif': 'image/gif',
+          '.webp': 'image/webp',
+          '.svg': 'image/svg+xml',
+          '.pdf': 'application/pdf',
+          '.txt': 'text/plain'
+        };
+        
+        const contentType = mimeTypes[ext] || 'application/octet-stream';
+        console.log(`📄 Content-Type déterminé: ${contentType} pour extension: ${ext}`);
+        
+        res.setHeader('Content-Type', contentType);
+        
+        // Pour les images, ajouter des headers pour l'affichage inline
+        if (contentType.startsWith('image/')) {
+          res.setHeader('Content-Disposition', 'inline');
+          console.log(`🖼️ Image servie pour affichage inline`);
+        }
+        
         // Servir le fichier
         res.sendFile(filePath);
       } catch (error) {
