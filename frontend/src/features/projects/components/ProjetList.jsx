@@ -308,9 +308,11 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                       <button
                         key={i}
                         onClick={() => {
-                          const url = `${window.location.origin}/api/uploads/${f}`;
-                          console.log('🔗 Opening URL:', url);
-                          window.open(url, '_blank', 'noopener,noreferrer');
+                          const fullUrl = `https://api-pousse-app-5y2wo.ondigitalocean.app/api/uploads/${f}`;
+                          console.log('🔗 Opening file URL HARD CODED:', fullUrl);
+                          console.log('🔗 f:', f);
+                          console.log('🔗 window.location.origin:', window.location.origin);
+                          window.open(fullUrl, '_blank', 'noopener,noreferrer');
                         }}
                         style={{
                           display: 'block',
@@ -343,9 +345,11 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                       <button
                         key={`doc-${i}`}
                         onClick={() => {
-                          const url = `${window.location.origin}/api/uploads/${doc.path}`;
-                          console.log('🔗 Opening document URL:', url);
-                          window.open(url, '_blank', 'noopener,noreferrer');
+                          const fullUrl = `https://api-pousse-app-5y2wo.ondigitalocean.app/api/uploads/${doc.path}`;
+                          console.log('🔗 Opening document URL HARD CODED:', fullUrl);
+                          console.log('🔗 doc.path:', doc.path);
+                          console.log('🔗 window.location.origin:', window.location.origin);
+                          window.open(fullUrl, '_blank', 'noopener,noreferrer');
                         }}
                         style={{
                           display: 'block',
