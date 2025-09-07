@@ -413,22 +413,26 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                     gap: '0.5rem'
                   }}>
                     {p.documents.map((doc, i) => (
-                      <a
+                      <button
                         key={i}
-                        href={doc.path || `${window.location.origin}/api/uploads/${doc.name || doc}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={() => {
+                          const url = doc.path || `${window.location.origin}/api/uploads/${doc.name || doc}`;
+                          console.log('🔗 Opening document URL:', url);
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        }}
                         style={{
                           display: 'block',
+                          width: '100%',
                           padding: '0.5rem 0.75rem',
                           background: 'var(--color-surface)',
                           borderRadius: '8px',
                           fontSize: '0.9rem',
                           fontWeight: '500',
                           color: '#3b82f6',
-                          textDecoration: 'none',
-                          transition: 'all 0.3s ease',
-                          border: '1px solid var(--color-border)'
+                          border: '1px solid var(--color-border)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.3s ease'
                         }}
                         onMouseEnter={(e) => {
                           e.target.style.background = 'var(--color-bg-secondary)';
@@ -440,7 +444,7 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                         }}
                       >
                         📄 {doc.name || doc}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>

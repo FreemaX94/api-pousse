@@ -305,22 +305,26 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                   }}>
                     {/* Afficher les anciens files et les nouveaux documents */}
                     {(p.files || []).map((f, i) => (
-                      <a
+                      <button
                         key={i}
-                        href={`${window.location.origin}/api/uploads/${f}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={() => {
+                          const url = `${window.location.origin}/api/uploads/${f}`;
+                          console.log('🔗 Opening URL:', url);
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        }}
                         style={{
                           display: 'block',
+                          width: '100%',
                           padding: '0.5rem 0.75rem',
                           background: 'rgba(255,255,255,0.8)',
                           borderRadius: '8px',
                           fontSize: '0.9rem',
                           fontWeight: '500',
                           color: '#3b82f6',
-                          textDecoration: 'none',
-                          transition: 'all 0.3s ease',
-                          border: '1px solid rgba(59,130,246,0.2)'
+                          border: '1px solid rgba(59,130,246,0.2)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.3s ease'
                         }}
                         onMouseEnter={(e) => {
                           e.target.style.background = 'rgba(59,130,246,0.1)';
@@ -332,26 +336,30 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                         }}
                       >
                         📄 {f}
-                      </a>
+                      </button>
                     ))}
                     {/* Afficher les nouveaux documents */}
                     {(p.documents || []).map((doc, i) => (
-                      <a
+                      <button
                         key={`doc-${i}`}
-                        href={`${window.location.origin}/api/uploads/${doc.path}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={() => {
+                          const url = `${window.location.origin}/api/uploads/${doc.path}`;
+                          console.log('🔗 Opening document URL:', url);
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        }}
                         style={{
                           display: 'block',
+                          width: '100%',
                           padding: '0.5rem 0.75rem',
                           background: 'rgba(255,255,255,0.8)',
                           borderRadius: '8px',
                           fontSize: '0.9rem',
                           fontWeight: '500',
                           color: '#3b82f6',
-                          textDecoration: 'none',
-                          transition: 'all 0.3s ease',
-                          border: '1px solid rgba(59,130,246,0.2)'
+                          border: '1px solid rgba(59,130,246,0.2)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.3s ease'
                         }}
                         onMouseEnter={(e) => {
                           e.target.style.background = 'rgba(59,130,246,0.1)';
@@ -363,7 +371,7 @@ export default function ProjetList({ projects, onUpdate, onDelete }) {
                         }}
                       >
                         📄 {doc.name}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>
