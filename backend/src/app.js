@@ -591,43 +591,10 @@ function setupDomains() {
     
     console.log('✅ Static files mounted AFTER API routes');
     
-    // 🚨 ROUTES REACT SPA SPÉCIFIQUES - AVANT CATCH-ALL
-    const reactRoutes = [
-      '/nieuwkoop', '/nieuwkoop/*',
-      '/app/nieuwkoop', '/app/nieuwkoop/*',
-      '/projets', '/projets/*', 
-      '/app/projets', '/app/projets/*',
-      '/dashboard', '/dashboard/*',
-      '/app/dashboard', '/app/dashboard/*',
-      '/mouvements', '/mouvements/*',
-      '/app/mouvements', '/app/mouvements/*',
-      '/vehicules', '/vehicules/*',
-      '/app/vehicules', '/app/vehicules/*',
-      '/finance', '/finance/*',
-      '/app/finance', '/app/finance/*',
-      '/admin', '/admin/*',
-      '/app/admin', '/app/admin/*',
-      '/app', '/app/*'
-    ];
+    console.log('✅ Routes React SPA gérées par catch-all amélioré');
     
-    reactRoutes.forEach(route => {
-      app.get(route, (req, res) => {
-        const indexPath = path.join(__dirname, '../public', 'index.html');
-        console.log(`📱 REACT ROUTE: ${req.path} -> serving index.html`);
-        
-        if (!fs.existsSync(indexPath)) {
-          console.error(`❌ Index.html non trouvé pour route React: ${indexPath}`);
-          return res.status(500).json({ error: 'Frontend non disponible' });
-        }
-        
-        res.sendFile(indexPath);
-      });
-    });
-    
-    console.log('✅ Routes React SPA configurées');
-    
-    // 🚨 ROUTE CATCH-ALL EN DERNIER - APRÈS TOUS LES DOMAINES ET STATIC FILES
-    app.get('*', (req, res) => {
+    // 🚨 ROUTE CATCH-ALL UNIVERSELLE - GÈRE TOUTES LES ROUTES SPA
+    app.use('*', (req, res) => {
       console.log(`🔍 CATCH-ALL HIT: ${req.method} ${req.path} - User-Agent: ${req.get('User-Agent')?.substring(0, 50)}`);
       
       // Ne pas intercepter les requêtes vers les API - elles sont déjà montées AVANT
@@ -636,18 +603,24 @@ function setupDomains() {
         return res.status(404).json({ error: 'Route API non trouvée', path: req.path });
       }
       
-      // Ne pas intercepter les fichiers statiques
-      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+      // Ne pas intercepter les uploads - ils sont déjà montés AVANT
+      if (req.path.startsWith('/uploads/')) {
+        console.log(`❌ Upload non trouvé (catch-all): ${req.path}`);
+        return res.status(404).json({ error: 'Fichier upload non trouvé' });
+      }
+      
+      // Ne pas intercepter les fichiers statiques avec extensions
+      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json|txt|xml)$/)) {
         console.log(`❌ Fichier statique non trouvé: ${req.path}`);
         return res.status(404).json({ error: 'Fichier statique non trouvé' });
       }
       
-      // 🚨 SERVIR LE VRAI INDEX.HTML DEPUIS PUBLIC
+      // 🚨 TOUTES LES AUTRES ROUTES = REACT SPA
       const indexPath = path.join(__dirname, '../public', 'index.html');
       
       if (!fs.existsSync(indexPath)) {
         console.error(`❌ Index.html non trouvé: ${indexPath}`);
-        return res.status(500).json({ error: 'Frontend non disponible' });
+        return res.status(500).json({ error: 'Frontend non disponible', indexPath });
       }
       
       console.log(`📄 Serving index.html for SPA route: ${req.path} -> ${indexPath}`);
