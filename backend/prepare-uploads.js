@@ -9,20 +9,31 @@ const fs = require('fs');
 const path = require('path');
 
 try {
-  console.log('🚀 Préparation uploads (version simple)...');
+  console.log('🚀 Préparation uploads (version robuste)...');
   
   const uploadsDir = path.join(__dirname, 'uploads');
   
-  // Créer simplement le dossier s'il n'existe pas
+  // Créer le dossier et sous-dossiers
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
-    console.log('✅ Dossier uploads créé');
-  } else {
-    console.log('✅ Dossier uploads existe déjà');
+    console.log('✅ Dossier uploads créé:', uploadsDir);
   }
   
-  console.log('✅ Préparation terminée sans erreur');
+  // Créer sous-dossiers requis
+  const subDirs = ['movements', 'backup_uploads'];
+  subDirs.forEach(subDir => {
+    const subPath = path.join(uploadsDir, subDir);
+    if (!fs.existsSync(subPath)) {
+      fs.mkdirSync(subPath, { recursive: true });
+      console.log('✅ Sous-dossier créé:', subDir);
+    }
+  });
+  
+  console.log('✅ Préparation uploads terminée avec succès');
+  
+  // Ne jamais faire d'exit() ou process.exit() qui pourrait bloquer
 } catch (error) {
-  console.log('⚠️ Erreur préparation uploads (non bloquante):', error.message);
-  console.log('✅ Le serveur peut démarrer normalement');
+  console.log('⚠️ Erreur préparation uploads (non critique):', error.message);
+  console.log('✅ Continuation normale du démarrage...');
+  // On ne fait rien qui puisse bloquer le processus
 }
