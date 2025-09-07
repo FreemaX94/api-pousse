@@ -493,6 +493,17 @@ function setupDomains() {
       console.warn('⚠️ Internal operations route non disponible:', error.message);
     }
     
+    // 🚨 ROUTE CRITQUE POUR SPA REFRESH - DANS LES APIs
+    app.get('/api/app/nieuwkoop', (req, res) => {
+      console.log('🎯 API Route /api/app/nieuwkoop HIT');
+      const indexPath = path.join(__dirname, '../public', 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(500).json({ error: 'Frontend not found' });
+      }
+    });
+    
     // Routes legacy pour compatibilité avec l'ancien frontend
     // Rediriger /api/projets vers le domaine projects
     app.use('/api/projets', (req, res, next) => {
@@ -609,12 +620,13 @@ function setupDomains() {
       res.sendFile(indexPath);
     });
     
-    // 🚨 ROUTE DEBUG POUR TESTER
+    // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
     app.get('/debug/test', (req, res) => {
       res.json({ 
-        message: 'Route debug fonctionne!', 
+        message: 'Route debug fonctionne - Deploy forced!', 
         timestamp: new Date().toISOString(),
-        path: req.path 
+        path: req.path,
+        deployVersion: '2025-09-07-02h00' // Force new deployment
       });
     });
     
