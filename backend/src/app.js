@@ -483,6 +483,11 @@ function setupDomains() {
       nieuwkoopController.getNieuwkoopItems(req, res, next);
     });
     app.get('/api/catalog/nieuwkoop/items/:productId/image', nieuwkoopController.getItemImage);
+    // 🖼️ Route publique pour les images des articles (utilisée par le frontend)
+    app.get('/api/catalog/nieuwkoop/items/:reference/image', (req, res, next) => {
+      console.log('🖼️ Route GET /api/catalog/nieuwkoop/items/${req.params.reference}/image appelée (PUBLIC - BYPASS AUTH)');
+      nieuwkoopController.getItemImage(req, res, next);
+    });
     console.log('✅ Routes publiques nieuwkoop montées AVANT domaine catalog');
 
     // Domaines métier
