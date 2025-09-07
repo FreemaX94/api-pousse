@@ -303,6 +303,42 @@ app.get('/debug/public-files', (req, res) => {
   }
 });
 
+// 🚨 DEBUG ROUTE UPLOADS - Pour diagnostiquer problème upload
+app.get('/debug/uploads', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  try {
+    const uploadsPath = path.join(__dirname, '../uploads');
+    const uploadsExists = fs.existsSync(uploadsPath);
+    
+    let files = [];
+    let stats = null;
+    
+    if (uploadsExists) {
+      files = fs.readdirSync(uploadsPath);
+      stats = fs.statSync(uploadsPath);
+    }
+    
+    res.json({
+      uploadsPath,
+      uploadsExists,
+      filesCount: files.length,
+      files,
+      permissions: stats ? stats.mode.toString(8) : 'N/A',
+      cwd: process.cwd(),
+      env: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: error.message,
+      uploadsPath: path.join(__dirname, '../uploads'),
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // 🚨 DEBUG ROUTES - Pour diagnostiquer problème DigitalOcean
 app.get('/debug/routes', (req, res) => {
   try {
