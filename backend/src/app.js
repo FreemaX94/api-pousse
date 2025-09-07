@@ -687,7 +687,6 @@ function setupDomains() {
         console.log(`✅ Serving fichier:`, filePath);
         
         // Déterminer le Content-Type selon l'extension
-        const path = require('path');
         const ext = path.extname(filename).toLowerCase();
         const mimeTypes = {
           '.jpg': 'image/jpeg',
