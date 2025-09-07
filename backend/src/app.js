@@ -1,5 +1,5 @@
 // backend/src/app.js - Application principale avec architecture DDD
-// FINAL DEPLOY - Configuration commit cbaab8d restaurée - 2025-09-02 23:25
+// UPLOAD FIX DEPLOY - Version da993de avec corrections uploads - 2025-09-07 12:30
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
@@ -628,7 +628,7 @@ function setupDomains() {
     });
     
     // 🚨 ROUTES DIAGNOSTIC - FORCE DEPLOY VERSION 3
-    app.get('/DIAGNOSTIC-UPLOAD-V3', (req, res) => {
+    app.get('/api/DIAGNOSTIC-UPLOAD-V3', (req, res) => {
       const uploadsPath = path.join(__dirname, '../uploads');
       try {
         const exists = fs.existsSync(uploadsPath);
@@ -658,12 +658,12 @@ function setupDomains() {
     });
     
     // Route test simple
-    app.get('/test-upload-route', (req, res) => {
+    app.get('/api/test-upload-route', (req, res) => {
       res.send('UPLOAD ROUTE TEST OK - V3');
     });
     
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
-    app.get('/debug/test', (req, res) => {
+    app.get('/api/debug/test', (req, res) => {
       res.json({ 
         message: 'Route debug fonctionne - Deploy forced V3!', 
         timestamp: new Date().toISOString(),
