@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { createMovement, getProjects, getStockItems, getConcepteurs } from '../api/clientApi';
 import api, { handleApiError } from '../api/axios';
+import { useTheme } from '../contexts/ThemeContext';
 import './EntryForm.css';
 
 export default function EntryForm({ onSaved, currentUser }) {
+  const { isDark, theme } = useTheme();
+
   const initialData = {
     type: 'entrée',
     reference: '',
@@ -317,10 +320,13 @@ export default function EntryForm({ onSaved, currentUser }) {
 
   return (
     <div style={{
-      background: 'var(--color-bg-secondary, rgba(255, 255, 255, 0.35))',
+      background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'var(--color-bg-secondary, rgba(255, 255, 255, 0.35))',
       borderRadius: '32px',
       padding: '3rem',
-      boxShadow: '0 20px 40px -5px rgba(0, 0, 0, 0.15), 0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+      boxShadow: isDark 
+        ? '0 20px 40px -5px rgba(0, 0, 0, 0.5), 0 10px 25px -5px rgba(0, 0, 0, 0.3)' 
+        : '0 20px 40px -5px rgba(0, 0, 0, 0.15), 0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+      color: isDark ? '#ffffff' : 'inherit',
       border: '1px solid var(--color-border-light, rgba(255, 255, 255, 0.3))',
       backdropFilter: 'blur(16px)',
       position: 'relative',

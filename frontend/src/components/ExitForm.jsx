@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { createMovement, getStockItems, getProjects } from '../api/clientApi'
+import { useTheme } from '../contexts/ThemeContext'
 import './ExitForm.css'
 
 export default function ExitForm({ onSaved, currentUser, variant = 'definitive' }) {
+  const { isDark, theme } = useTheme()
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     reference: '',
@@ -381,11 +383,14 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
 
   return (
     <div style={{
-      background: 'var(--glass-bg)',
+      background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'var(--glass-bg)',
       borderRadius: '32px',
       padding: '3rem',
-      boxShadow: 'var(--shadow-lg)',
-      border: '1px solid var(--glass-border)',
+      boxShadow: isDark 
+        ? '0 20px 40px -5px rgba(0, 0, 0, 0.5), 0 10px 25px -5px rgba(0, 0, 0, 0.3)' 
+        : 'var(--shadow-lg)',
+      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--glass-border)',
+      color: isDark ? '#ffffff' : 'inherit',
       backdropFilter: 'var(--glass-backdrop)',
       position: 'relative',
       overflow: 'auto',

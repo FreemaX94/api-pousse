@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getStockItems } from "../api/clientApi";
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function ProjetForm({ onSubmit, initialData = {} }) {
+  const { isDark, theme } = useTheme();
   const [clientName, setClientName] = useState(initialData.client || "");
   const [description, setDescription] = useState(initialData.description || "");
   const [address, setAddress] = useState(initialData.address || "");
@@ -237,15 +239,18 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
 
   return (
     <div style={{
-      background: 'var(--color-surface)',
-      border: '1px solid var(--color-border)',
+      background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'var(--color-surface)',
+      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--color-border)',
       borderRadius: 'var(--radius-xl)',
-      boxShadow: 'var(--shadow-lg)',
+      boxShadow: isDark 
+        ? '0 20px 40px -5px rgba(0, 0, 0, 0.5), 0 10px 25px -5px rgba(0, 0, 0, 0.3)' 
+        : 'var(--shadow-lg)',
       padding: '2rem',
       position: 'relative',
       overflow: 'hidden',
       maxWidth: '900px',
-      margin: '0 auto'
+      margin: '0 auto',
+      color: isDark ? '#ffffff' : 'inherit'
     }}>
       {/* Background decorative elements */}
       <div style={{
