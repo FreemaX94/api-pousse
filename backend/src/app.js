@@ -591,9 +591,9 @@ function setupDomains() {
     
     console.log('✅ Static files mounted AFTER API routes');
     
-    // 🚨 ROUTE TEST SPÉCIFIQUE POUR DEBUG
+    // 🚨 ROUTE SPÉCIFIQUE POUR /app/nieuwkoop - CORRIGE LE REFRESH
     app.get('/app/nieuwkoop', (req, res) => {
-      console.log('🎯 ROUTE SPÉCIFIQUE /app/nieuwkoop HIT');
+      console.log('🎯 ROUTE /app/nieuwkoop HIT - Serving index.html');
       const indexPath = path.join(__dirname, '../public', 'index.html');
       
       if (!fs.existsSync(indexPath)) {
@@ -606,7 +606,6 @@ function setupDomains() {
         });
       }
       
-      console.log(`📄 Serving index.html for /app/nieuwkoop: ${indexPath}`);
       res.sendFile(indexPath);
     });
     
