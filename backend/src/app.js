@@ -569,6 +569,18 @@ function setupDomains() {
     
     // 🚨 UPLOADS - Configuration APRÈS les routes API mais AVANT catch-all
     const uploadsPath = path.join(__dirname, '../uploads');
+    
+    // Créer le dossier uploads s'il n'existe pas
+    if (!fs.existsSync(uploadsPath)) {
+      console.log('⚠️ Dossier uploads inexistant, création...');
+      try {
+        fs.mkdirSync(uploadsPath, { recursive: true });
+        console.log('✅ Dossier uploads créé:', uploadsPath);
+      } catch (error) {
+        console.error('❌ Erreur création dossier uploads:', error.message);
+      }
+    }
+    
     app.use('/uploads', (req, res, next) => {
       if (req.path.startsWith('/api/')) {
         return next();
