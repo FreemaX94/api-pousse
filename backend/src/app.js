@@ -594,12 +594,20 @@ function setupDomains() {
     // 🚨 ROUTES REACT SPA SPÉCIFIQUES - AVANT CATCH-ALL
     const reactRoutes = [
       '/nieuwkoop', '/nieuwkoop/*',
+      '/app/nieuwkoop', '/app/nieuwkoop/*',
       '/projets', '/projets/*', 
+      '/app/projets', '/app/projets/*',
       '/dashboard', '/dashboard/*',
+      '/app/dashboard', '/app/dashboard/*',
       '/mouvements', '/mouvements/*',
+      '/app/mouvements', '/app/mouvements/*',
       '/vehicules', '/vehicules/*',
+      '/app/vehicules', '/app/vehicules/*',
       '/finance', '/finance/*',
-      '/admin', '/admin/*'
+      '/app/finance', '/app/finance/*',
+      '/admin', '/admin/*',
+      '/app/admin', '/app/admin/*',
+      '/app', '/app/*'
     ];
     
     reactRoutes.forEach(route => {
