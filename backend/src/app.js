@@ -490,13 +490,16 @@ function setupDomains() {
     });
     console.log('✅ Routes publiques nieuwkoop montées AVANT domaine catalog');
 
-    // 🚨 ROUTE TEST TEMPORAIRE POUR DEBUG MOVEMENTS
-    const movementController = require('./domains/inventory/controllers/movementController');
-    app.post('/api/test-movement', (req, res, next) => {
-      console.log('🔍 Route TEST movement appelée - Body:', req.body);
-      movementController.createMovement(req, res, next);
-    });
-    console.log('✅ Route test movement créée pour debug');
+    // Routes de debug temporaires supprimées - remplacées par solutions permanentes
+
+    // 🚨 CONFIGURATION UPLOADS - Servir les fichiers uploadés publiquement
+    const uploadsPath = path.join(__dirname, '../uploads');
+    app.use('/api/uploads', express.static(uploadsPath));
+    
+    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS
+    const publicPath = path.join(__dirname, '../public');
+    app.use('/api/uploads', express.static(publicPath));
+    console.log('✅ Route uploads configurée:', uploadsPath, '+ public:', publicPath);
 
     // Domaines métier
     app.use('/api/catalog', catalogDomain.routes);
