@@ -4,6 +4,8 @@ const router = express.Router();
 
 // Routes principales du domaine Projects
 router.use('/projets', require('./routes/projets'));
+// Route racine pour /api/projects - rediriger vers /projets
+router.use('/', require('./routes/projets'));
 router.use('/concepteurs', require('./routes/concepteurs'));
 router.use('/entretien', require('./routes/entretien'));
 router.use('/creation', require('./routes/creation'));

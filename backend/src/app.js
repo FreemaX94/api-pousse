@@ -801,6 +801,60 @@ function setupDomains() {
         res.status(500).json({ error: error.message });
       }
     });
+
+    // 🧪 ROUTE DE TEST: Créer un projet sans authentification
+    app.post('/api/projects/test-create', async (req, res) => {
+      try {
+        console.log('🧪 Test création projet via /api/projects/test-create:', req.body);
+        
+        const mongoose = require('mongoose');
+        const Projet = mongoose.models.Projet || require('../domains/projects/models/Projet');
+        
+        const projectData = {
+          title: req.body.title || req.body.client || 'Projet Test API',
+          client: {
+            type: 'individual',
+            name: req.body.client || 'Client Test',
+            contact: {
+              address: {
+                street: req.body.address || 'Test Address',
+                city: 'Test City',
+                postalCode: '12345',
+                country: 'France'
+              }
+            }
+          },
+          type: 'Installation',
+          dates: {
+            start: req.body.dateDebut ? new Date(req.body.dateDebut) : new Date(),
+            end: req.body.dateFin ? new Date(req.body.dateFin) : new Date(Date.now() + 7*24*60*60*1000)
+          },
+          location: {
+            address: req.body.address || 'Test Location'
+          },
+          description: req.body.description || 'Projet test créé via API publique',
+          status: 'active',
+          materials: [],
+          documents: []
+        };
+
+        const projet = await Projet.create(projectData);
+        
+        console.log('✅ Projet test créé via API:', projet._id);
+        res.status(201).json({
+          success: true,
+          message: 'Projet test créé avec succès',
+          project: projet
+        });
+      } catch (error) {
+        console.error('❌ Erreur création projet test:', error);
+        res.status(500).json({ 
+          success: false,
+          error: 'Erreur création projet test', 
+          details: error.message
+        });
+      }
+    });
     
     // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
     app.get('/api/debug/test', (req, res) => {
