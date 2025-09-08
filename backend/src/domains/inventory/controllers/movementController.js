@@ -4,6 +4,7 @@ const mongoose      = require('mongoose');
 const Movement      = require('../models/movementModel');
 const NieuwkoopItem = require('../../catalog/models/nieuwkoopItemModel');
 const Project       = require('../../projects/models/Projet');
+const { uploadFile, isSpacesConfigured } = require('../../../shared/services/spacesService');
 
 // Création d'un mouvement (entrée ou sortie), project optionnel
 exports.createMovement = async (req, res) => {
@@ -73,6 +74,7 @@ exports.createMovement = async (req, res) => {
     // Récupérer l'article pour obtenir le prix (pour les articles du catalogue uniquement)
     let item = null;
     let itemPrice = 0;
+    let imageUrl = '';
     
     // Si c'est une référence d'origine (pas générée automatiquement), chercher dans le catalogue
     if (reference && !reference.startsWith('EXT-')) {
@@ -84,11 +86,44 @@ exports.createMovement = async (req, res) => {
     } else {
       // Pour les entrées externes, utiliser le prix fourni par l'utilisateur
       itemPrice = req.body.price ? parseFloat(req.body.price) : 0;
+    }
+
+    // Gérer l'upload d'image vers Spaces ou stockage local (pour toutes les entrées)
+    if (req.file) {
+      const useSpaces = process.env.NODE_ENV === 'production' && isSpacesConfigured();
       
-      // Pour les entrées externes de type "entrée", créer automatiquement un article dans le catalogue
-      if (type === 'entrée') {
+      if (useSpaces) {
+        console.log('🗂️ Upload vers Spaces:', req.file.originalname);
         try {
-          // Créer un nouvel article dans le catalogue Nieuwkoop
+          // Générer nom de fichier unique
+          const timestamp = Date.now();
+          const ext = require('path').extname(req.file.originalname);
+          const cleanName = require('path').basename(req.file.originalname, ext)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9\-_]/g, '_')
+            .replace(/_+/g, '_')
+            .replace(/^_|_$/g, '');
+          const filename = `movement_${cleanName}_${timestamp}${ext}`;
+          
+          // Upload vers Spaces
+          imageUrl = await uploadFile(req.file.buffer, filename, req.file.mimetype, 'movements');
+          console.log('✅ Image uploadée vers Spaces:', imageUrl);
+        } catch (spacesError) {
+          console.error('❌ Erreur upload Spaces:', spacesError);
+          // Fallback: utiliser le chemin local
+          imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+        }
+      } else {
+        // Stockage local
+        imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+      }
+    }
+      
+    // Pour les entrées externes de type "entrée", créer automatiquement un article dans le catalogue
+    if (reference && reference.startsWith('EXT-') && type === 'entrée') {
+      try {
+        // Créer un nouvel article dans le catalogue Nieuwkoop
           const newItem = await NieuwkoopItem.create({
             reference: finalReference,
             name: name,
@@ -108,8 +143,8 @@ exports.createMovement = async (req, res) => {
               reservedQuantity: 0,
               minimumAlert: 0
             },
-            images: req.file ? [{
-              url: `/api/uploads/movements/${req.file.filename}`,
+            images: imageUrl ? [{
+              url: imageUrl,
               isPrimary: true,
               alt: name
             }] : [],
@@ -191,7 +226,7 @@ exports.createMovement = async (req, res) => {
       note,
       createdBy,
       concepteur: concepteur || null,  // Concepteur responsable
-      image: req.file ? `/api/uploads/movements/${req.file.filename}` : (req.body.image || ''),
+      image: imageUrl || req.body.image || '',
       // Champs pour le mode multiple
       coef: parsedCoef,
       isNewPlant: isNewPlant === 'true' || isNewPlant === true,
