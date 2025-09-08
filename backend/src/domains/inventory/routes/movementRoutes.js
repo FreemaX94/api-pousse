@@ -9,24 +9,14 @@ const { uploadFile, isSpacesConfigured } = require('../../../shared/services/spa
 const router = express.Router();
 
 // Configuration multer pour les images de mouvements
-// Utiliser DigitalOcean Spaces en production, stockage local en développement
-const useSpaces = process.env.NODE_ENV === 'production' && isSpacesConfigured();
-
-console.log('🔧 Configuration upload:', {
-  NODE_ENV: process.env.NODE_ENV,
-  spacesConfigured: isSpacesConfigured(),
-  useSpaces: useSpaces,
-  spacesKey: process.env.DO_SPACES_KEY ? 'SET' : 'MISSING',
-  spacesSecret: process.env.DO_SPACES_SECRET ? 'SET' : 'MISSING'
-});
-
-// Configuration pour stockage local (développement ou fallback)
+// TEMPORAIRE: Utiliser stockage local en attendant configuration Spaces
 const uploadDir = path.join(__dirname, '../../../../uploads/movements');
-if (!useSpaces && !fs.existsSync(uploadDir)) {
+
+if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = useSpaces ? multer.memoryStorage() : multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
