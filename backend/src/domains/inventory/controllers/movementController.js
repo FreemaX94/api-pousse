@@ -9,6 +9,7 @@ const { uploadFile, isSpacesConfigured } = require('../../../shared/services/spa
 // Création d'un mouvement (entrée ou sortie), project optionnel
 exports.createMovement = async (req, res) => {
   try {
+    console.log('🚀 [MOVEMENT CONTROLLER] Création mouvement démarrée');
 
     const {
       type,       // "entrée" ou "sortie"
