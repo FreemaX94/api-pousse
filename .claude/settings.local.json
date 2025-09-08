@@ -47,7 +47,8 @@
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/test-route)",
       "Bash(timeout:*)",
       "Bash(npx nodemon:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []

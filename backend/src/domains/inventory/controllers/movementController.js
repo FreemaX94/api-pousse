@@ -93,7 +93,14 @@ exports.createMovement = async (req, res) => {
           // Gérer l'upload d'image (Spaces si configuré, sinon local)
           let imageUrl = '';
           if (req.file) {
+            console.log('🔍 [NEW ARTICLE] NODE_ENV:', process.env.NODE_ENV);
+            console.log('🔍 [NEW ARTICLE] DO_SPACES_KEY:', process.env.DO_SPACES_KEY ? 'Configuré' : 'Non configuré');
+            console.log('🔍 [NEW ARTICLE] DO_SPACES_SECRET:', process.env.DO_SPACES_SECRET ? 'Configuré' : 'Non configuré');
+            console.log('🔍 [NEW ARTICLE] DO_SPACES_BUCKET:', process.env.DO_SPACES_BUCKET);
+            console.log('🔍 [NEW ARTICLE] isSpacesConfigured():', isSpacesConfigured());
+            
             const useSpaces = process.env.NODE_ENV === 'production' && isSpacesConfigured();
+            console.log('🔍 [NEW ARTICLE] useSpaces:', useSpaces);
             
             if (useSpaces) {
               console.log('🗂️ [NEW ARTICLE] Upload vers Spaces:', req.file.originalname);
