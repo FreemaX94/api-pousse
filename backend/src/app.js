@@ -236,7 +236,7 @@ app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   
-  console.log('🎯 API MOVEMENT IMAGE REQUEST:', filename);
+  console.log('🎯 API MOVEMENT IMAGE REQUEST (PERSISTENT STORAGE TEST):', filename);
   console.log('🔍 Checking uploads/movements path:', uploadsMovementsPath, '- exists:', fs.existsSync(uploadsMovementsPath));
   console.log('🔍 Checking public path:', publicPath, '- exists:', fs.existsSync(publicPath));
   console.log('🔍 Checking assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
