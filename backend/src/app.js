@@ -62,6 +62,9 @@ app.use(sanitizeData);
 // Debug middleware pour toutes les requêtes
 app.use((req, res, next) => {
   console.log(`🌐 ${req.method} ${req.url} - User-Agent: ${req.get('User-Agent')?.substring(0, 50)}...`);
+  if (req.url.includes('mouvement') || req.url.includes('movement')) {
+    console.log('🎯 [MOVEMENT REQUEST DETECTED] Method:', req.method, 'URL:', req.url);
+  }
   res.setHeader('X-Served-By', 'api-pousse-backend');
   res.setHeader('X-Debug-Path', req.url);
   next();
