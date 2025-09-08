@@ -583,6 +583,7 @@ function setupDomains() {
     
     // Rediriger /api/movements vers le domaine inventory
     app.use('/api/movements', (req, res, next) => {
+      console.log('🔍 [ROUTING] /api/movements appelé:', req.method, req.originalUrl);
       req.url = '/movements' + req.url;
       inventoryDomain.routes(req, res, next);
     });

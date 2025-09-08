@@ -111,7 +111,10 @@ router.get('/project/:projectId', getMovementsByProject);
 
 // POST /api/movements
 // Crée un nouveau mouvement (entrée ou sortie) lié à un projet
-router.post('/', upload.single('image'), createMovementSchema, createMovement);
+router.post('/', upload.single('image'), (req, res, next) => {
+  console.log('🔍 [MOVEMENT ROUTES] POST / appelé');
+  next();
+}, createMovementSchema, createMovement);
 
 // PUT /api/movements/:id/validate
 // Valide un mouvement existant
