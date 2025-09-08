@@ -9,10 +9,8 @@ const { uploadFile, isSpacesConfigured } = require('../../../shared/services/spa
 const router = express.Router();
 
 // Configuration multer pour les images de mouvements
-// Utiliser le volume persistant monté par DigitalOcean App Platform
-const uploadDir = process.env.NODE_ENV === 'production' 
-  ? '/app/uploads/movements'
-  : path.join(__dirname, '../../../../uploads/movements');
+// TEMPORAIRE: Utiliser stockage local en attendant configuration Spaces
+const uploadDir = path.join(__dirname, '../../../../uploads/movements');
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
