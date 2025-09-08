@@ -229,7 +229,10 @@ app.get('/movement_*', (req, res) => {
 // 🚨 SOLUTION API FINALE: Route API pour images movement
 app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   const filename = req.params.filename;
-  const uploadsMovementsPath = path.join(__dirname, '../uploads/movements', filename);
+  // Utiliser le volume persistant en production, chemin local en développement
+  const uploadsMovementsPath = process.env.NODE_ENV === 'production'
+    ? path.join('/app/uploads/movements', filename)
+    : path.join(__dirname, '../uploads/movements', filename);
   const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   

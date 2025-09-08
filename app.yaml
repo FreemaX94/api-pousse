@@ -19,6 +19,12 @@ services:
     instance_size_slug: basic-xxs
     http_port: 3001
     
+    # 🗂️ VOLUME PERSISTANT pour uploads
+    volumes:
+    - name: uploads-storage
+      mount_path: /app/uploads
+      size: 2GiB
+    
     # Variables d'environnement pour le backend
     envs:
     - key: NODE_ENV
