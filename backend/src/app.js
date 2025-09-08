@@ -856,7 +856,7 @@ function setupDomains() {
       }
     });
     
-    // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY
+    // 🚨 ROUTE DEBUG POUR TESTER - FORCE DEPLOY v2
     app.get('/api/debug/test', (req, res) => {
       res.json({ 
         message: 'Route debug fonctionne - Deploy forced V3!', 
