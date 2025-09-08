@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { celebrate, Segments, Joi } = require('celebrate');
+const { uploadFile, isSpacesConfigured } = require('../../../shared/services/spacesService');
 const router = express.Router();
 
 // Configuration multer pour les images de mouvements

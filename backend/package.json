@@ -29,6 +29,8 @@
     "init-rbac": "node -e \"require('./services/rbacService').initializeRBAC().then(() => process.exit(0)).catch(console.error)\""
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.884.0",
+    "@aws-sdk/s3-request-presigner": "^3.884.0",
     "@hapi/hoek": "^11.0.7",
     "@newrelic/winston-enricher": "^4.0.1",
     "@swc/helpers": "^0.5.17",
@@ -62,6 +64,7 @@
     "mongoose-paginate-v2": "^1.9.1",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
+    "multer-s3": "^3.0.1",
     "newrelic": "^12.25.0",
     "node-cache": "^5.1.2",
     "nodemailer": "^7.0.5",

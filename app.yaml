@@ -19,11 +19,7 @@ services:
     instance_size_slug: basic-xxs
     http_port: 3001
     
-    # 🗂️ VOLUME PERSISTANT pour uploads
-    volumes:
-    - name: uploads-storage
-      mount_path: /app/uploads
-      size: 2GiB
+    # 🗂️ STOCKAGE PERSISTANT via DigitalOcean Spaces (volumes non supportés sur App Platform)
     
     # Variables d'environnement pour le backend
     envs:
@@ -31,6 +27,17 @@ services:
       value: production
     - key: PORT
       value: "3001"
+    # 🗂️ DigitalOcean Spaces pour stockage persistant des images
+    - key: DO_SPACES_ENDPOINT
+      value: "https://ams3.digitaloceanspaces.com"
+    - key: DO_SPACES_REGION
+      value: "ams3"
+    - key: DO_SPACES_BUCKET
+      value: "api-pousse-uploads"
+    - key: DO_SPACES_KEY
+      value: "DO_SPACES_KEY_TO_CONFIGURE"
+    - key: DO_SPACES_SECRET
+      value: "DO_SPACES_SECRET_TO_CONFIGURE"
     
     # Health check
     health_check:
