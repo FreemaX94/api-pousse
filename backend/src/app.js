@@ -229,19 +229,32 @@ app.get('/movement_*', (req, res) => {
 // 🚨 SOLUTION API FINALE: Route API pour images movement
 app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   const filename = req.params.filename;
+  const uploadsMovementsPath = path.join(__dirname, '../uploads/movements', filename);
   const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🎯 API MOVEMENT IMAGE REQUEST:', filename);
+  console.log('🔍 Checking uploads/movements path:', uploadsMovementsPath, '- exists:', fs.existsSync(uploadsMovementsPath));
+  console.log('🔍 Checking public path:', publicPath, '- exists:', fs.existsSync(publicPath));
+  console.log('🔍 Checking assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
   
-  if (fs.existsSync(publicPath)) {
+  // Essayer d'abord dans uploads/movements (dossier principal pour les entrées externes)
+  if (fs.existsSync(uploadsMovementsPath)) {
+    const ext = path.extname(filename).toLowerCase();
+    const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
+    res.setHeader('Content-Type', contentType);
+    console.log('✅ Movement image found in uploads/movements');
+    res.sendFile(uploadsMovementsPath);
+  } else if (fs.existsSync(publicPath)) {
     res.setHeader('Content-Type', 'image/jpeg');
+    console.log('✅ Movement image found in public');
     res.sendFile(publicPath);
   } else if (fs.existsSync(assetsPath)) {
     res.setHeader('Content-Type', 'image/jpeg');
+    console.log('✅ Movement image found in assets');
     res.sendFile(assetsPath);
   } else {
-    console.log('❌ Movement file not found:', filename);
+    console.log('❌ Movement file not found in any location:', filename);
     res.status(404).json({ error: 'Movement image not found', filename });
   }
 });
@@ -440,6 +453,10 @@ function setupDomains() {
   try {
     console.log('🔄 [SETUP] Début chargement des domaines...');
     
+    // Declare paths used throughout this function
+    const uploadsPath = path.join(__dirname, '../uploads');
+    const publicPath = path.join(__dirname, '../public');
+    
     // Charger les domaines maintenant qu'Express est initialisé
     console.log('🔄 [SETUP] Chargement Auth domain...');
     authDomain = require('./domains/auth');
@@ -493,11 +510,30 @@ function setupDomains() {
     // Routes de debug temporaires supprimées - remplacées par solutions permanentes
 
     // 🚨 CONFIGURATION UPLOADS - Servir les fichiers uploadés publiquement
-    const uploadsPath = path.join(__dirname, '../uploads');
     app.use('/api/uploads', express.static(uploadsPath));
     
-    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS
-    const publicPath = path.join(__dirname, '../public');
+    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - Sécurité supplémentaire
+    app.get('/api/uploads/movements/:filename', (req, res) => {
+      const filename = req.params.filename;
+      const movementsPath = path.join(uploadsPath, 'movements', filename);
+      
+      console.log('🖼️ ROUTE MOVEMENT IMAGE:', filename);
+      console.log('🖼️ Path:', movementsPath);
+      console.log('🖼️ Exists:', fs.existsSync(movementsPath));
+      
+      if (fs.existsSync(movementsPath)) {
+        // Déterminer le Content-Type
+        const ext = path.extname(filename).toLowerCase();
+        const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
+        res.setHeader('Content-Type', contentType);
+        res.sendFile(movementsPath);
+      } else {
+        console.log('❌ Movement image not found:', filename);
+        res.status(404).json({ error: 'Movement image not found' });
+      }
+    });
+    
+    // 🖼️ ROUTE BACKUP POUR IMAGES DANS PUBLIC
     app.use('/api/uploads', express.static(publicPath));
     console.log('✅ Route uploads configurée:', uploadsPath, '+ public:', publicPath);
 
@@ -577,11 +613,8 @@ function setupDomains() {
     console.log('✅ Toutes les routes domaines montées');
     
     // 🚨 STATIC FILES APRÈS LES API ROUTES
-    const path = require('path');
-    const fs = require('fs');
-    
     console.log('📁 Mounting static files AFTER API routes...');
-    const publicPath = path.join(__dirname, '../public');
+    // Use publicPath already declared earlier in this function
     const distPath = path.join(__dirname, '../dist');
     const assetsPath = path.join(__dirname, '../public/assets');
     
@@ -605,7 +638,7 @@ function setupDomains() {
     app.use('/assets', express.static(assetsPath));
     
     // 🚨 SOLUTION 1: UPLOADS - Configuration statique simple et robuste
-    const uploadsPath = path.join(__dirname, '../uploads');
+    // Use uploadsPath already declared earlier in setupDomains function
     console.log('🔍 UPLOADS PATH:', uploadsPath);
     console.log('🔍 __dirname:', __dirname);
     console.log('🔍 process.cwd():', process.cwd());
@@ -655,7 +688,6 @@ function setupDomains() {
     
     // 🚨 ROUTES DIAGNOSTIC - FORCE DEPLOY VERSION 3
     app.get('/api/DIAGNOSTIC-UPLOAD-V3', (req, res) => {
-      const uploadsPath = path.join(__dirname, '../uploads');
       try {
         const exists = fs.existsSync(uploadsPath);
         const files = exists ? fs.readdirSync(uploadsPath) : [];
@@ -698,7 +730,6 @@ function setupDomains() {
         console.log(`🔍 Origin:`, req.get('Origin'));
         console.log(`🔍 Referer:`, req.get('Referer'));
         
-        const uploadsPath = path.join(__dirname, '../uploads');
         const filePath = path.join(uploadsPath, filename);
         
         console.log(`📁 Cherche fichier:`, filePath);

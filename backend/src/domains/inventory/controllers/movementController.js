@@ -109,7 +109,7 @@ exports.createMovement = async (req, res) => {
               minimumAlert: 0
             },
             images: req.file ? [{
-              url: `/movements/${req.file.filename}`,
+              url: `/api/uploads/movements/${req.file.filename}`,
               isPrimary: true,
               alt: name
             }] : [],
@@ -191,7 +191,7 @@ exports.createMovement = async (req, res) => {
       note,
       createdBy,
       concepteur: concepteur || null,  // Concepteur responsable
-      image: req.file ? `/movements/${req.file.filename}` : (req.body.image || ''),
+      image: req.file ? `/api/uploads/movements/${req.file.filename}` : (req.body.image || ''),
       // Champs pour le mode multiple
       coef: parsedCoef,
       isNewPlant: isNewPlant === 'true' || isNewPlant === true,

@@ -45,7 +45,8 @@
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/api/auth/me)",
       "Bash(timeout 10 curl -s https://api-pousse-app-5y2wo.ondigitalocean.app/debug/routes)",
       "Bash(timeout 10 curl -s -I https://api-pousse-app-5y2wo.ondigitalocean.app/test-route)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npx nodemon:*)"
     ],
     "deny": [],
     "ask": []
