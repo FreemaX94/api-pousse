@@ -265,6 +265,16 @@ function ExternalEntryForm({ onSaved, currentUser }) {
     setLoading(true);
     setError('');
 
+    console.log('🚀 [FRONTEND] ExternalEntryForm handleSubmit started');
+    console.log('🔍 [FRONTEND] FormData:', formData);
+
+    // Validation JavaScript au lieu de HTML5 required
+    if (!formData.name || formData.name.trim() === '') {
+      setError('Le nom du produit est obligatoire');
+      setLoading(false);
+      return;
+    }
+
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach(key => {
@@ -275,10 +285,15 @@ function ExternalEntryForm({ onSaved, currentUser }) {
         }
       });
 
+      console.log('📤 [FRONTEND] Sending POST request to /api/mouvements');
+      console.log('📋 [FRONTEND] FormData being sent:', Array.from(formDataToSend.entries()));
+      
       const response = await fetch('/api/mouvements', {
         method: 'POST',
         body: formDataToSend,
       });
+
+      console.log('📨 [FRONTEND] Response received:', response.status, response.statusText);
 
       if (!response.ok) {
         throw new Error('Erreur lors de la création de l\'entrée');
@@ -471,7 +486,6 @@ function ExternalEntryForm({ onSaved, currentUser }) {
             value={formData.name}
             onChange={handleChange}
             placeholder="Nom du produit"
-            required
             style={getInputStyle()}
             onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
             onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
