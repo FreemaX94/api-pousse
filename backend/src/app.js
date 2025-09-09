@@ -232,14 +232,16 @@ app.get('/movement_*', (req, res) => {
 // 🚨 SOLUTION API FINALE: Route API pour images movement
 app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   const filename = req.params.filename;
-  // SOLUTION HYBRIDE: Chercher dans uploads, puis backup, puis public
+  // SOLUTION HYBRIDE: Chercher dans uploads/movements, uploads direct, puis backup, puis public
   const uploadsMovementsPath = path.join(__dirname, '../uploads/movements', filename);
+  const uploadsDirectPath = path.join(__dirname, '../uploads', filename);
   const backupPath = path.join(__dirname, 'src/assets/backup-images', filename);
   const publicPath = path.join(__dirname, '../public', filename);
   const assetsPath = path.join(__dirname, '../assets', filename);
   
-  console.log('🎯 API MOVEMENT IMAGE REQUEST (TESTING GOLDY POT PERSISTENCE):', filename);
+  console.log('🎯 API MOVEMENT IMAGE REQUEST:', filename);
   console.log('🔍 Checking uploads/movements path:', uploadsMovementsPath, '- exists:', fs.existsSync(uploadsMovementsPath));
+  console.log('🔍 Checking uploads direct path:', uploadsDirectPath, '- exists:', fs.existsSync(uploadsDirectPath));
   console.log('🔍 Checking public path:', publicPath, '- exists:', fs.existsSync(publicPath));
   console.log('🔍 Checking assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
   
@@ -250,6 +252,12 @@ app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
     res.setHeader('Content-Type', contentType);
     console.log('✅ Movement image found in uploads/movements');
     res.sendFile(uploadsMovementsPath);
+  } else if (fs.existsSync(uploadsDirectPath)) {
+    const ext = path.extname(filename).toLowerCase();
+    const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
+    res.setHeader('Content-Type', contentType);
+    console.log('✅ Movement image found in uploads direct');
+    res.sendFile(uploadsDirectPath);
   } else if (fs.existsSync(publicPath)) {
     res.setHeader('Content-Type', 'image/jpeg');
     console.log('✅ Movement image found in public');
