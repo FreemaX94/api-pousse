@@ -198,8 +198,7 @@ app.get('/api/assets/:filename', (req, res) => {
 // Static files sont maintenant configurés dans index.js AVANT setupDomains()
 console.log('⚠️ Static files configuration moved to index.js for priority');
 
-// Servir les images des articles externes depuis le dossier persistant
-app.use('/movements', express.static(path.join(__dirname, 'public/movements')));
+// SUPPRIMÉ - Route conflictuelle
 
 // UPLOADS sera configuré dans setupDomains() après les routes API
 
@@ -522,8 +521,7 @@ function setupDomains() {
 
     // Routes de debug temporaires supprimées - remplacées par solutions permanentes
 
-    // 🚨 CONFIGURATION UPLOADS - Servir les fichiers uploadés publiquement
-    app.use('/api/uploads', express.static(uploadsPath));
+    // SUPPRIMÉ - Route conflictuelle avec celle du dessous
     
     // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - Sécurité supplémentaire
     app.get('/api/uploads/movements/:filename', (req, res) => {
@@ -546,8 +544,7 @@ function setupDomains() {
       }
     });
     
-    // 🖼️ ROUTE BACKUP POUR IMAGES DANS PUBLIC
-    app.use('/api/uploads', express.static(publicPath));
+    // SUPPRIMÉ - Route backup conflictuelle
     console.log('✅ Route uploads configurée:', uploadsPath, '+ public:', publicPath);
 
     // Domaines métier
@@ -680,9 +677,7 @@ function setupDomains() {
       console.error('❌ Erreur uploads setup:', error.message);
     }
     
-    // CONFIGURATION STATIQUE DIRECTE - SANS CONDITIONS  
-    app.use('/uploads', express.static(uploadsPath));
-    console.log('✅ Route /uploads configurée vers:', uploadsPath);
+    // SUPPRIMÉ - Route conflictuelle, on garde seulement /api/catalog/nieuwkoop/movement-image/
     
     // SOLUTION BACKUP: Upload depuis public/ aussi (au cas où uploads/ ne serait pas déployé)
     const publicUploadsPath = path.join(publicPath, 'uploads');
