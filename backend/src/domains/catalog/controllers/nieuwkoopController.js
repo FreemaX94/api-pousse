@@ -342,3 +342,82 @@ exports.getHealth = async (req, res, next) => {
     next(err);
   }
 };
+
+// PUT /:id/update-field - Mise à jour d'un champ spécifique
+exports.updateItemField = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { field, value } = req.body;
+
+    console.log(`🔄 [UPDATE FIELD] Article ${id}, champ: ${field}, valeur: ${value}`);
+
+    // Validation des champs autorisés
+    const allowedFields = ['name', 'price', 'height', 'diameter'];
+    if (!allowedFields.includes(field)) {
+      return res.status(400).json({ 
+        error: 'Champ non autorisé',
+        message: `Seuls ces champs peuvent être mis à jour: ${allowedFields.join(', ')}`
+      });
+    }
+
+    // Validation des valeurs
+    if (field === 'price' || field === 'height' || field === 'diameter') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0) {
+        return res.status(400).json({ 
+          error: 'Valeur invalide',
+          message: `${field} doit être un nombre positif`
+        });
+      }
+    }
+
+    // Trouver l'article
+    const NieuwkoopItem = require('../models/nieuwkoopItemModel');
+    const item = await NieuwkoopItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ 
+        error: 'Article non trouvé',
+        message: 'L\'article demandé n\'existe pas'
+      });
+    }
+
+    // Mettre à jour selon le champ
+    let updateQuery = {};
+    
+    if (field === 'name') {
+      updateQuery.name = value;
+    } else if (field === 'price') {
+      updateQuery['pricing.price'] = parseFloat(value);
+    } else if (field === 'height') {
+      // Mettre à jour à la fois dimensions.height et height (pour compatibilité)
+      updateQuery['dimensions.height'] = parseFloat(value);
+      updateQuery.height = parseFloat(value);
+    } else if (field === 'diameter') {
+      // Mettre à jour à la fois dimensions.diameter et diameter (pour compatibilité)
+      updateQuery['dimensions.diameter'] = parseFloat(value);
+      updateQuery.diameter = parseFloat(value);
+    }
+
+    // Effectuer la mise à jour
+    const updatedItem = await NieuwkoopItem.findByIdAndUpdate(
+      id, 
+      { $set: updateQuery },
+      { new: true, runValidators: true }
+    );
+
+    console.log(`✅ [UPDATE FIELD] Article ${id} mis à jour avec succès`);
+
+    res.json({
+      success: true,
+      message: `${field} mis à jour avec succès`,
+      item: updatedItem
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur mise à jour champ:', error);
+    res.status(500).json({ 
+      error: 'Erreur serveur',
+      message: 'Impossible de mettre à jour l\'article' 
+    });
+  }
+};

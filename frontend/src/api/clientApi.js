@@ -203,3 +203,9 @@ export const assignItemToProject = async ({
   });
   return res.data;
 };
+
+// ─── Mise à jour d'un champ spécifique d'un article ─────────────────────────
+export const updateItemField = async (itemId, field, value) => {
+  const response = await api.put(`/catalog/nieuwkoop/${itemId}/update-field`, { field, value });
+  return response.data;
+};

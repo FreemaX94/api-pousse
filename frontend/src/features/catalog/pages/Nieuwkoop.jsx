@@ -45,6 +45,7 @@ import {
   validateMovement,
   markReturned,
   api,
+  updateItemField,
 } from "../../../api/clientApi";
 import axiosApi, { handleApiError } from "../../../api/axios";
 import { useTheme, ThemeProvider } from "../../../contexts/ThemeContext";
@@ -178,11 +179,6 @@ function ExternalEntryForm({ onSaved, currentUser }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
-  
-  // États pour l'édition inline
-  const [editingItemId, setEditingItemId] = useState(null);
-  const [editingField, setEditingField] = useState(null); // 'name', 'price', 'height', 'diameter'
-  const [editValue, setEditValue] = useState('');
   
   // URL de base pour les images
   const imageBaseUrl = import.meta.env.MODE === 'development' 
@@ -666,6 +662,11 @@ const Nieuwkoop = () => {
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [itemToAssign, setItemToAssign] = useState(null);
 
+  // États pour l'édition inline
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editingField, setEditingField] = useState(null); // 'name', 'price', 'height', 'diameter'
+  const [editValue, setEditValue] = useState('');
+
   // États pour Entrée/Sortie
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [refreshExits, setRefreshExits] = useState(false);
@@ -1145,74 +1146,6 @@ const Nieuwkoop = () => {
   };
 
   // Fonction pour charger l'historique des opérations
-  // Fonctions pour l'édition inline
-  const handleStartEdit = (itemId, field, currentValue) => {
-    setEditingItemId(itemId);
-    setEditingField(field);
-    setEditValue(currentValue);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingItemId(null);
-    setEditingField(null);
-    setEditValue('');
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingItemId || !editingField) return;
-
-    try {
-      const updateData = {};
-      
-      // Préparer les données selon le champ
-      switch (editingField) {
-        case 'name':
-          updateData.name = editValue;
-          break;
-        case 'price':
-          updateData.pricing = { price: parseFloat(editValue) || 0 };
-          break;
-        case 'height':
-          updateData.dimensions = { height: parseFloat(editValue) || 0 };
-          break;
-        case 'diameter':
-          updateData.dimensions = { diameter: parseFloat(editValue) || 0 };
-          break;
-        default:
-          return;
-      }
-
-      const response = await axiosApi.put(`/catalog/nieuwkoop/stock/${editingItemId}`, updateData);
-      
-      if (response.data) {
-        // Mettre à jour l'élément dans la liste locale
-        setItems(prevItems => prevItems.map(item => {
-          if (item._id === editingItemId) {
-            const updated = { ...item };
-            if (editingField === 'name') updated.name = editValue;
-            if (editingField === 'price') updated.price = parseFloat(editValue) || 0;
-            if (editingField === 'height') updated.dimensions = { ...updated.dimensions, height: parseFloat(editValue) || 0 };
-            if (editingField === 'diameter') updated.dimensions = { ...updated.dimensions, diameter: parseFloat(editValue) || 0 };
-            return updated;
-          }
-          return item;
-        }));
-        
-        handleCancelEdit();
-      }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      handleCancelEdit();
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSaveEdit();
-    } else if (e.key === 'Escape') {
-      handleCancelEdit();
-    }
-  };
 
   const loadOperationsHistory = async () => {
     setOperationsLoading(true);
@@ -1667,6 +1600,79 @@ const Nieuwkoop = () => {
         });
     }
   }, [activeSection]);
+
+  // Fonctions pour l'édition inline
+  const handleStartEdit = (itemId, field, currentValue) => {
+    // Si on était en train d'éditer, annuler d'abord pour éviter les conflits
+    if (editingItemId && (editingItemId !== itemId || editingField !== field)) {
+      handleCancelEdit();
+    }
+    
+    setEditingItemId(itemId);
+    setEditingField(field);
+    setEditValue(currentValue?.toString() || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingItemId || !editingField || !editValue) return;
+
+    // Stocker les valeurs actuelles avant de les réinitialiser
+    const itemId = editingItemId;
+    const field = editingField;
+    const value = editValue;
+
+    try {
+      console.log(`🔄 Sauvegarde ${field} = "${value}" pour item ${itemId}`);
+      
+      // Utiliser la nouvelle API pour mettre à jour un champ spécifique
+      const response = await updateItemField(itemId, field, value);
+      
+      if (response.success) {
+        // Mettre à jour l'élément dans la liste locale
+        setAddedItems(prevItems => prevItems.map(item => {
+          if (item._id === itemId) {
+            const updated = { ...item };
+            if (field === 'name') updated.name = value;
+            if (field === 'price') {
+              updated.price = parseFloat(value) || 0;
+              if (updated.pricing) updated.pricing.price = parseFloat(value) || 0;
+            }
+            if (field === 'height') {
+              updated.height = parseFloat(value) || 0;
+              if (updated.dimensions) updated.dimensions.height = parseFloat(value) || 0;
+            }
+            if (field === 'diameter') {
+              updated.diameter = parseFloat(value) || 0;
+              if (updated.dimensions) updated.dimensions.diameter = parseFloat(value) || 0;
+            }
+            return updated;
+          }
+          return item;
+        }));
+        
+        handleCancelEdit();
+        console.log(`✅ ${field} mis à jour avec succès`);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      alert('Erreur lors de la mise à jour');
+      handleCancelEdit();
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
 
   const handleSearch = () => {
     // console.log('🔍 Frontend - Recherche lancée pour le produit:', productId);
@@ -4565,9 +4571,47 @@ return (
                                 margin: 0,
                                 lineHeight: '1.3',
                                 marginBottom: '0.25rem',
-                                color: 'var(--color-primary)', replace_all: true
+                                color: 'var(--color-primary)'
                               }}>
-                                {prod.name}
+                                {editingItemId === prod._id && editingField === 'name' ? (
+                                  <input
+                                    type="text"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onBlur={handleSaveEdit}
+                                    onKeyPress={handleKeyPress}
+                                    onClick={(e) => e.stopPropagation()}
+                                    autoFocus
+                                    style={{
+                                      background: 'var(--color-surface)',
+                                      border: '2px solid var(--color-primary)',
+                                      borderRadius: '4px',
+                                      padding: '2px 6px',
+                                      fontSize: 'inherit',
+                                      fontWeight: 'inherit',
+                                      color: 'inherit',
+                                      width: '100%'
+                                    }}
+                                  />
+                                ) : (
+                                  <span 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEdit(prod._id, 'name', prod.name);
+                                    }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    title="Cliquer pour modifier le nom"
+                                  >
+                                    {prod.name}
+                                  </span>
+                                )}
                               </h3>
                               <p style={{
                                 fontSize: '0.8rem',
@@ -4666,7 +4710,49 @@ return (
                               fontWeight: '700',
                               color: 'var(--color-primary)'
                             }}>
-                              €{prod.price ? prod.price.toFixed(2) : '0.00'}
+                              {editingItemId === prod._id && editingField === 'price' ? (
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <span>€</span>
+                                  <input
+                                    type="number"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onBlur={handleSaveEdit}
+                                    onKeyPress={handleKeyPress}
+                                    onClick={(e) => e.stopPropagation()}
+                                    autoFocus
+                                    style={{
+                                      background: 'var(--color-surface)',
+                                      border: '2px solid var(--color-primary)',
+                                      borderRadius: '4px',
+                                      padding: '2px 6px',
+                                      fontSize: 'inherit',
+                                      fontWeight: 'inherit',
+                                      color: 'inherit',
+                                      width: '80px',
+                                      marginLeft: '2px'
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <span 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStartEdit(prod._id, 'price', prod.price || 0);
+                                  }}
+                                  style={{
+                                    cursor: 'pointer',
+                                    padding: '2px 4px',
+                                    borderRadius: '4px',
+                                    transition: 'background-color 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                  title="Cliquer pour modifier le prix"
+                                >
+                                  €{prod.price ? prod.price.toFixed(2) : '0.00'}
+                                </span>
+                              )}
                             </div>
                           </div>
                           
@@ -4800,7 +4886,51 @@ return (
                                 fontWeight: '700',
                                 color: 'var(--color-primary)',
                                 marginBottom: '0.25rem'
-                              }}>{prod.height || 0} cm</div>
+                              }}>
+                                {editingItemId === prod._id && editingField === 'height' ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <input
+                                      type="number"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={handleSaveEdit}
+                                      onKeyPress={handleKeyPress}
+                                      onClick={(e) => e.stopPropagation()}
+                                      autoFocus
+                                      style={{
+                                        background: 'var(--color-surface)',
+                                        border: '2px solid var(--color-primary)',
+                                        borderRadius: '4px',
+                                        padding: '2px 6px',
+                                        fontSize: 'inherit',
+                                        fontWeight: 'inherit',
+                                        color: 'inherit',
+                                        width: '60px',
+                                        textAlign: 'center'
+                                      }}
+                                    />
+                                    <span style={{ marginLeft: '4px' }}>cm</span>
+                                  </div>
+                                ) : (
+                                  <span 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEdit(prod._id, 'height', prod.height || 0);
+                                    }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    title="Cliquer pour modifier la hauteur"
+                                  >
+                                    {prod.height || 0} cm
+                                  </span>
+                                )}
+                              </div>
                               <div style={{
                                 fontSize: '0.75rem',
                                 color: 'var(--color-secondary)',
@@ -4822,7 +4952,51 @@ return (
                                 fontWeight: '700',
                                 color: 'var(--color-primary)',
                                 marginBottom: '0.25rem'
-                              }}>{prod.diameter || 0} cm</div>
+                              }}>
+                                {editingItemId === prod._id && editingField === 'diameter' ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <input
+                                      type="number"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={handleSaveEdit}
+                                      onKeyPress={handleKeyPress}
+                                      onClick={(e) => e.stopPropagation()}
+                                      autoFocus
+                                      style={{
+                                        background: 'var(--color-surface)',
+                                        border: '2px solid var(--color-primary)',
+                                        borderRadius: '4px',
+                                        padding: '2px 6px',
+                                        fontSize: 'inherit',
+                                        fontWeight: 'inherit',
+                                        color: 'inherit',
+                                        width: '60px',
+                                        textAlign: 'center'
+                                      }}
+                                    />
+                                    <span style={{ marginLeft: '4px' }}>cm</span>
+                                  </div>
+                                ) : (
+                                  <span 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEdit(prod._id, 'diameter', prod.diameter || 0);
+                                    }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    title="Cliquer pour modifier le diamètre"
+                                  >
+                                    {prod.diameter || 0} cm
+                                  </span>
+                                )}
+                              </div>
                               <div style={{
                                 fontSize: '0.75rem',
                                 color: 'var(--color-secondary)',
