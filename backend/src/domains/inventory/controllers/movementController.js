@@ -124,10 +124,57 @@ exports.createMovement = async (req, res) => {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
                 // Fallback vers la route qui fonctionne (même que les vases EXT)
                 imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+                
+                // 🚨 COPIE IMMÉDIATE vers public et assets pour production (fallback Spaces)
+                try {
+                  const fs = require('fs');
+                  const path = require('path');
+                  const sourceFile = path.join(__dirname, '../../../../uploads/movements', req.file.filename);
+                  const publicFile = path.join(__dirname, '../../../public', req.file.filename);
+                  const assetsFile = path.join(__dirname, '../../../assets', req.file.filename);
+                  
+                  if (fs.existsSync(sourceFile)) {
+                    // Créer les dossiers si nécessaire
+                    fs.mkdirSync(path.dirname(publicFile), { recursive: true });
+                    fs.mkdirSync(path.dirname(assetsFile), { recursive: true });
+                    
+                    // Copier vers public et assets
+                    fs.copyFileSync(sourceFile, publicFile);
+                    fs.copyFileSync(sourceFile, assetsFile);
+                    console.log('✅ Image copiée vers public et assets (fallback Spaces):', req.file.filename);
+                  }
+                } catch (copyError) {
+                  console.error('❌ Erreur copie image vers public/assets (fallback):', copyError.message);
+                }
               }
             } else {
               // Système local existant - utiliser la route qui marche pour les vases EXT
               imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+              
+              // 🚨 COPIE IMMÉDIATE vers public et assets pour production (comme les vases EXT)
+              try {
+                const fs = require('fs');
+                const path = require('path');
+                const sourceFile = path.join(__dirname, '../../../../uploads/movements', req.file.filename);
+                const publicFile = path.join(__dirname, '../../../public', req.file.filename);
+                const assetsFile = path.join(__dirname, '../../../assets', req.file.filename);
+                
+                if (fs.existsSync(sourceFile)) {
+                  // Créer les dossiers si nécessaire
+                  fs.mkdirSync(path.dirname(publicFile), { recursive: true });
+                  fs.mkdirSync(path.dirname(assetsFile), { recursive: true });
+                  
+                  // Copier vers public et assets
+                  fs.copyFileSync(sourceFile, publicFile);
+                  fs.copyFileSync(sourceFile, assetsFile);
+                  console.log('✅ Image copiée vers public et assets:', req.file.filename);
+                } else {
+                  console.log('⚠️ Fichier source non trouvé:', sourceFile);
+                }
+              } catch (copyError) {
+                console.error('❌ Erreur copie image vers public/assets:', copyError.message);
+                // Continuer même si la copie échoue
+              }
             }
           }
 
