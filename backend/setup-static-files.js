@@ -129,10 +129,18 @@ async function downloadSpacesImages() {
           const distPath = path.join('dist', filename);
           
           try {
+            // Vérifier d'abord la taille du fichier sur Spaces
+            const fileSize = await checkFileSize(imageUrl);
+            
+            if (fileSize === 0) {
+              console.log(`⚠️ ${filename} ignoré (0 Bytes sur Spaces - fichier corrompu)`);
+              continue;
+            }
+            
             await downloadFile(imageUrl, publicPath);
             await downloadFile(imageUrl, distPath);
             downloadCount++;
-            console.log(`✅ ${filename} téléchargé vers public et dist`);
+            console.log(`✅ ${filename} téléchargé vers public et dist (${fileSize} bytes)`);
           } catch (downloadError) {
             console.log(`⚠️ Erreur téléchargement ${filename}:`, downloadError.message);
           }
@@ -146,6 +154,22 @@ async function downloadSpacesImages() {
   } catch (error) {
     console.log('⚠️ Erreur téléchargement Spaces (non critique):', error.message);
   }
+}
+
+// Fonction helper pour vérifier la taille d'un fichier sur Spaces
+function checkFileSize(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { method: 'HEAD' }, (response) => {
+      if (response.statusCode === 200) {
+        const contentLength = parseInt(response.headers['content-length'] || '0', 10);
+        resolve(contentLength);
+      } else {
+        resolve(0); // Si erreur, considérer comme 0 bytes
+      }
+    }).on('error', (err) => {
+      resolve(0); // Si erreur réseau, considérer comme 0 bytes
+    });
+  });
 }
 
 // Fonction helper pour télécharger un fichier
