@@ -136,9 +136,16 @@ exports.createMovement = async (req, res) => {
                 
                 console.log('☁️ [DEBUG] Début upload vers Spaces...');
                 spacesImageUrl = await uploadFile(fileBuffer, filename, req.file.mimetype, 'movements');
-                spacesUploadSuccess = true;
-                console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces AVEC SUCCÈS:', spacesImageUrl);
-                console.log('🎯 [DEBUG] Upload Spaces terminé, URL finale:', spacesImageUrl);
+                
+                // ✨ VALIDATION CRITIQUE: Vérifier que l'URL Spaces est valide avant de continuer
+                if (spacesImageUrl && spacesImageUrl.includes('digitaloceanspaces.com')) {
+                  spacesUploadSuccess = true;
+                  console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces AVEC SUCCÈS:', spacesImageUrl);
+                  console.log('🎯 [PRIORITY] Flag spacesUploadSuccess défini à TRUE');
+                } else {
+                  console.error('❌ [CRITICAL] URL Spaces invalide reçue:', spacesImageUrl);
+                  spacesUploadSuccess = false;
+                }
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
                 console.error('📋 [DEBUG] Stack trace complet:', spacesError.stack);
@@ -180,14 +187,21 @@ exports.createMovement = async (req, res) => {
                 }
               }
               
-              // 🚨 SOLUTION ROBUSTE: Utiliser Spaces si upload réussi, peu importe les erreurs après
-              if (spacesUploadSuccess && spacesImageUrl) {
+              // 🚨 SOLUTION ULTRA-ROBUSTE: Prioriser Spaces même en cas d'erreurs mineures
+              console.log('🔍 [DECISION] spacesUploadSuccess:', spacesUploadSuccess);
+              console.log('🔍 [DECISION] spacesImageUrl:', spacesImageUrl);
+              
+              // Double validation: si on a une URL Spaces valide, l'utiliser TOUJOURS
+              if (spacesImageUrl && spacesImageUrl.includes('digitaloceanspaces.com')) {
+                imageUrl = spacesImageUrl;
+                console.log('✅ [ULTIMATE PRIORITY] URL Spaces confirmée et utilisée:', spacesImageUrl);
+              } else if (spacesUploadSuccess && spacesImageUrl) {
                 imageUrl = spacesImageUrl;
                 console.log('🎯 [PRIORITY] Utilisation URL Spaces (priorité):', spacesImageUrl);
               } else {
-                // Fallback uniquement si upload Spaces a échoué
+                // Fallback uniquement si upload Spaces a vraiment échoué
                 imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
-                console.log('🔄 [FALLBACK] Upload Spaces échoué, utilisation URL locale:', imageUrl);
+                console.log('🔄 [FALLBACK] Pas d\'URL Spaces valide, utilisation URL locale:', imageUrl);
               }
             } else {
               // Système local existant - utiliser la route qui marche pour les vases EXT
