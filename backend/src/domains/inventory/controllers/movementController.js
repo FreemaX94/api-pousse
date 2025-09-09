@@ -129,9 +129,17 @@ exports.createMovement = async (req, res) => {
                 try {
                   const fs = require('fs');
                   const path = require('path');
-                  const sourceFile = path.join(__dirname, '../../../../uploads/movements', req.file.filename);
-                  const publicFile = path.join(__dirname, '../../../public', req.file.filename);
-                  const assetsFile = path.join(__dirname, '../../../assets', req.file.filename);
+                  // SOLUTION: Utiliser process.cwd() comme le script setup-static-files.js
+                  const rootDir = process.cwd();
+                  const sourceFile = path.join(rootDir, 'uploads', 'movements', req.file.filename);
+                  const publicFile = path.join(rootDir, 'public', req.file.filename);
+                  const assetsFile = path.join(rootDir, 'assets', req.file.filename);
+                  
+                  console.log('🔍 [PRODUCTION DEBUG] Chemins de copie:');
+                  console.log('🔍 Root dir:', rootDir);
+                  console.log('🔍 Source:', sourceFile, '- exists:', fs.existsSync(sourceFile));
+                  console.log('🔍 Public:', publicFile);
+                  console.log('🔍 Assets:', assetsFile);
                   
                   if (fs.existsSync(sourceFile)) {
                     // Créer les dossiers si nécessaire
@@ -142,6 +150,8 @@ exports.createMovement = async (req, res) => {
                     fs.copyFileSync(sourceFile, publicFile);
                     fs.copyFileSync(sourceFile, assetsFile);
                     console.log('✅ Image copiée vers public et assets (fallback Spaces):', req.file.filename);
+                  } else {
+                    console.log('⚠️ [PRODUCTION] Fichier source non trouvé:', sourceFile);
                   }
                 } catch (copyError) {
                   console.error('❌ Erreur copie image vers public/assets (fallback):', copyError.message);
@@ -155,9 +165,17 @@ exports.createMovement = async (req, res) => {
               try {
                 const fs = require('fs');
                 const path = require('path');
-                const sourceFile = path.join(__dirname, '../../../../uploads/movements', req.file.filename);
-                const publicFile = path.join(__dirname, '../../../public', req.file.filename);
-                const assetsFile = path.join(__dirname, '../../../assets', req.file.filename);
+                // SOLUTION: Utiliser process.cwd() comme le script setup-static-files.js
+                const rootDir = process.cwd();
+                const sourceFile = path.join(rootDir, 'uploads', 'movements', req.file.filename);
+                const publicFile = path.join(rootDir, 'public', req.file.filename);
+                const assetsFile = path.join(rootDir, 'assets', req.file.filename);
+                
+                console.log('🔍 [PRODUCTION DEBUG] Chemins de copie (local):');
+                console.log('🔍 Root dir:', rootDir);
+                console.log('🔍 Source:', sourceFile, '- exists:', fs.existsSync(sourceFile));
+                console.log('🔍 Public:', publicFile);
+                console.log('🔍 Assets:', assetsFile);
                 
                 if (fs.existsSync(sourceFile)) {
                   // Créer les dossiers si nécessaire
@@ -169,7 +187,7 @@ exports.createMovement = async (req, res) => {
                   fs.copyFileSync(sourceFile, assetsFile);
                   console.log('✅ Image copiée vers public et assets:', req.file.filename);
                 } else {
-                  console.log('⚠️ Fichier source non trouvé:', sourceFile);
+                  console.log('⚠️ [PRODUCTION] Fichier source non trouvé (local):', sourceFile);
                 }
               } catch (copyError) {
                 console.error('❌ Erreur copie image vers public/assets:', copyError.message);
