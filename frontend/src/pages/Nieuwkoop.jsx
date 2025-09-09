@@ -64,6 +64,7 @@ const AssignModal = lazy(() => import('../components/AssignModal'));
 
 // Composant pour le formulaire d'entrée externe
 function ExternalEntryForm({ onSaved, currentUser }) {
+  console.log('🔄 [DEBUG] ExternalEntryForm component loaded');
   const { isDark, theme, isBeige, isNeon, isOcean, isTropical, isLavender, isGalaxy, isAutumn, isGlacier, isSakura, isMidnight, isLava } = useTheme();
   
   // Fonction pour obtenir les styles adaptatifs selon le thème
@@ -652,6 +653,9 @@ function ExternalEntryForm({ onSaved, currentUser }) {
               transition: 'all 0.3s ease',
               boxShadow: `0 15px 35px ${isDark ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.3)'}`,
               transform: loading ? 'scale(0.98)' : 'scale(1)'
+            }}
+            onClick={(e) => {
+              console.log('🎯 [DEBUG] Submit button clicked!');
             }}
             onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px) scale(1.02)')}
             onMouseLeave={(e) => !loading && (e.target.style.transform = 'translateY(0) scale(1)')}
