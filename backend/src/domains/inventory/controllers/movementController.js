@@ -117,13 +117,29 @@ exports.createMovement = async (req, res) => {
                   .replace(/^_|_$/g, '');
                 const filename = `movement_${cleanName}_${timestamp}${ext}`;
                 
+                console.log('🔍 [DEBUG] Fichier à uploader:', {
+                  originalname: req.file.originalname,
+                  filename: filename,
+                  path: req.file.path,
+                  size: req.file.size,
+                  mimetype: req.file.mimetype
+                });
+                
                 // Upload vers Spaces - LIRE LE FICHIER DEPUIS LE DISQUE
                 const fs = require('fs');
+                console.log('📂 [DEBUG] Lecture du fichier depuis:', req.file.path);
                 const fileBuffer = fs.readFileSync(req.file.path);
+                console.log('📊 [DEBUG] Buffer lu, taille:', fileBuffer.length);
+                
+                console.log('☁️ [DEBUG] Début upload vers Spaces...');
                 imageUrl = await uploadFile(fileBuffer, filename, req.file.mimetype, 'movements');
-                console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces:', imageUrl);
+                console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces AVEC SUCCÈS:', imageUrl);
+                console.log('🎯 [DEBUG] Upload Spaces terminé, URL finale:', imageUrl);
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
+                console.error('📋 [DEBUG] Stack trace complet:', spacesError.stack);
+                console.error('🔍 [DEBUG] Type d\'erreur:', spacesError.name);
+                console.error('💭 [DEBUG] Détails erreur:', JSON.stringify(spacesError, null, 2));
                 // Fallback vers la route qui fonctionne (même que les vases EXT)
                 imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
                 
