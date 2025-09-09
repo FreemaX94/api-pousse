@@ -117,8 +117,10 @@ exports.createMovement = async (req, res) => {
                   .replace(/^_|_$/g, '');
                 const filename = `movement_${cleanName}_${timestamp}${ext}`;
                 
-                // Upload vers Spaces
-                imageUrl = await uploadFile(req.file.buffer, filename, req.file.mimetype, 'movements');
+                // Upload vers Spaces - LIRE LE FICHIER DEPUIS LE DISQUE
+                const fs = require('fs');
+                const fileBuffer = fs.readFileSync(req.file.path);
+                imageUrl = await uploadFile(fileBuffer, filename, req.file.mimetype, 'movements');
                 console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces:', imageUrl);
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
