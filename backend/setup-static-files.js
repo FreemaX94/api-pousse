@@ -82,4 +82,30 @@ if (fs.existsSync(uploadsMovements)) {
   }
 }
 
+// 🚀 Lancer la synchronisation Spaces en arrière-plan (non-bloquant)
+try {
+  const { spawn } = require('child_process');
+  
+  // Lancer le script de sync en arrière-plan après un délai
+  setTimeout(() => {
+    console.log('🌐 Lancement synchronisation Spaces en arrière-plan...');
+    const syncProcess = spawn('node', ['sync-spaces-images.js'], {
+      stdio: 'inherit',
+      detached: false,
+      cwd: __dirname
+    });
+    
+    syncProcess.on('exit', (code) => {
+      console.log(`🏁 Synchronisation Spaces terminée (code: ${code})`);
+    });
+    
+    syncProcess.on('error', (error) => {
+      console.log('⚠️ Erreur lancement sync Spaces (non critique):', error.message);
+    });
+  }, 2000); // Délai de 2 secondes pour laisser le serveur principal démarrer
+  
+} catch (error) {
+  console.log('⚠️ Erreur setup sync Spaces (non critique):', error.message);
+}
+
 console.log('🚨 SETUP COMPLETE');
