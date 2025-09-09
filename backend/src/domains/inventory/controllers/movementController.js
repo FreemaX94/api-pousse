@@ -122,12 +122,12 @@ exports.createMovement = async (req, res) => {
                 console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces:', imageUrl);
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
-                // Fallback vers le système local qui fonctionnait hier soir
-                imageUrl = `/api/uploads/movements/${req.file.filename}`;
+                // Fallback vers la route qui fonctionne (même que les vases EXT)
+                imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
               }
             } else {
-              // Système local existant (développement ou si Spaces non configuré)  
-              imageUrl = `/api/uploads/movements/${req.file.filename}`;
+              // Système local existant - utiliser la route qui marche pour les vases EXT
+              imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
             }
           }
 
