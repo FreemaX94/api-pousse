@@ -122,12 +122,12 @@ exports.createMovement = async (req, res) => {
                 console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces:', imageUrl);
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
-                // Fallback vers le système local actuel
-                imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+                // Fallback vers le système local qui fonctionnait hier soir
+                imageUrl = `/api/uploads/movements/${req.file.filename}`;
               }
             } else {
               // Système local existant (développement ou si Spaces non configuré)  
-              imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+              imageUrl = `/api/uploads/movements/${req.file.filename}`;
             }
           }
 
