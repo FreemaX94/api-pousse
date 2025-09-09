@@ -262,19 +262,9 @@ function ExternalEntryForm({ onSaved, currentUser }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    console.log('📤 ExternalEntryForm handleSubmit called', formData);
     setLoading(true);
     setError('');
 
-    // Validation manuelle pour des messages d'erreur plus clairs
-    if (!formData.name || formData.name.trim() === '') {
-      console.log('❌ Validation failed: name is required');
-      setError('Le nom du produit est obligatoire.');
-      setLoading(false);
-      return;
-    }
-
-    console.log('✅ Validation passed, sending request to /api/mouvements');
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach(key => {
@@ -290,12 +280,8 @@ function ExternalEntryForm({ onSaved, currentUser }) {
         body: formDataToSend,
       });
 
-      console.log('🔄 Response received:', response.status, response.statusText);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log('❌ Error response:', errorText);
-        throw new Error(`Erreur ${response.status}: ${errorText || 'Erreur lors de la création de l\'entrée'}`);
+        throw new Error('Erreur lors de la création de l\'entrée');
       }
 
       onSaved();
@@ -485,6 +471,7 @@ function ExternalEntryForm({ onSaved, currentUser }) {
             value={formData.name}
             onChange={handleChange}
             placeholder="Nom du produit"
+            required
             style={getInputStyle()}
             onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
             onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
