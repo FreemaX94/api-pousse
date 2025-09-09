@@ -105,6 +105,9 @@ exports.createMovement = async (req, res) => {
             
             if (useSpaces) {
               console.log('🗂️ [NEW ARTICLE] Upload vers Spaces:', req.file.originalname);
+              let spacesUploadSuccess = false;
+              let spacesImageUrl = null;
+              
               try {
                 // Générer nom de fichier unique pour Spaces
                 const timestamp = Date.now();
@@ -132,9 +135,10 @@ exports.createMovement = async (req, res) => {
                 console.log('📊 [DEBUG] Buffer lu, taille:', fileBuffer.length);
                 
                 console.log('☁️ [DEBUG] Début upload vers Spaces...');
-                imageUrl = await uploadFile(fileBuffer, filename, req.file.mimetype, 'movements');
-                console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces AVEC SUCCÈS:', imageUrl);
-                console.log('🎯 [DEBUG] Upload Spaces terminé, URL finale:', imageUrl);
+                spacesImageUrl = await uploadFile(fileBuffer, filename, req.file.mimetype, 'movements');
+                spacesUploadSuccess = true;
+                console.log('✅ [NEW ARTICLE] Image uploadée vers Spaces AVEC SUCCÈS:', spacesImageUrl);
+                console.log('🎯 [DEBUG] Upload Spaces terminé, URL finale:', spacesImageUrl);
               } catch (spacesError) {
                 console.error('❌ [NEW ARTICLE] Erreur upload Spaces, fallback local:', spacesError.message);
                 console.error('📋 [DEBUG] Stack trace complet:', spacesError.stack);
@@ -174,6 +178,16 @@ exports.createMovement = async (req, res) => {
                 } catch (copyError) {
                   console.error('❌ Erreur copie image vers public/assets (fallback):', copyError.message);
                 }
+              }
+              
+              // 🚨 SOLUTION ROBUSTE: Utiliser Spaces si upload réussi, peu importe les erreurs après
+              if (spacesUploadSuccess && spacesImageUrl) {
+                imageUrl = spacesImageUrl;
+                console.log('🎯 [PRIORITY] Utilisation URL Spaces (priorité):', spacesImageUrl);
+              } else {
+                // Fallback uniquement si upload Spaces a échoué
+                imageUrl = `/api/catalog/nieuwkoop/movement-image/${req.file.filename}`;
+                console.log('🔄 [FALLBACK] Upload Spaces échoué, utilisation URL locale:', imageUrl);
               }
             } else {
               // Système local existant - utiliser la route qui marche pour les vases EXT
