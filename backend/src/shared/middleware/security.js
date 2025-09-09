@@ -50,7 +50,12 @@ const csrfProtection = csrf({
 
 // Security headers middleware
 const securityHeaders = (req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
+  // Permettre les frames pour les PDF
+  if (req.path.includes('/api/uploads/') && req.get('Accept')?.includes('application/pdf')) {
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  } else {
+    res.setHeader('X-Frame-Options', 'DENY');
+  }
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
@@ -68,14 +73,14 @@ module.exports = {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ['\'self\''],
-        imgSrc: ['\'self\'', 'data:', 'https:'],
-        scriptSrc: ['\'self\''],
-        styleSrc: ['\'self\'', '\'unsafe-inline\''],
-        connectSrc: ['\'self\''],
-        fontSrc: ['\'self\''],
-        objectSrc: ['\'none\''],
+        imgSrc: ['\'self\'', 'data:', 'https:', 'http://localhost:3001'],
+        scriptSrc: ['\'self\'', 'https://www.google.com', 'https://www.gstatic.com'],
+        styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
+        connectSrc: ['\'self\'', 'https://www.google.com'],
+        fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
+        objectSrc: ['\'self\''], // Permettre les objets pour PDF
         mediaSrc: ['\'self\''],
-        frameSrc: ['\'none\'']
+        frameSrc: ['\'self\'', 'https://www.google.com'] // Permettre les frames pour PDF
       }
     },
     hsts: {

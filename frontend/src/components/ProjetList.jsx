@@ -1,6 +1,6 @@
 // frontend/src/components/ProjetList.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 const STATUS_GRADIENT = {
@@ -55,6 +55,8 @@ const TrashIcon = (props) => (
 );
 
 export default function ProjetList({ projects, onUpdate, onDelete, showHistory }) {
+  const [pdfViewerData, setPdfViewerData] = useState(null);
+
   if (!projects?.length) {
     return (
       <div style={{
@@ -416,10 +418,18 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
                       <button
                         key={i}
                         onClick={() => {
-                          const fullUrl = `https://api-pousse-app-5y2wo.ondigitalocean.app/api/uploads/${doc.path || doc.name || doc}`;
-                          console.log('🔗 Opening document URL HARD CODED:', fullUrl);
-                          console.log('🔗 doc.path:', doc.path);
-                          window.open(fullUrl, '_blank', 'noopener,noreferrer');
+                          const filename = doc.path || doc.name || doc;
+                          const baseUrl = import.meta.env.MODE === 'development' 
+                            ? 'http://localhost:3001' 
+                            : 'https://api-pousse-app-5y2wo.ondigitalocean.app';
+                          const fullUrl = `${baseUrl}/api/uploads/${filename}`;
+                          console.log('🔗 Opening PDF in viewer:', fullUrl);
+                          console.log('🔗 doc:', doc);
+                          setPdfViewerData({
+                            url: fullUrl,
+                            name: doc.originalname || filename,
+                            projectTitle: p.title
+                          });
                         }}
                         style={{
                           display: 'block',
@@ -658,6 +668,77 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
         );
       })}
     </div>
+    
+    {/* PDF Viewer Modal */}
+    {pdfViewerData && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.8)',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setPdfViewerData(null);
+          }
+        }}
+      >
+        {/* Header avec titre et bouton fermer */}
+        <div style={{
+          background: '#fff',
+          padding: '1rem 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #e5e7eb'
+        }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
+              Projet: {pdfViewerData.projectTitle}
+            </h3>
+          </div>
+          <button
+            onClick={() => setPdfViewerData(null)}
+            style={{
+              background: '#f3f4f6',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              color: '#6b7280'
+            }}
+          >
+            ×
+          </button>
+        </div>
+        
+        {/* Viewer PDF */}
+        <div style={{ flex: 1, background: '#f3f4f6', padding: '1rem' }}>
+          <iframe
+            src={`${pdfViewerData.url}#toolbar=1&navpanes=1&scrollbar=1`}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              borderRadius: '8px',
+              background: '#fff'
+            }}
+            title={`PDF: ${pdfViewerData.name}`}
+          />
+        </div>
+      </div>
+    )}
     </>
   );
 }

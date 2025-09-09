@@ -685,6 +685,47 @@ function setupDomains() {
       app.use('/public-uploads', express.static(publicUploadsPath));
       console.log('✅ Route /public-uploads backup configurée vers:', publicUploadsPath);
     }
+
+    // 📁 ROUTE SPÉCIFIQUE POUR LES FICHIERS PDF AVEC HEADERS OPTIMISÉS
+    app.get('/api/uploads/:filename', (req, res, next) => {
+      const filename = req.params.filename;
+      const filePath = path.join(uploadsPath, filename);
+      
+      if (fs.existsSync(filePath)) {
+        // Détecter le type de fichier
+        const fileBuffer = fs.readFileSync(filePath);
+        const isPDF = fileBuffer.subarray(0, 4).toString() === '%PDF';
+        
+        if (isPDF) {
+          // Headers spéciaux pour PDF pour bypasser les restrictions
+          res.removeHeader('Content-Security-Policy');
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'inline');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          res.setHeader('X-Frame-Options', 'ALLOWALL');
+          console.log('📄 Serving PDF with relaxed headers:', filename);
+        } else {
+          // Autres types de fichiers
+          const ext = path.extname(filename).toLowerCase();
+          if (['.jpg', '.jpeg', '.png', '.gif'].includes(ext)) {
+            res.setHeader('Content-Type', 'image/' + ext.slice(1));
+          }
+        }
+        
+        res.sendFile(filePath);
+      } else {
+        // Continuer vers la route statique si pas trouvé
+        next();
+      }
+    });
+
+    // 📁 ROUTE STATIQUE POUR LES AUTRES UPLOADS
+    if (fs.existsSync(uploadsPath)) {
+      app.use('/api/uploads', express.static(uploadsPath));
+      console.log('✅ Route /api/uploads configurée vers:', uploadsPath);
+    } else {
+      console.log('⚠️ Dossier uploads non trouvé:', uploadsPath);
+    }
     
     console.log('✅ Static files mounted AFTER API routes');
     
