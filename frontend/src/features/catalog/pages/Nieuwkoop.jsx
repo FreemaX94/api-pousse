@@ -697,7 +697,11 @@ const Nieuwkoop = () => {
   const [operationSuccess, setOperationSuccess] = useState('');
   
 
-  const handleEntrySaved = () => setRefreshEntries(f => !f);
+  const handleEntrySaved = () => {
+    setRefreshEntries(f => !f);
+    // 🚀 Déclencher aussi le rafraîchissement du stock pour les entrées externes
+    setNeedsStockRefresh(true);
+  };
   const handleExitSaved  = () => setRefreshExits(f => !f);
 
   // Fonction pour vider tout l'historique des entrées
@@ -1285,12 +1289,43 @@ const Nieuwkoop = () => {
     }
   }, [activeSection]);
 
-  // Actualiser le stock si nécessaire quand on revient sur l'onglet Stock
+  // 🚀 Actualiser le stock intelligemment sans recharger la page
   useEffect(() => {
     if (activeSection === 'Stock' && needsStockRefresh) {
       setNeedsStockRefresh(false);
-      // Forcer le rechargement des données de stock
-      window.location.reload();
+      console.log('🔄 Actualisation intelligente du stock...');
+      
+      // Forcer le rechargement des données de stock sans recharger la page
+      stockLoadedRef.current.delete('Stock');
+      setStockLoading(true);
+      
+      // Recharger les données depuis l'API
+      axiosApi.get('/catalog/nieuwkoop/stock', {
+        headers: { 'Cache-Control': 'no-cache' }
+      })
+      .then(response => {
+        const data = Array.isArray(response.data) ? response.data : [];
+        const cleaned = data.map(item => ({
+          ...item,
+          quantity: parseInt(item.quantity) || 0,
+          price: parseFloat(item.price) || 0,
+          height: item.dimensions?.height || item.height || item.Height || item.HeightLxWxH || 0,
+          diameter: item.dimensions?.diameter || item.diameter || item.DiameterCulturePot || item.Diameter || item.Opening || (item.PotSize ? parseInt(item.PotSize) : 0) || 0,
+          note: item.notes || item.note || ''
+        }));
+        
+        console.log('✅ Stock actualisé:', cleaned.length, 'articles');
+        setAddedItems(cleaned);
+        stockLoadedRef.current.add('Stock');
+      })
+      .catch(err => {
+        console.error('❌ Erreur actualisation stock:', err);
+        // En cas d'erreur, fallback vers le rechargement de page
+        window.location.reload();
+      })
+      .finally(() => {
+        setStockLoading(false);
+      });
     }
   }, [activeSection, needsStockRefresh]);
 
