@@ -1,6 +1,7 @@
 // Script pour forcer la copie des fichiers statiques
 const fs = require('fs');
 const path = require('path');
+const https = require('https'); // Import manquant pour téléchargements Spaces
 
 console.log('🚨 SETUP STATIC FILES - FORCE COPY');
 
@@ -88,7 +89,6 @@ async function downloadSpacesImages() {
     console.log('🌐 Téléchargement des images Spaces vers public/dist...');
     
     const mongoose = require('mongoose');
-    const https = require('https');
     
     // Connexion MongoDB pour récupérer les articles avec URLs Spaces
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/api-pousse';
