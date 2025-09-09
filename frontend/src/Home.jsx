@@ -144,6 +144,7 @@ const sections = [
 const HomeContent = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { isDark } = useTheme()
 
   return (
     <motion.div 
@@ -672,7 +673,7 @@ const HomeContent = () => {
                   style={{
                     fontSize: '1.5rem',
                     fontWeight: '800',
-                    color: '#1e293b',
+                    color: isDark ? '#ffffff' : '#1e293b',
                     margin: '0 0 0.5rem 0',
                     lineHeight: '1.2'
                   }}
@@ -686,7 +687,7 @@ const HomeContent = () => {
                 <motion.p 
                   style={{
                     fontSize: '1rem',
-                    color: '#64748b',
+                    color: isDark ? '#e2e8f0' : '#64748b',
                     fontWeight: '500',
                     margin: 0,
                     lineHeight: '1.5'
