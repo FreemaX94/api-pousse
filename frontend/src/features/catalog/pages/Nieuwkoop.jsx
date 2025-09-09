@@ -5604,13 +5604,28 @@ return (
                               }}>
 {item.image ? (
                                   <img
-                                    src={item.reference && !item.reference.startsWith('EXT-') ? `/api/catalog/nieuwkoop/items/${item.reference}/image` : (() => {
-                                      if (!item.image || !item.image.includes('movement_')) return item.image;
-                                      const filename = item.image.replace('/movements/', '').replace('/', '');
-                                      const baseUrl = window.location.hostname === 'localhost' 
-                                        ? 'http://localhost:3001' 
-                                        : 'https://api-pousse-app-5y2wo.ondigitalocean.app';
-                                      return `${baseUrl}/api/uploads/${filename}`;
+                                    src={(() => {
+                                      // Articles Nieuwkoop (référence normale)
+                                      if (item.reference && !item.reference.startsWith('EXT-')) {
+                                        return `/api/catalog/nieuwkoop/items/${item.reference}/image`;
+                                      }
+                                      
+                                      // Articles externes avec image Spaces (URL complète)
+                                      if (item.image && (item.image.includes('digitaloceanspaces.com') || item.image.startsWith('https://'))) {
+                                        return item.image;
+                                      }
+                                      
+                                      // Images de mouvements locales
+                                      if (item.image && item.image.includes('movement_')) {
+                                        const filename = item.image.replace('/movements/', '').replace('/', '');
+                                        const baseUrl = window.location.hostname === 'localhost' 
+                                          ? 'http://localhost:3001' 
+                                          : 'https://api-pousse-app-5y2wo.ondigitalocean.app';
+                                        return `${baseUrl}/api/uploads/${filename}`;
+                                      }
+                                      
+                                      // Fallback pour autres cas
+                                      return item.image;
                                     })()}
                                     alt={item.name}
                                     style={{
