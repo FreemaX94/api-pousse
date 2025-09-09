@@ -700,7 +700,7 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
                     )}
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
-                        {item.reference} — {item.name}
+                        {item.category === 'externe' ? item.name : `${item.reference} — ${item.name}`}
                       </div>
                       <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         <span>{item.price ? `${item.price}€` : 'Prix non défini'}</span>
