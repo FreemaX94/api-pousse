@@ -164,14 +164,10 @@ exports.getNieuwkoopItems = async (req, res) => {
         description: item.description,
         // Extraire le prix de pricing.price pour le frontend
         price: item.pricing?.price || 0,
-        // Extraire l'image primaire pour le frontend avec URL ABSOLUE
+        // Extraire l'image primaire pour le frontend - CONSERVER URL SPACES ORIGINALE
         image: (() => {
           const imageUrl = item.images?.find(img => img.isPrimary)?.url || item.images?.[0]?.url || null;
-          // FORCER URL ABSOLUE pour articles EXT
-          if (imageUrl && imageUrl.includes('movement_')) {
-            const filename = imageUrl.split('/').pop();
-            return `/api/catalog/nieuwkoop/movement-image/${filename}`;
-          }
+          // Retourner l'URL originale (Spaces) sans transformation
           return imageUrl;
         })(),
         // Conserver la structure stock

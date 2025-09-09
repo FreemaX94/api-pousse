@@ -345,7 +345,7 @@ exports.createMovement = async (req, res) => {
       note,
       createdBy,
       concepteur: concepteur || null,  // Concepteur responsable
-      image: (type === 'entrée' && imageUrl) ? imageUrl : (req.file ? `/api/catalog/nieuwkoop/movement-image/${req.file.filename}` : (req.body.image || '')),
+      image: imageUrl || (req.file ? `/api/catalog/nieuwkoop/movement-image/${req.file.filename}` : (req.body.image || '')),
       // Champs pour le mode multiple
       coef: parsedCoef,
       isNewPlant: isNewPlant === 'true' || isNewPlant === true,
