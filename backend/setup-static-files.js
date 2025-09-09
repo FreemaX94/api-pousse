@@ -60,4 +60,26 @@ console.log('\n📊 FINAL STATUS:');
   }
 });
 
+// Copier aussi les images de mouvements vers public pour que la route les trouve
+const uploadsMovements = 'uploads/movements';
+if (fs.existsSync(uploadsMovements)) {
+  console.log('📂 Movement images found, copying to public...');
+  const publicMovements = 'public';
+  const distMovements = 'dist';
+  
+  try {
+    const movementFiles = fs.readdirSync(uploadsMovements);
+    movementFiles.forEach(file => {
+      if (file.startsWith('movement_')) {
+        fs.copyFileSync(path.join(uploadsMovements, file), path.join(publicMovements, file));
+        fs.copyFileSync(path.join(uploadsMovements, file), path.join(distMovements, file));
+        console.log('📄 Copied movement image:', file);
+      }
+    });
+    console.log('✅ Movement images copied to public and dist');
+  } catch (e) {
+    console.log('⚠️ Movement copy error:', e.message);
+  }
+}
+
 console.log('🚨 SETUP COMPLETE');
