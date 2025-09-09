@@ -82,4 +82,97 @@ if (fs.existsSync(uploadsMovements)) {
   }
 }
 
-console.log('🚨 SETUP COMPLETE');
+// 🌐 NOUVEAU: Télécharger les images de Spaces vers public et dist
+async function downloadSpacesImages() {
+  try {
+    console.log('🌐 Téléchargement des images Spaces vers public/dist...');
+    
+    const mongoose = require('mongoose');
+    const https = require('https');
+    
+    // Connexion MongoDB pour récupérer les articles avec URLs Spaces
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/api-pousse';
+    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('✅ Connecté à MongoDB pour récupération images Spaces');
+    
+    // Schéma pour récupérer les articles
+    const nieuwkoopItemSchema = new mongoose.Schema({
+      reference: String,
+      name: String,
+      images: [{ url: String, isPrimary: Boolean, alt: String }]
+    }, { collection: 'nieuwkoopitems' });
+    
+    const NieuwkoopItem = mongoose.model('NieuwkoopItem', nieuwkoopItemSchema);
+    
+    // Récupérer tous les articles avec URLs Spaces
+    const articlesWithSpacesImages = await NieuwkoopItem.find({
+      'images.url': { $regex: 'digitaloceanspaces.com' }
+    });
+    
+    console.log(`📊 Trouvé ${articlesWithSpacesImages.length} articles avec images Spaces`);
+    
+    let downloadCount = 0;
+    
+    for (const article of articlesWithSpacesImages) {
+      if (article.images && article.images.length > 0) {
+        const imageUrl = article.images[0].url;
+        
+        if (imageUrl && imageUrl.includes('digitaloceanspaces.com')) {
+          // Extraire le nom de fichier de l'URL
+          const urlParts = imageUrl.split('/');
+          const filename = urlParts[urlParts.length - 1];
+          
+          console.log(`📥 Téléchargement: ${filename} depuis Spaces`);
+          
+          // Télécharger vers public et dist
+          const publicPath = path.join('public', filename);
+          const distPath = path.join('dist', filename);
+          
+          try {
+            await downloadFile(imageUrl, publicPath);
+            await downloadFile(imageUrl, distPath);
+            downloadCount++;
+            console.log(`✅ ${filename} téléchargé vers public et dist`);
+          } catch (downloadError) {
+            console.log(`⚠️ Erreur téléchargement ${filename}:`, downloadError.message);
+          }
+        }
+      }
+    }
+    
+    await mongoose.connection.close();
+    console.log(`🎯 Téléchargement terminé: ${downloadCount} images copiées depuis Spaces`);
+    
+  } catch (error) {
+    console.log('⚠️ Erreur téléchargement Spaces (non critique):', error.message);
+  }
+}
+
+// Fonction helper pour télécharger un fichier
+function downloadFile(url, outputPath) {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(outputPath);
+    
+    https.get(url, (response) => {
+      if (response.statusCode === 200) {
+        response.pipe(file);
+        file.on('finish', () => {
+          file.close();
+          resolve();
+        });
+      } else {
+        reject(new Error(`HTTP ${response.statusCode}`));
+      }
+    }).on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+// Exécuter le téléchargement Spaces de manière asynchrone
+downloadSpacesImages().then(() => {
+  console.log('🚨 SETUP COMPLETE');
+}).catch((error) => {
+  console.log('⚠️ Setup terminé avec erreurs Spaces:', error.message);
+  console.log('🚨 SETUP COMPLETE');
+});
