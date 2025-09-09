@@ -265,7 +265,7 @@ function ExternalEntryForm({ onSaved, currentUser }) {
     setLoading(true);
     setError('');
 
-    console.log('🚀 [FRONTEND] ExternalEntryForm handleSubmit started');
+    console.log('🚀 [FRONTEND] ExternalEntryForm handleSubmit started - v2025.09.09.15h45');
     console.log('🔍 [FRONTEND] FormData:', formData);
 
     // Validation JavaScript au lieu de HTML5 required
