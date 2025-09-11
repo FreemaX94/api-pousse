@@ -628,6 +628,12 @@ const Nieuwkoop = () => {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
   const [focusedCard, setFocusedCard] = useState(null);
+  const [showWateringDashboard, setShowWateringDashboard] = useState(false);
+  const [showWateringCalendar, setShowWateringCalendar] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [showDayDetail, setShowDayDetail] = useState(false);
+  const [selectedDayPlants, setSelectedDayPlants] = useState([]);
+  const [selectedDayInfo, setSelectedDayInfo] = useState({ day: 0, month: '', year: 0 });
 
   // useEffect(() => {
   //   if (focusedCard) {
@@ -1349,6 +1355,488 @@ const Nieuwkoop = () => {
   const openAssign = (item) => {
     setItemToAssign(item);
     setIsAssignOpen(true);
+  };
+
+  // 🧠 SERVICE DE CALCUL D'ARROSAGE INTELLIGENT - FORMULES HORTICOLES RÉALISTES
+  const calculateWateringNeeds = (item) => {
+    const diameter = item.dimensions?.diameter || item.diameter || 20;
+    const height = item.dimensions?.height || item.height || 30;
+    const createdDate = new Date(item.createdAt || Date.now());
+    const currentDate = new Date();
+    
+    // 📐 CALCUL DU VOLUME D'ARROSAGE OPTIMAL (recherche horticole 2024)
+    // Formule basée sur: 1/4 à 1/5 du volume total du pot en été
+    const radius = diameter / 2;
+    const potSurfaceArea = Math.PI * radius * radius; // cm²
+    const potHeight = Math.min(diameter * 1.2, height * 0.3); // Estimation hauteur pot
+    const totalPotVolume = (potSurfaceArea * potHeight) / 1000; // litres
+    
+    // Volume d'arrosage optimal: 20-25% du volume total du pot
+    const baseWaterVolume = totalPotVolume * 0.22;
+    
+    // 🌿 CALCUL DE L'ÂGE ET MATURITÉ
+    const ageWeeks = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24 * 7));
+    
+    // 🧬 CONFIGURATIONS ULTRA-PRÉCISES PAR ESPÈCE (Entrepôt intérieur contrôlé)
+    const plantTypeConfigs = {
+      // 🏝️ STRELITZIA - Oiseau du paradis (recherche professionnelle 2024)
+      strelitzia_nicolai: {
+        baseDays: 7, // 1x/semaine standard professionnel
+        summerFactor: 0.8, // 3-4x/semaine été (recherche confirmée)
+        winterFactor: 1.8, // 1x/semaine hiver
+        waterMultiplier: 1.5, // 15-20L adultes, 5-10L jeunes (recherche pro)
+        minWater: 0.8, maxWater: 4.5,
+        heightFactor: 0.008, // Très sensible à la taille
+        description: 'Strelitzia nicolai (Oiseau du paradis)',
+        species: ['strelitzia nicolai', 'strelitzia reginae'],
+        isPlant: true
+      },
+      
+      // 🌿 FICUS - Figuier lyre (recherche professionnelle 2024)
+      ficus_lyrata: {
+        baseDays: 10, // 1-2 semaines standard professionnel
+        summerFactor: 0.7, // Augmenter quantité, pas fréquence
+        winterFactor: 2.0, // Réduction hivernale
+        waterMultiplier: 2.2, // 8oz/semaine petites, 3x plus grandes
+        minWater: 0.6, maxWater: 3.8,
+        heightFactor: 0.012, // Très sensible taille (triple pour grandes)
+        description: 'Ficus lyrata (Figuier lyre)',
+        species: ['ficus lyrata', 'ficus cyathistipula'],
+        isPlant: true
+      },
+      
+      // 🌴 KENTIA - Palmier Kentia (5 références dans stock)
+      kentia_forsteriana: {
+        baseDays: 6, // 5 jours été, 10 jours hiver (recherches confirmées)
+        summerFactor: 0.8, // Croissance active
+        winterFactor: 1.7, // Métabolisme ralenti
+        waterRatio: 0.06, // Sol constamment humide mais pas détrempé
+        minWater: 0.2, maxWater: 2.0,
+        heightFactor: 0.0025,
+        description: 'Kentia (Howea) forsteriana',
+        species: ['howea forsteriana', 'kentia'],
+        isPlant: true
+      },
+      
+      // 🥥 DYPSIS/ARECA - Palmier Areca (4 références dans stock)
+      dypsis_lutescens: {
+        baseDays: 4, // Sol toujours légèrement humide
+        summerFactor: 0.7,
+        winterFactor: 2.0,
+        waterRatio: 0.05, // Sensible au sur-arrosage
+        minWater: 0.15, maxWater: 1.5,
+        heightFactor: 0.002,
+        description: 'Dypsis (Areca) lutescens',
+        species: ['dypsis lutescens', 'areca lutescens', 'dypsiss'],
+        isPlant: true
+      },
+      
+      // 🌺 VEITCHIA - Palmier Adonidia (2 références dans stock)
+      veitchia_merrillii: {
+        baseDays: 5,
+        summerFactor: 0.8,
+        winterFactor: 1.8,
+        waterRatio: 0.06,
+        minWater: 0.2, maxWater: 2.2,
+        heightFactor: 0.0025,
+        description: 'Veitchia (Adonidia) merrillii',
+        species: ['veitchia merrillii', 'adonidia merrillii'],
+        isPlant: true
+      },
+      
+      // 🌿 SCHEFFLERA - Arbre parapluie (1 référence dans stock)
+      schefflera_arboricola: {
+        baseDays: 6,
+        summerFactor: 0.7,
+        winterFactor: 1.6,
+        waterRatio: 0.09,
+        minWater: 0.25, maxWater: 2.0,
+        heightFactor: 0.002,
+        description: 'Schefflera arboricola',
+        species: ['schefflera arboricola'],
+        isPlant: true
+      },
+      
+      // 🌱 CHAMAEDOREA - Palmier nain (1 référence dans stock)
+      chamaedorea_seifrizii: {
+        baseDays: 5,
+        summerFactor: 0.8,
+        winterFactor: 1.9,
+        waterRatio: 0.07,
+        minWater: 0.18, maxWater: 1.8,
+        heightFactor: 0.002,
+        description: 'Chamaedorea seifrizii',
+        species: ['chamaedorea seifrizii'],
+        isPlant: true
+      },
+      
+      // 🐟 CARYOTA - Palmier queue de poisson (1 référence dans stock)
+      caryota_mitis: {
+        baseDays: 4,
+        summerFactor: 0.9, // Très gourmand en eau
+        winterFactor: 1.8,
+        waterRatio: 0.08,
+        minWater: 0.22, maxWater: 2.2,
+        heightFactor: 0.0025,
+        description: 'Caryota mitis (Palmier queue de poisson)',
+        species: ['caryota mitis'],
+        isPlant: true
+      },
+      
+      // 🐉 DRACAENA - Dragonnier (recherche professionnelle 2024)
+      dracaena_marginata: {
+        baseDays: 14, // Très résistant, 75% sol sec avant arrosage
+        summerFactor: 0.6, // Moins fréquent mais plus abondant
+        winterFactor: 3.0, // 1x/mois hiver, très espacé
+        waterMultiplier: 1.8, // Arrosage profond jusqu'aux trous
+        minWater: 0.4, maxWater: 2.8,
+        heightFactor: 0.006, // Modérément sensible à la taille
+        description: 'Dracaena marginata (Dragonnier)',
+        species: ['dracaena marginata', 'dracaena fragrans'],
+        isPlant: true
+      },
+      
+      // 🍃 MONSTERA - Plante fromage suisse (4 références dans stock)
+      monstera_deliciosa: {
+        baseDays: 6,
+        summerFactor: 0.7,
+        winterFactor: 1.7,
+        waterRatio: 0.10,
+        minWater: 0.25, maxWater: 2.0,
+        heightFactor: 0.0018,
+        description: 'Monstera deliciosa',
+        species: ['monstera deliciosa'],
+        isPlant: true
+      },
+      
+      // 🌿 PHILODENDRON - (3 références dans stock)
+      philodendron: {
+        baseDays: 7,
+        summerFactor: 0.8,
+        winterFactor: 1.6,
+        waterRatio: 0.11,
+        minWater: 0.2, maxWater: 1.8,
+        heightFactor: 0.0015,
+        description: 'Philodendron',
+        species: ['philodendron imperial green', 'philodendron xanadu'],
+        isPlant: true
+      },
+      
+      // 🌺 CALATHEA - Plante prière (1 référence dans stock)
+      calathea_rufibarba: {
+        baseDays: 5, // Très sensible à l'humidité
+        summerFactor: 0.9,
+        winterFactor: 1.4,
+        waterRatio: 0.12,
+        minWater: 0.15, maxWater: 1.2,
+        heightFactor: 0.0012,
+        description: 'Calathea rufibarba',
+        species: ['calathea rufibarba'],
+        isPlant: true
+      },
+      
+      // 🐘 ALOCASIA - Oreille d'éléphant (2 références dans stock)
+      alocasia: {
+        baseDays: 4, // Sol constamment humide
+        summerFactor: 0.8,
+        winterFactor: 1.5,
+        waterRatio: 0.13,
+        minWater: 0.2, maxWater: 1.8,
+        heightFactor: 0.002,
+        description: 'Alocasia',
+        species: ['alocasia wentii', 'alocasia sarawakensis'],
+        isPlant: true
+      },
+      
+      // 🍃 CLUSIA - Arbre autographe (1 référence dans stock)
+      clusia_rosea: {
+        baseDays: 10, // Très résistant, arrosage espacé
+        summerFactor: 0.7,
+        winterFactor: 2.5,
+        waterRatio: 0.05,
+        minWater: 0.12, maxWater: 1.0,
+        heightFactor: 0.001,
+        description: 'Clusia rosea',
+        species: ['clusia rosea'],
+        isPlant: true
+      },
+      
+      // 🗡️ SANSEVIERIA - Langue de belle-mère (2 références dans stock)
+      sansevieria: {
+        baseDays: 14, // Succulente, très peu d'eau
+        summerFactor: 0.6,
+        winterFactor: 3.0,
+        waterRatio: 0.03,
+        minWater: 0.08, maxWater: 0.5,
+        heightFactor: 0.0008,
+        description: 'Sansevieria trifasciata',
+        species: ['sansevieria trifasciata', 'sansevieria'],
+        isPlant: true
+      },
+      
+      // 🍃 HEDERA - Lierre (1 référence dans stock)
+      hedera_helix: {
+        baseDays: 5,
+        summerFactor: 0.8,
+        winterFactor: 1.6,
+        waterRatio: 0.09,
+        minWater: 0.15, maxWater: 1.5,
+        heightFactor: 0.0012,
+        description: 'Hedera helix (Lierre)',
+        species: ['hedera helix'],
+        isPlant: true
+      },
+      
+      // CATÉGORIES GÉNÉRIQUES (fallback)
+      palmier: {
+        baseDays: 5,
+        summerFactor: 0.7,
+        winterFactor: 1.9,
+        waterRatio: 0.06,
+        minWater: 0.2, maxWater: 2.0,
+        heightFactor: 0.0025,
+        description: 'Palmier (générique)',
+        isPlant: true
+      },
+      
+      ficus: {
+        baseDays: 8,
+        summerFactor: 0.6,
+        winterFactor: 2.2,
+        waterRatio: 0.12,
+        minWater: 0.4, maxWater: 3.0,
+        heightFactor: 0.002,
+        description: 'Ficus (générique)',
+        isPlant: true
+      },
+      
+      plante_verte: {
+        baseDays: 7,
+        summerFactor: 0.8,
+        winterFactor: 1.6,
+        waterRatio: 0.10,
+        minWater: 0.2, maxWater: 1.8,
+        heightFactor: 0.0015,
+        description: 'Plante verte d\'intérieur',
+        isPlant: true
+      },
+      
+      plante_grasse: {
+        baseDays: 14,
+        summerFactor: 0.6,
+        winterFactor: 3.0,
+        waterRatio: 0.03,
+        minWater: 0.08, maxWater: 0.5,
+        heightFactor: 0.0008,
+        description: 'Plante grasse/Succulente',
+        isPlant: true
+      },
+      
+      // ARTICLES NON-PLANTES (pas d'arrosage)
+      pot_contenant: { isPlant: false, description: 'Pot/Contenant' },
+      terreau_substrat: { isPlant: false, description: 'Terreau/Substrat' },
+      outil_jardin: { isPlant: false, description: 'Outil de jardin' },
+      engrais_produit: { isPlant: false, description: 'Engrais/Produit' },
+      decoration: { isPlant: false, description: 'Décoration' },
+      graine_bulbe: { isPlant: false, description: 'Graine/Bulbe' },
+      accessoire: { isPlant: false, description: 'Accessoire' },
+      autre: { isPlant: false, description: 'Article non identifié' }
+    };
+    
+    // 🔬 DÉTECTION ULTRA-PRÉCISE D'ESPÈCE 
+    const detectPlantType = () => {
+      const name = item.name?.toLowerCase() || '';
+      const reference = item.reference?.toLowerCase() || '';
+      
+      // 🏝️ STRELITZIA - Détection précise
+      if (name.includes('strelitzia nicolai') || name.includes('strelitzia reginae')) {
+        return 'strelitzia_nicolai';
+      }
+      
+      // 🌿 FICUS - Détection précise par espèce
+      if (name.includes('ficus lyrata') || name.includes('ficus cyathistipula')) {
+        return 'ficus_lyrata';
+      }
+      
+      // 🌴 KENTIA - Détection précise
+      if (name.includes('kentia') || name.includes('howea forsteriana')) {
+        return 'kentia_forsteriana';
+      }
+      
+      // 🥥 DYPSIS/ARECA - Détection précise
+      if (name.includes('dypsis') || name.includes('areca') || name.includes('dypsiss')) {
+        return 'dypsis_lutescens';
+      }
+      
+      // 🌺 VEITCHIA/ADONIDIA - Détection précise
+      if (name.includes('veitchia') || name.includes('adonidia')) {
+        return 'veitchia_merrillii';
+      }
+      
+      // 🌿 SCHEFFLERA - Détection précise
+      if (name.includes('schefflera arboricola')) {
+        return 'schefflera_arboricola';
+      }
+      
+      // 🌱 CHAMAEDOREA - Détection précise
+      if (name.includes('chamaedorea seifrizii')) {
+        return 'chamaedorea_seifrizii';
+      }
+      
+      // 🐟 CARYOTA - Détection précise
+      if (name.includes('caryota mitis')) {
+        return 'caryota_mitis';
+      }
+      
+      // 🐉 DRACAENA - Détection précise
+      if (name.includes('dracaena marginata') || name.includes('dracaena fragrans')) {
+        return 'dracaena_marginata';
+      }
+      
+      // 🍃 MONSTERA - Détection précise
+      if (name.includes('monstera deliciosa')) {
+        return 'monstera_deliciosa';
+      }
+      
+      // 🌿 PHILODENDRON - Détection précise
+      if (name.includes('philodendron imperial green') || name.includes('philodendron xanadu')) {
+        return 'philodendron';
+      }
+      
+      // 🌺 CALATHEA - Détection précise
+      if (name.includes('calathea rufibarba')) {
+        return 'calathea_rufibarba';
+      }
+      
+      // 🐘 ALOCASIA - Détection précise
+      if (name.includes('alocasia wentii') || name.includes('alocasia sarawakensis')) {
+        return 'alocasia';
+      }
+      
+      // 🍃 CLUSIA - Détection précise
+      if (name.includes('clusia rosea')) {
+        return 'clusia_rosea';
+      }
+      
+      // 🗡️ SANSEVIERIA - Détection précise
+      if (name.includes('sansevieria trifasciata') || name.includes('sansevieria')) {
+        return 'sansevieria';
+      }
+      
+      // 🍃 HEDERA - Détection précise
+      if (name.includes('hedera helix')) {
+        return 'hedera_helix';
+      }
+      
+      // CATÉGORIES GÉNÉRIQUES (fallback pour anciens articles)
+      if (name.includes('palmier') && !name.includes('dypsis') && !name.includes('kentia')) return 'palmier';
+      if (name.includes('ficus') && !name.includes('lyrata')) return 'ficus';
+      if (name.includes('cactus') || name.includes('aloe') || name.includes('echeveria')) return 'plante_grasse';
+      if (name.includes('orchidee') || name.includes('phalaenopsis')) return 'plante_grasse';
+      if (name.includes('begonia') || name.includes('geranium')) return 'plante_verte';
+      
+      // Articles non-plantes
+      if (name.includes('pot') || name.includes('bac') || name.includes('contenant') || 
+          name.includes('grigio') || name.includes('pure') || name.includes('argento') ||
+          name.includes('fiberstone') || name.includes('cement') || name.includes('terra cotta') ||
+          name.includes('natural') || name.includes('b round') || name.includes('palermo') ||
+          name.includes('artstone') || name.includes('pure straight') || name.includes('lechuza') ||
+          name.includes('elho') || name.includes('pottery') || name.includes('planter') ||
+          name.includes('raindrop rough') || name.includes('raindrop') || name.includes('rough') ||
+          name.includes('terra') || name.includes('cotta') || name.includes('cylinder') ||
+          name.includes('round') || name.includes('square') || name.includes('oval') ||
+          name.includes('planters') || name.includes('vaso') || name.includes('maceta') ||
+          name.includes('container') || name.includes('vessel')) {
+        return 'pot_contenant';
+      }
+      if (name.includes('terreau') || name.includes('substrat')) return 'terreau_substrat';
+      if (name.includes('outil') || name.includes('sécateur')) return 'outil_jardin';
+      if (name.includes('engrais') || name.includes('fertilisant')) return 'engrais_produit';
+      if (name.includes('vase')) return 'decoration';
+      
+      // Articles externes non identifiés
+      if (reference.startsWith('ext-')) return 'autre';
+      
+      // Par défaut selon catégorie
+      if (item.category === 'plante') return 'plante_verte';
+      if (item.category === 'floral') return 'plante_verte';
+      
+      // Si rien ne correspond, vérifier si c'est potentiellement une plante
+      const isPotentialPlant = name.length > 3 && !name.includes('pot') && !name.includes('vase');
+      return isPotentialPlant ? 'plante_verte' : 'autre';
+    };
+    
+    const plantType = detectPlantType();
+    const config = plantTypeConfigs[plantType];
+    
+    // Si ce n'est pas une plante, pas d'arrosage nécessaire
+    if (!config.isPlant) {
+      return {
+        interval: 0,
+        quantity: 0,
+        needsWatering: false,
+        plantType: config.description,
+        isPlant: false
+      };
+    }
+    
+    // 🌡️ FACTEUR SAISONNIER SPÉCIALISÉ (utilise les facteurs spécifiques par plante)
+    const month = currentDate.getMonth();
+    let seasonFactor;
+    if (month >= 5 && month <= 8) { // Été (juin-septembre)
+      seasonFactor = config.summerFactor;
+    } else if (month >= 11 || month <= 2) { // Hiver (décembre-mars)
+      seasonFactor = config.winterFactor;
+    } else { // Printemps/Automne
+      seasonFactor = 1.0;
+    }
+    
+    // 🌱 FACTEUR MATURITÉ (progression réaliste)
+    const ageFactor = ageWeeks < 8 ? 0.7 : // Très jeune
+                     ageWeeks < 26 ? 0.9 : // Jeune
+                     ageWeeks > 78 ? 1.2 : // Très mature
+                     1.0; // Mature standard
+    
+    // 📏 FACTEUR TAILLE - INTÉGRATION HAUTEUR ET DIAMÈTRE RÉELS
+    const heightEffect = height * config.heightFactor; // Plus la plante est haute, plus elle a besoin d'eau
+    const diameterEffect = (diameter / 20) * 0.1; // Normalisation par rapport à 20cm de base
+    const sizeMultiplier = 1 + heightEffect + diameterEffect;
+    
+    // 💧 CALCULS FINAUX OPTIMISÉS (recherche horticole 2024)
+    let interval = config.baseDays * seasonFactor * ageFactor;
+    interval = Math.max(1, Math.round(interval)); // Au minimum 1 jour
+    
+    // Volume d'eau basé sur recherche: 20-25% volume pot + multiplier plante
+    const waterMultiplier = config.waterMultiplier || 1.0;
+    let waterQuantity = baseWaterVolume * waterMultiplier * sizeMultiplier;
+    
+    // Appliquer les limites spécifiques à l'espèce
+    waterQuantity = Math.max(waterQuantity, config.minWater);
+    waterQuantity = Math.min(waterQuantity, config.maxWater);
+    
+    // 📅 SIMULATION PLANNING D'ARROSAGE
+    const lastWatered = new Date(currentDate - (Math.random() * interval * 24 * 60 * 60 * 1000));
+    const nextWatering = new Date(lastWatered.getTime() + interval * 24 * 60 * 60 * 1000);
+    const daysUntil = Math.ceil((nextWatering - currentDate) / (1000 * 60 * 60 * 24));
+    
+    return {
+      interval,
+      quantity: Math.round(waterQuantity * 100) / 100, // 2 décimales
+      nextWatering,
+      daysUntil: Math.max(0, daysUntil),
+      lastWatered,
+      potVolume: Math.round(totalPotVolume * 100) / 100, // Volume total du pot réaliste
+      ageWeeks,
+      seasonFactor,
+      ageFactor,
+      sizeMultiplier: Math.round(sizeMultiplier * 100) / 100,
+      actualHeight: height,
+      actualDiameter: diameter,
+      isOverdue: daysUntil < 0,
+      plantType: config.description,
+      needsWatering: true,
+      isPlant: true
+    };
   };
 
   const handleAssign = async ({ projectId, quantity, note }) => {
@@ -2313,8 +2801,15 @@ return (
                       borderRadius: '12px',
                       textAlign: 'center',
                       border: '1px solid var(--color-border)',
-                      backdropFilter: 'blur(10px)'
-                    }}>
+                      backdropFilter: 'blur(10px)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                      }
+                    }}
+                    onClick={() => setShowWateringDashboard(true)}>
                       <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>💧</div>
                       <div style={{
                         fontSize: '0.7rem', 
@@ -2340,62 +2835,6 @@ return (
                     gridTemplateColumns: '1fr 1fr',
                     gap: '1rem'
                   }}>
-                    <div style={{
-                      background: 'var(--color-success-bg)',
-                      border: '1px solid var(--color-success)',
-                      padding: '0.75rem',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      backdropFilter: 'blur(10px)'
-                    }}>
-                      <div style={{fontSize: '1rem', marginRight: '0.5rem'}}>🌱</div>
-                      <div>
-                        <div style={{
-                          fontSize: '0.7rem', 
-                          color: 'var(--color-text-secondary)',
-                          fontWeight: '600'
-                        }}>
-                          Dernière activité
-                        </div>
-                        <div style={{
-                          fontSize: '0.8rem', 
-                          fontWeight: '600',
-                          color: 'var(--color-text-primary)'
-                        }}>
-                          {focusedProduct.lastActivity || 'Aujourd\'hui'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{
-                      background: 'var(--color-warning)',
-                      backgroundOpacity: '0.1',
-                      border: '1px solid var(--color-warning)',
-                      padding: '0.75rem',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      backdropFilter: 'blur(10px)'
-                    }}>
-                      <div style={{fontSize: '1rem', marginRight: '0.5rem'}}>⚡</div>
-                      <div>
-                        <div style={{
-                          fontSize: '0.7rem', 
-                          color: 'var(--color-text-secondary)',
-                          fontWeight: '600'
-                        }}>
-                          Score santé
-                        </div>
-                        <div style={{
-                          fontSize: '0.8rem', 
-                          fontWeight: '600',
-                          color: 'var(--color-text-primary)'
-                        }}>
-                          {focusedProduct.healthScore || '85%'}
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -2419,6 +2858,1142 @@ return (
           )}
         </div>
       )}
+
+      {/* 🌿 DASHBOARD ARROSAGE PREMIUM */}
+      {showWateringDashboard && focusedCard && (() => {
+        const product = sortedItems.find(prod => prod.reference === focusedCard);
+        if (!product) return null;
+
+
+        const wateringData = calculateWateringNeeds(product);
+
+        return (
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(12px)',
+            zIndex: 11000,
+            animation: 'overlayFadeIn 0.3s ease-out forwards'
+          }}
+          onClick={() => setShowWateringDashboard(false)}
+          >
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.98))',
+              borderRadius: '24px',
+              padding: '2rem',
+              maxWidth: '600px',
+              width: '90vw',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              animation: 'cardFocusIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+            }}
+            onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '2rem',
+                borderBottom: '2px solid rgba(13,148,136,0.2)',
+                paddingBottom: '1rem'
+              }}>
+                <div style={{ fontSize: '2rem', marginRight: '1rem' }}>🌿</div>
+                <div>
+                  <h2 style={{ 
+                    margin: 0, 
+                    color: '#0d9488', 
+                    fontSize: '1.5rem',
+                    fontWeight: '700'
+                  }}>
+                    Dashboard Arrosage
+                  </h2>
+                  <p style={{ 
+                    margin: 0, 
+                    color: '#64748b', 
+                    fontSize: '0.9rem' 
+                  }}>
+                    {product.name} ({product.reference})
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowWateringDashboard(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: 'rgba(239,68,68,0.1)',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Stats Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '1rem',
+                marginBottom: '2rem'
+              }}>
+                <div style={{
+                  background: wateringData.isOverdue ? 
+                    'linear-gradient(135deg, #fee2e2, #fecaca)' : 
+                    'linear-gradient(135deg, #d1fae5, #a7f3d0)',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  textAlign: 'center',
+                  border: `2px solid ${wateringData.isOverdue ? '#fca5a5' : '#6ee7b7'}`
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                    {wateringData.isOverdue ? '🚨' : '💧'}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>
+                    PROCHAIN ARROSAGE
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: wateringData.isOverdue ? '#dc2626' : '#059669' }}>
+                    {wateringData.isOverdue ? 'URGENT' : `Dans ${wateringData.daysUntil} jour${wateringData.daysUntil > 1 ? 's' : ''}`}
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  textAlign: 'center',
+                  border: '2px solid #93c5fd'
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🥤</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>
+                    QUANTITÉ RECOMMANDÉE
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1d4ed8' }}>
+                    {wateringData.quantity}L
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                  padding: '1rem',
+                  borderRadius: '16px',
+                  textAlign: 'center',
+                  border: '2px solid #fcd34d'
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⏱️</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>
+                    FRÉQUENCE
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#d97706' }}>
+                    Tous les {wateringData.interval} jours
+                  </div>
+                </div>
+              </div>
+
+              {/* Données techniques */}
+              <div style={{
+                background: 'rgba(248,250,252,0.8)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                marginBottom: '1.5rem'
+              }}>
+                <h3 style={{ 
+                  margin: '0 0 1rem 0', 
+                  color: '#374151', 
+                  fontSize: '1.1rem',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ marginRight: '0.5rem' }}>📊</span>
+                  Données Techniques
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: '1rem',
+                  fontSize: '0.85rem'
+                }}>
+                  <div>
+                    <span style={{ color: '#6b7280' }}>Hauteur:</span>
+                    <div style={{ fontWeight: '600', color: '#374151' }}>{wateringData.actualHeight}cm</div>
+                  </div>
+                  <div>
+                    <span style={{ color: '#6b7280' }}>Diamètre:</span>
+                    <div style={{ fontWeight: '600', color: '#374151' }}>{wateringData.actualDiameter}cm</div>
+                  </div>
+                  <div>
+                    <span style={{ color: '#6b7280' }}>Volume pot:</span>
+                    <div style={{ fontWeight: '600', color: '#374151' }}>{wateringData.potVolume}L</div>
+                  </div>
+                  <div>
+                    <span style={{ color: '#6b7280' }}>Facteur taille:</span>
+                    <div style={{ fontWeight: '600', color: '#374151' }}>×{wateringData.sizeMultiplier}</div>
+                  </div>
+                  <div>
+                    <span style={{ color: '#6b7280' }}>Type:</span>
+                    <div style={{ fontWeight: '600', color: '#374151' }}>{wateringData.plantType}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center'
+              }}>
+                <button style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '12px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span>💧</span>
+                  Marquer comme arrosé
+                </button>
+                <button style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '12px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span>⚙️</span>
+                  Personnaliser
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 🗓️ MODAL CALENDRIER D'ARROSAGE ULTRA-PREMIUM */}
+      {showWateringCalendar && (() => {
+        const currentMonth = calendarDate.getMonth();
+        const currentYear = calendarDate.getFullYear();
+        
+        // 📅 FONCTION ULTRA-INTELLIGENTE POUR LE PLANNING CALENDRIER
+        const generateMonthlyWateringSchedule = (month, year) => {
+          const schedule = {};
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          
+          // Initialiser tous les jours du mois
+          for (let day = 1; day <= daysInMonth; day++) {
+            schedule[day] = [];
+          }
+          
+          // Parcourir toutes les plantes du stock
+          sortedItems.forEach(item => {
+            // Calculer les besoins d'arrosage pour cette plante
+            const wateringNeeds = calculateWateringNeeds(item);
+            
+            // Si c'est une vraie plante qui a besoin d'arrosage
+            if (wateringNeeds.isPlant && wateringNeeds.needsWatering) {
+              // Simuler une date de dernière arrosage (entre -7 et 0 jours)
+              const lastWatered = new Date();
+              lastWatered.setDate(lastWatered.getDate() - Math.floor(Math.random() * 7));
+              
+              // Calculer les prochains arrosages pour le mois
+              let nextWatering = new Date(lastWatered);
+              nextWatering.setDate(nextWatering.getDate() + wateringNeeds.interval);
+              
+              // Ajouter tous les arrosages du mois
+              while (nextWatering.getMonth() === month && nextWatering.getFullYear() === year) {
+                const day = nextWatering.getDate();
+                
+                schedule[day].push({
+                  ...item,
+                  wateringData: wateringNeeds,
+                  quantity: wateringNeeds.quantity,
+                  plantType: wateringNeeds.plantType,
+                  isOverdue: false // Sera recalculé en temps réel
+                });
+                
+                // Calculer le prochain arrosage
+                nextWatering = new Date(nextWatering);
+                nextWatering.setDate(nextWatering.getDate() + wateringNeeds.interval);
+              }
+            }
+          });
+          
+          return schedule;
+        };
+        
+        const monthlySchedule = generateMonthlyWateringSchedule(currentMonth, currentYear);
+        
+        const monthNames = [
+          'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ];
+        
+        const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        
+        // Calculer le premier jour de la semaine (Lundi = 0)
+        let firstDayWeekday = firstDayOfMonth.getDay();
+        firstDayWeekday = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+        
+        const calendarDays = [];
+        
+        // Jours vides avant le premier du mois
+        for (let i = 0; i < firstDayWeekday; i++) {
+          calendarDays.push(null);
+        }
+        
+        // Jours du mois
+        for (let day = 1; day <= daysInMonth; day++) {
+          calendarDays.push(day);
+        }
+        
+        return (
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '100vw',
+            height: '100vh',
+            background: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(20px)',
+            zIndex: 12000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+            animation: 'overlayFadeIn 0.4s ease-out forwards'
+          }}
+          onClick={() => setShowWateringCalendar(false)}
+          >
+            <div style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, rgba(31,41,55,0.98), rgba(17,24,39,0.95))' 
+                : 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95))',
+              borderRadius: '32px',
+              padding: '3rem',
+              maxWidth: '1200px',
+              width: '95vw',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: isDark 
+                ? '0 50px 100px -20px rgba(0, 0, 0, 0.8)' 
+                : '0 50px 100px -20px rgba(0, 0, 0, 0.4)',
+              border: isDark 
+                ? '1px solid rgba(75,85,99,0.4)' 
+                : '1px solid rgba(255,255,255,0.3)',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              animation: 'cardFocusIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+            }}
+            onClick={e => e.stopPropagation()}
+            >
+              {/* Header avec navigation */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '3rem',
+                borderBottom: '3px solid rgba(14,165,233,0.2)',
+                paddingBottom: '2rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                  <div style={{ 
+                    fontSize: '3rem',
+                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 2px 4px rgba(14,165,233,0.3))'
+                  }}>
+                    💧
+                  </div>
+                  <div>
+                    <h1 style={{ 
+                      margin: 0, 
+                      color: isDark ? '#f9fafb' : '#0f172a', 
+                      fontSize: '2.5rem',
+                      fontWeight: '800',
+                      background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      letterSpacing: '-0.025em'
+                    }}>
+                      Calendrier d'Arrosage
+                    </h1>
+                    <p style={{ 
+                      margin: 0, 
+                      color: isDark ? '#9ca3af' : '#64748b', 
+                      fontSize: '1.1rem',
+                      fontWeight: '500'
+                    }}>
+                      Planning optimal pour vos {sortedItems.filter(item => calculateWateringNeeds(item).isPlant).length} plantes
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Navigation mois */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                  <button
+                    onClick={() => setCalendarDate(new Date(currentYear, currentMonth - 1, 1))}
+                    style={{
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #374151, #4b5563)' 
+                        : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)',
+                      border: isDark 
+                        ? '2px solid rgba(156,163,175,0.3)' 
+                        : '2px solid rgba(100,116,139,0.2)',
+                      borderRadius: '16px',
+                      width: '50px',
+                      height: '50px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      color: isDark ? '#f9fafb' : '#1f2937',
+                      transition: 'all 0.3s ease',
+                      boxShadow: isDark 
+                        ? '0 4px 15px rgba(0,0,0,0.3)' 
+                        : '0 4px 15px rgba(0,0,0,0.1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.1) rotate(-10deg)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1) rotate(0deg)';
+                      e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                    }}
+                  >
+                    ‹
+                  </button>
+                  
+                  <div style={{
+                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '20px',
+                    fontSize: '1.3rem',
+                    fontWeight: '700',
+                    boxShadow: '0 8px 25px rgba(14,165,233,0.3)',
+                    textAlign: 'center',
+                    minWidth: '200px'
+                  }}>
+                    {monthNames[currentMonth]} {currentYear}
+                  </div>
+                  
+                  <button
+                    onClick={() => setCalendarDate(new Date(currentYear, currentMonth + 1, 1))}
+                    style={{
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #374151, #4b5563)' 
+                        : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)',
+                      border: isDark 
+                        ? '2px solid rgba(156,163,175,0.3)' 
+                        : '2px solid rgba(100,116,139,0.2)',
+                      borderRadius: '16px',
+                      width: '50px',
+                      height: '50px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      color: isDark ? '#f9fafb' : '#1f2937',
+                      transition: 'all 0.3s ease',
+                      boxShadow: isDark 
+                        ? '0 4px 15px rgba(0,0,0,0.3)' 
+                        : '0 4px 15px rgba(0,0,0,0.1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.1) rotate(10deg)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1) rotate(0deg)';
+                      e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+                
+                {/* Bouton fermer */}
+                <button
+                  onClick={() => setShowWateringCalendar(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: isDark 
+                      ? 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(248,113,113,0.2))' 
+                      : 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(248,113,113,0.1))',
+                    border: isDark 
+                      ? '2px solid rgba(239,68,68,0.4)' 
+                      : '2px solid rgba(239,68,68,0.2)',
+                    borderRadius: '50%',
+                    width: '50px',
+                    height: '50px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isDark ? '#f87171' : '#ef4444',
+                    cursor: 'pointer',
+                    fontSize: '1.5rem',
+                    transition: 'all 0.3s ease',
+                    color: '#ef4444'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1) rotate(90deg)';
+                    e.target.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(248,113,113,0.2))';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1) rotate(0deg)';
+                    e.target.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(248,113,113,0.1))';
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {/* En-têtes des jours */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: '1rem',
+                marginBottom: '1rem'
+              }}>
+                {dayNames.map(day => (
+                  <div key={day} style={{
+                    textAlign: 'center',
+                    padding: '1rem',
+                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                    color: 'white',
+                    borderRadius: '16px',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    boxShadow: '0 4px 15px rgba(14,165,233,0.3)'
+                  }}>
+                    {day}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Calendrier */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: '1rem',
+                minHeight: '400px'
+              }}>
+                {calendarDays.map((day, index) => {
+                  if (!day) {
+                    return <div key={index} style={{ minHeight: '150px' }} />;
+                  }
+                  
+                  const plantsToWater = monthlySchedule[day] || [];
+                  const today = new Date();
+                  const isToday = day === today.getDate() && 
+                                 currentMonth === today.getMonth() && 
+                                 currentYear === today.getFullYear();
+                  const isPast = new Date(currentYear, currentMonth, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                  
+                  return (
+                    <div key={day} 
+                    onClick={() => {
+                      console.log('🔥 Click sur jour:', day, 'plantsToWater:', plantsToWater.length);
+                      if (plantsToWater.length > 0) {
+                        console.log('✅ Ouverture modal pour:', plantsToWater);
+                        setSelectedDayPlants(plantsToWater);
+                        setSelectedDayInfo({
+                          day,
+                          month: new Date(currentYear, currentMonth, day).toLocaleDateString('fr-FR', { month: 'long' }),
+                          year: currentYear
+                        });
+                        setShowDayDetail(true);
+                      } else {
+                        console.log('❌ Pas de plantes à arroser ce jour');
+                      }
+                    }}
+                    style={{
+                      background: isToday 
+                        ? 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+                        : isPast 
+                          ? isDark 
+                            ? 'linear-gradient(135deg, #374151, #4b5563)'
+                            : 'linear-gradient(135deg, #f8fafc, #e2e8f0)'
+                          : plantsToWater.length > 0 
+                            ? isDark
+                              ? 'linear-gradient(135deg, #065f46, #047857)'
+                              : 'linear-gradient(135deg, #dcfce7, #bbf7d0)'
+                            : isDark
+                              ? 'linear-gradient(135deg, #1f2937, #374151)'
+                              : 'linear-gradient(135deg, #ffffff, #f8fafc)',
+                      borderRadius: '20px',
+                      padding: '1rem',
+                      minHeight: '150px',
+                      border: isToday 
+                        ? '3px solid #f59e0b'
+                        : plantsToWater.length > 0 
+                          ? isDark 
+                            ? '2px solid #10b981'
+                            : '2px solid #22c55e'
+                          : isDark
+                            ? '2px solid rgba(75,85,99,0.5)'
+                            : '2px solid rgba(226,232,240,0.5)',
+                      boxShadow: isToday 
+                        ? '0 8px 25px rgba(245,158,11,0.3)'
+                        : plantsToWater.length > 0 
+                          ? isDark
+                            ? '0 4px 15px rgba(16,185,129,0.3)'
+                            : '0 4px 15px rgba(34,197,94,0.2)'
+                          : isDark
+                            ? '0 2px 8px rgba(0,0,0,0.2)'
+                            : '0 2px 8px rgba(0,0,0,0.05)',
+                      transition: 'all 0.3s ease',
+                      cursor: plantsToWater.length > 0 ? 'pointer' : 'default',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (plantsToWater.length > 0) {
+                        e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                        e.target.style.boxShadow = isToday 
+                          ? '0 15px 35px rgba(245,158,11,0.4)'
+                          : '0 10px 25px rgba(34,197,94,0.3)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0) scale(1)';
+                      e.target.style.boxShadow = isToday 
+                        ? '0 8px 25px rgba(245,158,11,0.3)'
+                        : plantsToWater.length > 0 
+                          ? '0 4px 15px rgba(34,197,94,0.2)'
+                          : '0 2px 8px rgba(0,0,0,0.05)';
+                    }}
+                    >
+                      {/* Numéro du jour */}
+                      <div style={{
+                        fontSize: '1.2rem',
+                        fontWeight: '700',
+                        color: isToday 
+                          ? 'white' 
+                          : isPast 
+                            ? isDark ? '#6b7280' : '#94a3b8'
+                            : isDark ? '#f9fafb' : '#1f2937',
+                        marginBottom: '0.5rem',
+                        textAlign: 'center'
+                      }}>
+                        {day}
+                      </div>
+                      
+                      {/* Indicateur nombre de plantes */}
+                      {plantsToWater.length > 0 && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '0.5rem',
+                          right: '0.5rem',
+                          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                          color: 'white',
+                          borderRadius: '50%',
+                          width: '24px',
+                          height: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          boxShadow: '0 2px 8px rgba(239,68,68,0.4)'
+                        }}>
+                          {plantsToWater.length}
+                        </div>
+                      )}
+                      
+                      {/* Mini-cartes des plantes */}
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.25rem',
+                        maxHeight: '100px',
+                        overflowY: 'auto'
+                      }}>
+                        {plantsToWater.slice(0, 2).map((plant, idx) => (
+                          <div key={plant.reference} style={{
+                            background: isDark 
+                              ? 'rgba(75,85,99,0.8)' 
+                              : 'rgba(255,255,255,0.9)',
+                            borderRadius: '8px',
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.7rem',
+                            fontWeight: '600',
+                            color: isDark ? '#f9fafb' : '#1f2937',
+                            border: isDark 
+                              ? '1px solid rgba(16,185,129,0.5)' 
+                              : '1px solid rgba(34,197,94,0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            backdropFilter: 'blur(10px)'
+                          }}>
+                            <span style={{ 
+                              overflow: 'hidden', 
+                              textOverflow: 'ellipsis', 
+                              whiteSpace: 'nowrap',
+                              maxWidth: '60px'
+                            }}>
+                              {plant.name?.split(' ')[0] || plant.reference}
+                            </span>
+                            <span style={{ 
+                              color: '#0ea5e9', 
+                              fontWeight: '700',
+                              fontSize: '0.65rem'
+                            }}>
+                              {plant.quantity}L
+                            </span>
+                          </div>
+                        ))}
+                        {plantsToWater.length > 2 && (
+                          <div style={{
+                            background: isDark 
+                              ? 'rgba(55,65,81,0.6)' 
+                              : 'rgba(100,116,139,0.1)',
+                            borderRadius: '8px',
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.65rem',
+                            fontWeight: '600',
+                            color: isDark ? '#9ca3af' : '#64748b',
+                            textAlign: 'center'
+                          }}>
+                            +{plantsToWater.length - 2} autres
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Légende */}
+              <div style={{
+                marginTop: '2rem',
+                padding: '1.5rem',
+                background: isDark 
+                  ? 'rgba(31,41,55,0.8)' 
+                  : 'rgba(248,250,252,0.8)',
+                borderRadius: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '2rem',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                    borderRadius: '50%',
+                    boxShadow: '0 2px 8px rgba(245,158,11,0.3)'
+                  }} />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '600', color: isDark ? '#f9fafb' : '#1f2937' }}>Aujourd'hui</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)',
+                    borderRadius: '50%',
+                    border: '2px solid #22c55e'
+                  }} />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '600', color: isDark ? '#f9fafb' : '#1f2937' }}>Arrosage prévu</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    background: 'linear-gradient(135deg, #ffffff, #f8fafc)',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(226,232,240,0.5)'
+                  }} />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '600', color: isDark ? '#f9fafb' : '#1f2937' }}>Repos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Modal Détail Jour - Affichage des plantes à arroser */}
+      {(() => {
+        console.log('🎯 Rendu modal - showDayDetail:', showDayDetail, 'selectedDayPlants:', selectedDayPlants.length);
+        return showDayDetail && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 15000,
+            backdropFilter: 'blur(10px)'
+          }}
+          onClick={() => setShowDayDetail(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.3, type: "spring", damping: 20 }}
+            style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' 
+                : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              borderRadius: '30px',
+              width: '90vw',
+              maxWidth: '1200px',
+              maxHeight: '85vh',
+              padding: '2rem',
+              boxShadow: isDark 
+                ? '0 25px 60px rgba(0,0,0,0.6)' 
+                : '0 25px 60px rgba(0,0,0,0.2)',
+              border: isDark 
+                ? '1px solid rgba(75,85,99,0.3)' 
+                : '1px solid rgba(255,255,255,0.8)',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header du modal */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '2rem',
+              paddingBottom: '1rem',
+              borderBottom: '2px solid rgba(16,185,129,0.1)'
+            }}>
+              <div>
+                <h2 style={{
+                  fontSize: '1.8rem',
+                  fontWeight: '700',
+                  color: isDark ? '#f9fafb' : '#1f2937',
+                  margin: 0,
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  🌿 Arrosage du {selectedDayInfo.day} {selectedDayInfo.month} {selectedDayInfo.year}
+                </h2>
+                <p style={{
+                  fontSize: '1rem',
+                  color: isDark ? '#9ca3af' : '#6b7280',
+                  margin: '0.5rem 0 0 0'
+                }}>
+                  {selectedDayPlants.length} plante{selectedDayPlants.length > 1 ? 's' : ''} à arroser • Total: {selectedDayPlants.reduce((sum, plant) => sum + plant.quantity, 0).toFixed(1)}L
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDayDetail(false)}
+                style={{
+                  background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '15px',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.2rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(239,68,68,0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.1)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(239,68,68,0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(239,68,68,0.3)';
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Grille des plantes */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+              gap: '2rem',
+              maxHeight: 'calc(85vh - 150px)',
+              overflowY: 'auto',
+              paddingRight: '10px'
+            }}>
+              {selectedDayPlants.map((plant, index) => {
+                const plantData = filteredItems.find(item => item.reference === plant.reference) || {};
+                return (
+                  <motion.div
+                    key={plant.reference}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    style={{
+                      background: isDark 
+                        ? 'linear-gradient(135deg, #374151 0%, #1f2937 100%)' 
+                        : 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+                      borderRadius: '20px',
+                      padding: '2rem',
+                      border: '2px solid rgba(16,185,129,0.2)',
+                      boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      minHeight: '280px'
+                    }}
+                    whileHover={{
+                      scale: 1.02,
+                      boxShadow: '0 12px 35px rgba(16,185,129,0.15)'
+                    }}
+                  >
+                    {/* Badge quantité d'eau */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                      color: 'white',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '15px',
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      boxShadow: '0 4px 15px rgba(14,165,233,0.3)'
+                    }}>
+                      {plant.quantity}L
+                    </div>
+
+                    {/* Layout avec image et informations */}
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '1.5rem',
+                      marginRight: '80px'
+                    }}>
+                      {/* Image de la plante */}
+                      <div style={{
+                        width: '160px',
+                        height: '180px',
+                        borderRadius: '15px',
+                        overflow: 'hidden',
+                        border: '3px solid rgba(16,185,129,0.4)',
+                        boxShadow: '0 4px 15px rgba(16,185,129,0.2)',
+                        flexShrink: 0
+                      }}>
+                        <img 
+                          src={plantData.images?.[0] || plantData.image || '/placeholder-plant.jpg'}
+                          alt={plantData.name || plant.reference}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div style={{
+                          display: 'none',
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: 'rgba(16,185,129,0.1)',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '3rem'
+                        }}>
+                          🌱
+                        </div>
+                      </div>
+
+                      {/* Informations plante */}
+                      <div style={{ flex: 1 }}>
+                      <h3 style={{
+                        fontSize: '1.2rem',
+                        fontWeight: '700',
+                        color: isDark ? '#f9fafb' : '#1f2937',
+                        margin: '0 0 0.5rem 0',
+                        lineHeight: '1.3'
+                      }}>
+                        {plantData.name || 'Nom non disponible'}
+                      </h3>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        color: isDark ? '#9ca3af' : '#6b7280',
+                        marginBottom: '1rem'
+                      }}>
+                        <span style={{
+                          background: 'rgba(16,185,129,0.1)',
+                          color: '#059669',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '10px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600'
+                        }}>
+                          {plant.reference}
+                        </span>
+                      </div>
+
+                      {/* Détails techniques */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '1rem',
+                        marginTop: '1rem'
+                      }}>
+                        <div style={{
+                          background: 'rgba(59,130,246,0.1)',
+                          padding: '0.75rem',
+                          borderRadius: '12px',
+                          textAlign: 'center'
+                        }}>
+                          <div style={{
+                            fontSize: '1.2rem',
+                            fontWeight: '700',
+                            color: '#3b82f6'
+                          }}>
+                            {plantData.dimensions?.diameter || plantData.diameter || 'N/A'}
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: isDark ? '#9ca3af' : '#6b7280',
+                            fontWeight: '600'
+                          }}>
+                            Diamètre (cm)
+                          </div>
+                        </div>
+                        
+                        <div style={{
+                          background: 'rgba(34,197,94,0.1)',
+                          padding: '0.75rem',
+                          borderRadius: '12px',
+                          textAlign: 'center'
+                        }}>
+                          <div style={{
+                            fontSize: '1.2rem',
+                            fontWeight: '700',
+                            color: '#22c55e'
+                          }}>
+                            {plantData.dimensions?.height || plantData.height || 'N/A'}
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: isDark ? '#9ca3af' : '#6b7280',
+                            fontWeight: '600'
+                          }}>
+                            Hauteur (cm)
+                          </div>
+                        </div>
+                        
+                        <div style={{
+                          background: 'rgba(168,85,247,0.1)',
+                          padding: '0.75rem',
+                          borderRadius: '12px',
+                          textAlign: 'center'
+                        }}>
+                          <div style={{
+                            fontSize: '1.2rem',
+                            fontWeight: '700',
+                            color: '#a855f7'
+                          }}>
+                            {plantData.stock?.quantity || 0}
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: isDark ? '#9ca3af' : '#6b7280',
+                            fontWeight: '600'
+                          }}>
+                            Stock
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Type de plante */}
+                      {plant.type && plant.type !== 'autre' && (
+                        <div style={{
+                          marginTop: '1rem',
+                          padding: '0.75rem',
+                          background: 'rgba(16,185,129,0.05)',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(16,185,129,0.2)'
+                        }}>
+                          <div style={{
+                            fontSize: '0.8rem',
+                            color: '#059669',
+                            fontWeight: '600',
+                            marginBottom: '0.25rem'
+                          }}>
+                            Type de plante:
+                          </div>
+                          <div style={{
+                            fontSize: '0.9rem',
+                            color: isDark ? '#f9fafb' : '#1f2937',
+                            fontWeight: '600'
+                          }}>
+                            {plant.type.replace('_', ' ').toUpperCase()}
+                          </div>
+                        </div>
+                      )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+        );
+      })()}
       
       <motion.div 
         className="flex min-h-screen" 
@@ -4359,6 +5934,28 @@ return (
                       }}
                     >
                       <span style={{fontSize: '1.2rem'}}>📊</span> Exporter
+                    </button>
+                    
+                    <button
+                      onClick={() => setShowWateringCalendar(true)}
+                      className="btn"
+                      style={{
+                        color: 'white',
+                        background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                        border: '2px solid transparent',
+                        boxShadow: '0 4px 15px rgba(14, 165, 233, 0.3)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 8px 25px rgba(14, 165, 233, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 15px rgba(14, 165, 233, 0.3)';
+                      }}
+                    >
+                      <span style={{fontSize: '1.2rem'}}>💧</span> Arrosage
                     </button>
 
 {showPartnerForm && (
