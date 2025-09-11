@@ -48,7 +48,12 @@
       "Bash(timeout:*)",
       "Bash(npx nodemon:*)",
       "WebSearch",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(npm test)",
+      "Bash(del Nieuwkoop.jsx)",
+      "Bash(ren:*)",
+      "Bash(Remove-Item Nieuwkoop.jsx)",
+      "Bash(Rename-Item \"Nieuwkoop.jsx.modified\" \"Nieuwkoop.jsx\")"
     ],
     "deny": [],
     "ask": []

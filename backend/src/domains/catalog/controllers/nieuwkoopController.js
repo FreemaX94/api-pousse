@@ -2,6 +2,47 @@ const fs = require('fs');
 const axios = require('axios');
 const nieuwkoopApi = require('../services/nieuwkoopApi');
 const NieuwkoopItem = require('../models/nieuwkoopItemModel');
+const Movement = require('../../inventory/models/movementModel');
+
+// 🚀 Fonction utilitaire premium pour calculer les exitCount
+async function calculateExitCounts(references) {
+  try {
+    console.log('🔄 [EXITCOUNT] Calcul des compteurs de sortie pour', references.length, 'références');
+    
+    // Agrégation MongoDB optimisée pour performance
+    const exitCounts = await Movement.aggregate([
+      {
+        $match: {
+          type: 'sortie',
+          reference: { $in: references }
+        }
+      },
+      {
+        $group: {
+          _id: '$reference',
+          totalExits: { $sum: 1 },
+          totalQuantity: { $sum: '$quantity' }
+        }
+      }
+    ]);
+    
+    // Créer un map pour accès O(1)
+    const exitCountMap = {};
+    exitCounts.forEach(item => {
+      exitCountMap[item._id] = {
+        exitCount: item.totalExits,
+        totalExitQuantity: item.totalQuantity
+      };
+    });
+    
+    console.log('✅ [EXITCOUNT] Compteurs calculés:', Object.keys(exitCountMap).length, 'articles avec sorties');
+    return exitCountMap;
+    
+  } catch (error) {
+    console.error('❌ [EXITCOUNT] Erreur calcul:', error.message);
+    return {};
+  }
+}
 
 // 🔍 API Nieuwkoop - Infos produits
 exports.getItems = async (req, res, next) => {
@@ -155,6 +196,10 @@ exports.getNieuwkoopItems = async (req, res) => {
   try {
     const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
     
+    // 🚀 Calculer les exitCount pour tous les articles
+    const references = items.map(item => item.reference);
+    const exitCountData = await calculateExitCounts(references);
+    
     // Formater les données pour le frontend
     const formattedItems = items.map(item => {
       const formattedItem = {
@@ -179,6 +224,9 @@ exports.getNieuwkoopItems = async (req, res) => {
         // Ajouter availableQuantity pour cohérence
         availableQuantity: Math.max(0, (item.stock?.quantity || 0) - (item.stock?.reservedQuantity || 0)),
         category: item.category,
+        // 🎯 INJECTION des compteurs de sortie réels
+        exitCount: exitCountData[item.reference]?.exitCount || 0,
+        totalExitQuantity: exitCountData[item.reference]?.totalExitQuantity || 0,
         // Conserver d'autres champs utiles
         dimensions: item.dimensions,
         createdAt: item.createdAt,
@@ -196,7 +244,9 @@ exports.getNieuwkoopItems = async (req, res) => {
         price: formattedItems[0].price,
         image: formattedItems[0].image,
         hasImage: !!formattedItems[0].image,
-        stock: formattedItems[0].stock
+        stock: formattedItems[0].stock,
+        exitCount: formattedItems[0].exitCount,
+        totalExitQuantity: formattedItems[0].totalExitQuantity
       });
     }
     

@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-09-11T20:44:49.574Z",
+  "stats": {
+    "totalItems": 1,
+    "plantTypes": {
+      "palmier": 1
+    },
+    "confidenceLevels": {
+      "high": 1,
+      "medium": 0,
+      "low": 0
+    },
+    "dimensionRanges": {
+      "diameter": {
+        "min": 30,
+        "max": 30,
+        "avg": 30
+      },
+      "height": {
+        "min": 200,
+        "max": 200,
+        "avg": 200
+      }
+    }
+  },
+  "items": [
+    {
+      "reference": "4VEMEMS02",
+      "name": "Dypsis lutescens",
+      "category": "plante",
+      "plantType": "palmier",
+      "confidence": "high",
+      "matchedKeyword": "dypsis",
+      "dimensions": {
+        "diameter": 30,
+        "height": 200,
+        "potSurface": 707,
+        "wateringVolume": 1.767,
+        "biomassIndex": 6
+      },
+      "stock": {
+        "quantity": 5,
+        "available": 5
+      }
+    }
+  ]
+}
