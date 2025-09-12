@@ -3377,8 +3377,7 @@ return (
                     color: isDark ? '#f87171' : '#ef4444',
                     cursor: 'pointer',
                     fontSize: '1.5rem',
-                    transition: 'all 0.3s ease',
-                    color: '#ef4444'
+                    transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.transform = 'scale(1.1) rotate(90deg)';
