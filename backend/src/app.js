@@ -206,89 +206,40 @@ console.log('⚠️ Static files configuration moved to index.js for priority');
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 console.log('✅ Assets served from:', path.join(__dirname, 'assets'));
 
-// 🚨 Route pour servir les images movement_ directement à la racine
+// 🚨 Route pour servir les images movement_ directement à la racine - REDIRECT TO SPACES
 app.get('/movement_*', (req, res) => {
   const filename = req.path.substring(1); // Enlever le / du début
-  const publicPath = path.join(__dirname, '../public', filename);
-  const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🖼️ MOVEMENT IMAGE REQUEST:', filename);
-  console.log('🖼️ Public path:', publicPath);
-  console.log('🖼️ Assets path:', assetsPath);
+  console.log('🌐 REDIRECTING TO SPACES:', `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`);
   
-  // Essayer d'abord dans public, puis dans assets
-  if (fs.existsSync(publicPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.sendFile(publicPath);
-  } else if (fs.existsSync(assetsPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.sendFile(assetsPath);
-  } else {
-    res.status(404).json({ error: 'Movement image not found', path: filename, triedPaths: [publicPath, assetsPath] });
-  }
+  // Rediriger vers DigitalOcean Spaces
+  const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  res.redirect(302, spacesUrl);
 });
 
-// 🚨 SOLUTION API FINALE: Route API pour images movement
+// 🚨 SOLUTION API FINALE: Route API pour images movement - REDIRECT TO SPACES
 app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   const filename = req.params.filename;
-  // SOLUTION HYBRIDE: Chercher dans uploads/movements, uploads direct, puis backup, puis public
-  const uploadsMovementsPath = path.join(__dirname, '../uploads/movements', filename);
-  const uploadsDirectPath = path.join(__dirname, '../uploads', filename);
-  const backupPath = path.join(__dirname, 'src/assets/backup-images', filename);
-  const publicPath = path.join(__dirname, '../public', filename);
-  const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🎯 API MOVEMENT IMAGE REQUEST:', filename);
-  console.log('🔍 Checking uploads/movements path:', uploadsMovementsPath, '- exists:', fs.existsSync(uploadsMovementsPath));
-  console.log('🔍 Checking uploads direct path:', uploadsDirectPath, '- exists:', fs.existsSync(uploadsDirectPath));
-  console.log('🔍 Checking public path:', publicPath, '- exists:', fs.existsSync(publicPath));
-  console.log('🔍 Checking assets path:', assetsPath, '- exists:', fs.existsSync(assetsPath));
+  console.log('🌐 REDIRECTING TO SPACES:', `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`);
   
-  // Essayer d'abord dans uploads/movements (dossier principal pour les entrées externes)
-  if (fs.existsSync(uploadsMovementsPath)) {
-    const ext = path.extname(filename).toLowerCase();
-    const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
-    res.setHeader('Content-Type', contentType);
-    console.log('✅ Movement image found in uploads/movements');
-    res.sendFile(uploadsMovementsPath);
-  } else if (fs.existsSync(uploadsDirectPath)) {
-    const ext = path.extname(filename).toLowerCase();
-    const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
-    res.setHeader('Content-Type', contentType);
-    console.log('✅ Movement image found in uploads direct');
-    res.sendFile(uploadsDirectPath);
-  } else if (fs.existsSync(publicPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    console.log('✅ Movement image found in public');
-    res.sendFile(publicPath);
-  } else if (fs.existsSync(assetsPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    console.log('✅ Movement image found in assets');
-    res.sendFile(assetsPath);
-  } else {
-    console.log('❌ Movement file not found in any location:', filename);
-    res.status(404).json({ error: 'Movement image not found', filename });
-  }
+  // Rediriger vers DigitalOcean Spaces
+  const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  res.redirect(302, spacesUrl);
 });
 
-// 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin
+// 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin - REDIRECT TO SPACES
 app.use('*/movement_*', (req, res) => {
   const filename = req.path.split('/').pop(); // Récupérer juste le nom du fichier
-  const publicPath = path.join(__dirname, '../public', filename);
-  const assetsPath = path.join(__dirname, '../assets', filename);
   
   console.log('🎯 WILDCARD MOVEMENT REQUEST:', req.path, '->', filename);
+  console.log('🌐 REDIRECTING TO SPACES:', `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`);
   
-  if (fs.existsSync(publicPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.sendFile(publicPath);
-  } else if (fs.existsSync(assetsPath)) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.sendFile(assetsPath);
-  } else {
-    console.log('❌ Movement file not found:', filename);
-    res.status(404).end();
-  }
+  // Rediriger vers DigitalOcean Spaces
+  const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  res.redirect(302, spacesUrl);
 });
 
 // Debug endpoint
@@ -523,25 +474,16 @@ function setupDomains() {
 
     // SUPPRIMÉ - Route conflictuelle avec celle du dessous
     
-    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - Sécurité supplémentaire
+    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - REDIRECT TO SPACES
     app.get('/api/uploads/movements/:filename', (req, res) => {
       const filename = req.params.filename;
-      const movementsPath = path.join(uploadsPath, 'movements', filename);
       
       console.log('🖼️ ROUTE MOVEMENT IMAGE:', filename);
-      console.log('🖼️ Path:', movementsPath);
-      console.log('🖼️ Exists:', fs.existsSync(movementsPath));
+      console.log('🌐 REDIRECTING TO SPACES:', `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`);
       
-      if (fs.existsSync(movementsPath)) {
-        // Déterminer le Content-Type
-        const ext = path.extname(filename).toLowerCase();
-        const contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
-        res.setHeader('Content-Type', contentType);
-        res.sendFile(movementsPath);
-      } else {
-        console.log('❌ Movement image not found:', filename);
-        res.status(404).json({ error: 'Movement image not found' });
-      }
+      // Rediriger vers DigitalOcean Spaces
+      const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+      res.redirect(302, spacesUrl);
     });
     
     // SUPPRIMÉ - Route backup conflictuelle
