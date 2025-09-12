@@ -5299,13 +5299,22 @@ return (
                                       }}>
                                         {/* Image de l'article basée sur la référence */}
                                         {(() => {
-                                          // Construire l'URL de l'image basée sur la référence
-                                          const imageUrl = material.reference ? 
-                                            `/api/catalog/nieuwkoop/items/${material.reference}/image` : 
-                                            null;
+                                          // Déterminer l'URL finale de l'image
+                                          let finalImageUrl;
                                           
-                                          // Utiliser soit l'image stockée soit l'image générée
-                                          const finalImageUrl = material.image || imageUrl;
+                                          // Si c'est une image movement_, utiliser directement Spaces
+                                          if (material.image && material.image.includes('movement_')) {
+                                            const filename = material.image.replace('/movements/', '').replace('/', '');
+                                            finalImageUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+                                          } else {
+                                            // Construire l'URL de l'image basée sur la référence
+                                            const imageUrl = material.reference ? 
+                                              `/api/catalog/nieuwkoop/items/${material.reference}/image` : 
+                                              null;
+                                            
+                                            // Utiliser soit l'image stockée soit l'image générée
+                                            finalImageUrl = material.image || imageUrl;
+                                          }
                                           
                                           // console.log(`🖼️ Image pour ${material.name} (${material.reference}):`, finalImageUrl);
                                           
@@ -7201,6 +7210,15 @@ return (
 {item.image ? (
                                   <img
                                     src={(() => {
+                                      // DEBUG: Log des images de vases
+                                      if (item.reference && item.reference.startsWith('EXT-') && item.image && item.image.includes('movement_')) {
+                                        console.log(`🖼️ VASE DEBUG: ${item.name} (${item.reference})`, {
+                                          image: item.image,
+                                          includesSpaces: item.image.includes('digitaloceanspaces.com'),
+                                          startsWithHttps: item.image.startsWith('https://')
+                                        });
+                                      }
+                                      
                                       // Articles Nieuwkoop (référence normale)
                                       if (item.reference && !item.reference.startsWith('EXT-')) {
                                         return `/api/catalog/nieuwkoop/items/${item.reference}/image`;
@@ -7211,13 +7229,11 @@ return (
                                         return item.image;
                                       }
                                       
-                                      // Images de mouvements locales
+                                      // Images de mouvements - Direct Spaces URL
                                       if (item.image && item.image.includes('movement_')) {
                                         const filename = item.image.replace('/movements/', '').replace('/', '');
-                                        const baseUrl = window.location.hostname === 'localhost' 
-                                          ? 'http://localhost:3001' 
-                                          : 'https://api-pousse-app-5y2wo.ondigitalocean.app';
-                                        return `${baseUrl}/api/uploads/${filename}`;
+                                        // Direct URL vers DigitalOcean Spaces
+                                        return `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
                                       }
                                       
                                       // Fallback pour autres cas
