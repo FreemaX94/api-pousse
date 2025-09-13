@@ -477,26 +477,7 @@ function setupDomains() {
     console.log('✅ Routes publiques nieuwkoop montées AVANT domaine catalog');
 
     // Routes de debug temporaires supprimées - remplacées par solutions permanentes
-
-    // SUPPRIMÉ - Route conflictuelle avec celle du dessous
     
-    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - REDIRECT TO SPACES AVEC DEBUG
-    app.get('/api/uploads/movements/:filename', (req, res) => {
-      const filename = req.params.filename;
-      
-      console.log('🖼️ ROUTE MOVEMENT IMAGE HIT:', filename);
-      console.log('🔍 Full path:', req.path);
-      console.log('🔍 Params:', req.params);
-      
-      // Construire l'URL DigitalOcean Spaces correcte
-      const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
-      console.log('🌐 REDIRECTING TO SPACES:', spacesUrl);
-      
-      // Rediriger vers DigitalOcean Spaces
-      res.redirect(302, spacesUrl);
-    });
-    
-    // SUPPRIMÉ - Route backup conflictuelle
     console.log('✅ Route uploads configurée:', uploadsPath, '+ public:', publicPath);
 
     // Domaines métier
@@ -962,6 +943,24 @@ function initializeDomains() {
     console.log('✅ Route catch-all de secours ajoutée');
   }
 }
+
+// 🖼️ ROUTE CRITIQUE MOVEMENTS - MONTÉE AVANT DOMAINES POUR ÉVITER ÉCHEC
+console.log('🔄 Montage route critique movements AVANT domaines...');
+app.get('/api/uploads/movements/:filename', (req, res) => {
+  const filename = req.params.filename;
+  
+  console.log('🖼️ ROUTE MOVEMENT IMAGE HIT (CRITIQUE):', filename);
+  console.log('🔍 Full path:', req.path);
+  console.log('🔍 Params:', req.params);
+  
+  // Construire l'URL DigitalOcean Spaces correcte
+  const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  console.log('🌐 REDIRECTING TO SPACES:', spacesUrl);
+  
+  // Rediriger vers DigitalOcean Spaces
+  res.redirect(302, spacesUrl);
+});
+console.log('✅ Route critique movements montée AVANT domaines');
 
 // 🚨 FORCE L'INITIALISATION IMMÉDIATE - Ne pas attendre MongoDB
 console.log('🚀 INITIALISATION FORCÉE DES DOMAINES...');
