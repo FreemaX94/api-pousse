@@ -474,15 +474,19 @@ function setupDomains() {
 
     // SUPPRIMÉ - Route conflictuelle avec celle du dessous
     
-    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - REDIRECT TO SPACES
+    // 🖼️ ROUTE SPÉCIFIQUE POUR IMAGES MOVEMENTS - REDIRECT TO SPACES AVEC DEBUG
     app.get('/api/uploads/movements/:filename', (req, res) => {
       const filename = req.params.filename;
       
-      console.log('🖼️ ROUTE MOVEMENT IMAGE:', filename);
-      console.log('🌐 REDIRECTING TO SPACES:', `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`);
+      console.log('🖼️ ROUTE MOVEMENT IMAGE HIT:', filename);
+      console.log('🔍 Full path:', req.path);
+      console.log('🔍 Params:', req.params);
+      
+      // Construire l'URL DigitalOcean Spaces correcte
+      const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+      console.log('🌐 REDIRECTING TO SPACES:', spacesUrl);
       
       // Rediriger vers DigitalOcean Spaces
-      const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
       res.redirect(302, spacesUrl);
     });
     
@@ -628,9 +632,16 @@ function setupDomains() {
       console.log('✅ Route /public-uploads backup configurée vers:', publicUploadsPath);
     }
 
-    // 📁 ROUTE SPÉCIFIQUE POUR LES FICHIERS PDF AVEC HEADERS OPTIMISÉS
+    // 📁 ROUTE SPÉCIFIQUE POUR LES FICHIERS PDF AVEC HEADERS OPTIMISÉS (EXCLUT MOVEMENTS)
     app.get('/api/uploads/:filename', (req, res, next) => {
       const filename = req.params.filename;
+      
+      // Skip movement files - they have their own route
+      if (filename.startsWith('movement_')) {
+        console.log('🔀 Skipping movement file, letting specific route handle it:', filename);
+        return next();
+      }
+      
       const filePath = path.join(uploadsPath, filename);
       
       if (fs.existsSync(filePath)) {
@@ -713,10 +724,17 @@ function setupDomains() {
       res.send('UPLOAD ROUTE TEST OK - V3');
     });
     
-    // 🚨 SOLUTION DÉFINITIVE: Route API pour servir les uploads
+    // 🚨 SOLUTION DÉFINITIVE: Route API pour servir les uploads (EXCLUT MOVEMENTS)
     app.get('/api/uploads/:filename', (req, res) => {
       try {
         const filename = req.params.filename;
+        
+        // Skip movement files - they have their own route
+        if (filename.startsWith('movement_')) {
+          console.log('🔀 SOLUTION DÉFINITIVE: Skipping movement file:', filename);
+          return res.status(404).json({ error: 'Movement files are handled by specific route' });
+        }
+        
         console.log(`🔥 ROUTE /api/uploads/${filename} APPELÉE DIRECTEMENT`);
         console.log(`🔍 Headers:`, req.headers);
         console.log(`🔍 User-Agent:`, req.get('User-Agent'));
