@@ -1735,7 +1735,12 @@ const Nieuwkoop = () => {
       if (name.includes('orchidee') || name.includes('phalaenopsis')) return 'plante_grasse';
       if (name.includes('begonia') || name.includes('geranium')) return 'plante_verte';
       
-      // Articles non-plantes
+      // EXCLUSIONS SPÉCIFIQUES (références exactes d'articles non-plantes)
+      if (reference === '6bst1270x' || reference === '6ppnb36bb' || reference === '6limhupt6') {
+        return 'pot_contenant';
+      }
+      
+      // Articles non-plantes (détection par nom)
       if (name.includes('pot') || name.includes('bac') || name.includes('contenant') || 
           name.includes('grigio') || name.includes('pure') || name.includes('argento') ||
           name.includes('fiberstone') || name.includes('cement') || name.includes('terra cotta') ||
@@ -1746,7 +1751,8 @@ const Nieuwkoop = () => {
           name.includes('terra') || name.includes('cotta') || name.includes('cylinder') ||
           name.includes('round') || name.includes('square') || name.includes('oval') ||
           name.includes('planters') || name.includes('vaso') || name.includes('maceta') ||
-          name.includes('container') || name.includes('vessel')) {
+          name.includes('container') || name.includes('vessel') || 
+          name.includes('b-straight') || name.includes('bohemian') || name.includes('humus')) {
         return 'pot_contenant';
       }
       if (name.includes('terreau') || name.includes('substrat')) return 'terreau_substrat';
