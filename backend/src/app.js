@@ -230,8 +230,14 @@ app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   res.redirect(302, spacesUrl);
 });
 
-// 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin - REDIRECT TO SPACES
-app.use('*/movement_*', (req, res) => {
+// 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin - REDIRECT TO SPACES (EXCLUT /api/uploads/movements/)
+app.use('*/movement_*', (req, res, next) => {
+  // Skip /api/uploads/movements/ - handled by specific route in setupDomains()
+  if (req.path.startsWith('/api/uploads/movements/')) {
+    console.log('🔀 WILDCARD: Skipping /api/uploads/movements/, letting specific route handle:', req.path);
+    return next();
+  }
+  
   const filename = req.path.split('/').pop(); // Récupérer juste le nom du fichier
   
   console.log('🎯 WILDCARD MOVEMENT REQUEST:', req.path, '->', filename);
