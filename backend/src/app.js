@@ -230,9 +230,25 @@ app.get('/api/catalog/nieuwkoop/movement-image/:filename', (req, res) => {
   res.redirect(302, spacesUrl);
 });
 
+// 🚨 ROUTE DE SECOURS POUR /api/uploads/movements/ - MONTÉE AVANT WILDCARD
+app.get('/api/uploads/movements/:filename', (req, res) => {
+  const filename = req.params.filename;
+  
+  console.log('🔥 ROUTE SECOURS MOVEMENTS HIT:', filename);
+  console.log('🔍 Full path:', req.path);
+  console.log('🔍 Params:', req.params);
+  
+  // Construire l'URL DigitalOcean Spaces correcte
+  const spacesUrl = `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  console.log('🌐 REDIRECTING TO SPACES:', spacesUrl);
+  
+  // Rediriger vers DigitalOcean Spaces
+  res.redirect(302, spacesUrl);
+});
+
 // 🚨 SOLUTION FINALE: Servir movement_ depuis n'importe quel chemin - REDIRECT TO SPACES (EXCLUT /api/uploads/movements/)
 app.use('*/movement_*', (req, res, next) => {
-  // Skip /api/uploads/movements/ - handled by specific route in setupDomains()
+  // Skip /api/uploads/movements/ - handled by specific route above
   if (req.path.startsWith('/api/uploads/movements/')) {
     console.log('🔀 WILDCARD: Skipping /api/uploads/movements/, letting specific route handle:', req.path);
     return next();
