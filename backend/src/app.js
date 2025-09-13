@@ -637,8 +637,8 @@ function setupDomains() {
       const filename = req.params.filename;
       
       // Skip movement files - they have their own route
-      if (filename.startsWith('movement_')) {
-        console.log('🔀 Skipping movement file, letting specific route handle it:', filename);
+      if (filename.includes('movements/') || filename.startsWith('movement_')) {
+        console.log('🔀 Skipping movement file (contains movements/ or starts with movement_):', filename);
         return next();
       }
       
@@ -672,10 +672,17 @@ function setupDomains() {
       }
     });
 
-    // 📁 ROUTE STATIQUE POUR LES AUTRES UPLOADS
+    // 📁 ROUTE STATIQUE POUR LES AUTRES UPLOADS (EXCLUT MOVEMENTS)
     if (fs.existsSync(uploadsPath)) {
-      app.use('/api/uploads', express.static(uploadsPath));
-      console.log('✅ Route /api/uploads configurée vers:', uploadsPath);
+      app.use('/api/uploads', (req, res, next) => {
+        // Skip movements directory - handled by specific routes
+        if (req.path.startsWith('/movements/')) {
+          console.log('🔀 Static route skipping movements:', req.path);
+          return next();
+        }
+        express.static(uploadsPath)(req, res, next);
+      });
+      console.log('✅ Route /api/uploads configurée vers:', uploadsPath, '(exclut movements)');
     } else {
       console.log('⚠️ Dossier uploads non trouvé:', uploadsPath);
     }
@@ -730,8 +737,8 @@ function setupDomains() {
         const filename = req.params.filename;
         
         // Skip movement files - they have their own route
-        if (filename.startsWith('movement_')) {
-          console.log('🔀 SOLUTION DÉFINITIVE: Skipping movement file:', filename);
+        if (filename.includes('movements/') || filename.startsWith('movement_')) {
+          console.log('🔀 SOLUTION DÉFINITIVE: Skipping movement file (contains movements/ or starts with movement_):', filename);
           return res.status(404).json({ error: 'Movement files are handled by specific route' });
         }
         
