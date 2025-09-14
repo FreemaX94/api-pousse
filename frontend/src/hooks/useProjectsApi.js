@@ -106,10 +106,24 @@ export const useProjectTemplates = () => {
     setError(null);
     try {
       const data = await templatesApi.getAllTemplates(options);
-      setTemplates(data.templates || data);
+      console.log('useProjectTemplates - API response:', data);
+
+      // Vérifier si la réponse est de l'HTML (API endpoint non implémenté)
+      if (typeof data === 'string' && data.includes('<!DOCTYPE html>')) {
+        console.warn('Templates API endpoint not implemented - returning HTML instead of JSON');
+        setError('Les templates ne sont pas encore disponibles');
+        setTemplates([]);
+        return;
+      }
+
+      const templatesArray = Array.isArray(data) ? data : (Array.isArray(data.templates) ? data.templates : []);
+      console.log('useProjectTemplates - final templatesArray:', templatesArray, 'isArray:', Array.isArray(templatesArray));
+      setTemplates(templatesArray);
     } catch (err) {
-      setError(err.message);
       console.error('Erreur lors du chargement des templates:', err);
+      setError(err.message);
+      // En cas d'erreur, on s'assure que templates reste un tableau vide
+      setTemplates([]);
     } finally {
       setLoading(false);
     }
@@ -118,9 +132,19 @@ export const useProjectTemplates = () => {
   const fetchPopularTemplates = useCallback(async (limit = 10) => {
     try {
       const data = await templatesApi.getPopularTemplates(limit);
-      setPopularTemplates(data.templates || data);
+
+      // Vérifier si la réponse est de l'HTML (API endpoint non implémenté)
+      if (typeof data === 'string' && data.includes('<!DOCTYPE html>')) {
+        console.warn('Popular templates API endpoint not implemented');
+        setPopularTemplates([]);
+        return;
+      }
+
+      const templatesArray = Array.isArray(data) ? data : (Array.isArray(data.templates) ? data.templates : []);
+      setPopularTemplates(templatesArray);
     } catch (err) {
       console.error('Erreur lors du chargement des templates populaires:', err);
+      setPopularTemplates([]);
     }
   }, []);
 

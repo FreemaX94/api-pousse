@@ -3,7 +3,6 @@ import { Search } from 'lucide-react';
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProjectHistory from '../../../components/ProjectHistory';
-import ProjectTemplates from '../../../components/ProjectTemplates';
 import { useProjectExport } from '../../../hooks/useProjectsApi';
 // useScroll, useTransform supprimés pour optimiser les performances
 
@@ -759,7 +758,6 @@ const Nieuwkoop = () => {
 
   // États pour les nouvelles fonctionnalités
   const [showProjectHistory, setShowProjectHistory] = useState(false);
-  const [showProjectTemplates, setShowProjectTemplates] = useState(false);
   const [selectedProjectForHistory, setSelectedProjectForHistory] = useState(null);
 
   // Hook pour l'export
@@ -2524,44 +2522,44 @@ const Nieuwkoop = () => {
             const projectColor = getProjectManagerColor(project);
             
             // Debug: Voir ce qu'on a dans le stock
-            if (project._id === projects[0]?._id) { // Log seulement pour le premier projet pour éviter le spam
-              console.log('📦 Stock disponible (addedItems):', {
-                count: addedItems.length,
-                sampleItems: addedItems.slice(0, 3).map(item => ({
-                  name: item.name,
-                  designation: item.designation,
-                  reference: item.reference,
-                  hasImage: !!item.image,
-                  hasImagesArray: !!item.images
-                }))
-              });
-            }
+            // if (project._id === projects[0]?._id) { // Log seulement pour le premier projet pour éviter le spam
+            //   console.log('📦 Stock disponible (addedItems):', {
+            //     count: addedItems.length,
+            //     sampleItems: addedItems.slice(0, 3).map(item => ({
+            //       name: item.name,
+            //       designation: item.designation,
+            //       reference: item.reference,
+            //       hasImage: !!item.image,
+            //       hasImagesArray: !!item.images
+            //     }))
+            //   });
+            // }
             
             // AUDIT DÉTAILLÉ: Analyser TOUS les matériaux du projet
-            console.log(`🔍 AUDIT PROJET [${project._id}]:`, {
-              title: project.title,
-              materialsCount: project.materials?.length || 0,
-              materialsRaw: project.materials
-            });
+            // console.log(`🔍 AUDIT PROJET [${project._id}]:`, {
+            //   title: project.title,
+            //   materialsCount: project.materials?.length || 0,
+            //   materialsRaw: project.materials
+            // });
             
             // Enrichir les matériaux avec les données du stock pour avoir les images
             const enrichedMaterials = (project.materials || []).map((material, matIndex) => {
-              console.log(`\n📋 === MATERIAL ${matIndex} AUDIT COMPLET ===`);
-              console.log(`📦 Material brut [${matIndex}]:`, material);
-              console.log(`🔑 Material keys [${matIndex}]:`, Object.keys(material));
+              // console.log(`\n📋 === MATERIAL ${matIndex} AUDIT COMPLET ===`);
+              // console.log(`📦 Material brut [${matIndex}]:`, material);
+              // console.log(`🔑 Material keys [${matIndex}]:`, Object.keys(material));
               
               // Montrer TOUTES les valeurs importantes
-              console.log(`📝 Material détaillé [${matIndex}]:`, {
-                name: material.name,
-                designation: material.designation,
-                libelle: material.libelle,
-                reference: material.reference,
-                category: material.category,
-                id: material.id,
-                _id: material._id,
-                Itemcode: material.Itemcode,
-                item_code: material.item_code
-              });
+              // console.log(`📝 Material détaillé [${matIndex}]:`, {
+              //   name: material.name,
+              //   designation: material.designation,
+              //   libelle: material.libelle,
+              //   reference: material.reference,
+              //   category: material.category,
+              //   id: material.id,
+              //   _id: material._id,
+              //   Itemcode: material.Itemcode,
+              //   item_code: material.item_code
+              // });
               
               // Chercher dans les données du stock avec MATCHING STRICT et PRIORITAIRE
               let stockItem = null;
@@ -2574,7 +2572,7 @@ const Nieuwkoop = () => {
                   item.item_code === material.reference
                 );
                 if (stockItem) {
-                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR RÉFÉRENCE:`, material.reference);
+                  // console.log(`🎯 [${matIndex}] MATCH EXACT PAR RÉFÉRENCE:`, material.reference);
                 }
               }
               
@@ -2586,7 +2584,7 @@ const Nieuwkoop = () => {
                   item.libelle === material.name
                 );
                 if (stockItem) {
-                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR NOM:`, material.name);
+                  // console.log(`🎯 [${matIndex}] MATCH EXACT PAR NOM:`, material.name);
                 }
               }
               
@@ -2598,7 +2596,7 @@ const Nieuwkoop = () => {
                   item.libelle === material.designation
                 );
                 if (stockItem) {
-                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR DESIGNATION:`, material.designation);
+                  // console.log(`🎯 [${matIndex}] MATCH EXACT PAR DESIGNATION:`, material.designation);
                 }
               }
               
@@ -2609,27 +2607,27 @@ const Nieuwkoop = () => {
                   (item.designation && item.designation.toLowerCase().includes(material.name.toLowerCase()))
                 );
                 if (stockItem) {
-                  console.log(`🎯 [${matIndex}] MATCH SIMILARITÉ PAR NOM:`, material.name);
+                  // console.log(`🎯 [${matIndex}] MATCH SIMILARITÉ PAR NOM:`, material.name);
                 }
               }
               
               // 5. DERNIÈRE CHANCE: Si toujours pas trouvé, pas de match
               if (!stockItem) {
-                console.log(`❌ [${matIndex}] AUCUN MATCH TROUVÉ pour:`, {
-                  name: material.name,
-                  designation: material.designation,
-                  reference: material.reference
-                });
+                // console.log(`❌ [${matIndex}] AUCUN MATCH TROUVÉ pour:`, {
+                //   name: material.name,
+                //   designation: material.designation,
+                //   reference: material.reference
+                // });
               }
               
-              console.log(`🎯 [${matIndex}] Match trouvé:`, stockItem ? {
-                name: stockItem.name,
-                designation: stockItem.designation,
-                reference: stockItem.reference,
-                image: stockItem.image,
-                hasImages: !!stockItem.images,
-                imagesArray: stockItem.images
-              } : 'AUCUN MATCH');
+              // console.log(`🎯 [${matIndex}] Match trouvé:`, stockItem ? {
+              //   name: stockItem.name,
+              //   designation: stockItem.designation,
+              //   reference: stockItem.reference,
+              //   image: stockItem.image,
+              //   hasImages: !!stockItem.images,
+              //   imagesArray: stockItem.images
+              // } : 'AUCUN MATCH');
               
               if (stockItem) {
                 // Fusionner les données du matériau avec celles du stock - CONSERVATEUR
@@ -2651,15 +2649,15 @@ const Nieuwkoop = () => {
                   uniqueId: `${material.name || material.designation}-${matIndex}-${Date.now()}` // ID unique
                 };
                 
-                console.log(`✅ [${matIndex}] Material enrichi FINAL:`, {
-                  originalName: material.name,
-                  originalRef: material.reference,
-                  enrichedName: enrichedMaterial.name,
-                  enrichedRef: enrichedMaterial.reference,
-                  enrichedImage: enrichedMaterial.image,
-                  uniqueId: enrichedMaterial.uniqueId,
-                  fullEnriched: enrichedMaterial
-                });
+                // console.log(`✅ [${matIndex}] Material enrichi FINAL:`, {
+                //   originalName: material.name,
+                //   originalRef: material.reference,
+                //   enrichedName: enrichedMaterial.name,
+                //   enrichedRef: enrichedMaterial.reference,
+                //   enrichedImage: enrichedMaterial.image,
+                //   uniqueId: enrichedMaterial.uniqueId,
+                //   fullEnriched: enrichedMaterial
+                // });
                 
                 return enrichedMaterial;
               }
@@ -2670,27 +2668,27 @@ const Nieuwkoop = () => {
                 uniqueId: `${material.name || material.designation}-${matIndex}-original-${Date.now()}`
               };
               
-              console.log(`❌ [${matIndex}] Pas de match, matériau original FINAL:`, {
-                name: originalMaterial.name,
-                reference: originalMaterial.reference,
-                uniqueId: originalMaterial.uniqueId,
-                fullOriginal: originalMaterial
-              });
+              // console.log(`❌ [${matIndex}] Pas de match, matériau original FINAL:`, {
+              //   name: originalMaterial.name,
+              //   reference: originalMaterial.reference,
+              //   uniqueId: originalMaterial.uniqueId,
+              //   fullOriginal: originalMaterial
+              // });
               
               return originalMaterial;
             });
             
             // AUDIT FINAL: Vérifier les matériaux enrichis avant ajout au calendrier
-            console.log(`🏁 FINAL MATERIALS POUR PROJET [${project._id}]:`, {
-              count: enrichedMaterials.length,
-              materials: enrichedMaterials.map((mat, idx) => ({
-                index: idx,
-                name: mat.name,
-                reference: mat.reference,
-                uniqueId: mat.uniqueId,
-                hasImage: !!mat.image
-              }))
-            });
+            // console.log(`🏁 FINAL MATERIALS POUR PROJET [${project._id}]:`, {
+            //   count: enrichedMaterials.length,
+            //   materials: enrichedMaterials.map((mat, idx) => ({
+            //     index: idx,
+            //     name: mat.name,
+            //     reference: mat.reference,
+            //     uniqueId: mat.uniqueId,
+            //     hasImage: !!mat.image
+            //   }))
+            // });
 
             schedule[day].push({
               id: project._id,
@@ -2935,19 +2933,6 @@ const Nieuwkoop = () => {
     setSelectedProjectForHistory(null);
   };
 
-  const handleShowTemplates = () => {
-    setShowProjectTemplates(true);
-  };
-
-  const handleCloseTemplates = () => {
-    setShowProjectTemplates(false);
-  };
-
-  const handleSelectTemplate = (project) => {
-    // Ajouter le projet créé à partir du template à la liste
-    setProjects(prev => [project, ...prev]);
-    console.log('🎯 Nouveau projet créé depuis template:', project);
-  };
 
   // Fonction pour changer le statut d'un projet
   const handleChangeProjectStatus = async (project, newStatus) => {
@@ -4344,6 +4329,53 @@ return (
                 
                 {/* Navigation mois */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                  {/* Bouton Tout arroser */}
+                  <button
+                    onClick={() => {
+                      // Fonction pour marquer tous les arrosages comme effectués aujourd'hui
+                      const today = new Date();
+                      const plantsCount = sortedItems.filter(item => calculateWateringNeeds(item).isPlant).length;
+
+                      // Simulation de l'arrosage complet
+                      console.log(`🌿 Arrosage global effectué pour ${plantsCount} plantes le ${today.toLocaleDateString('fr-FR')}`);
+
+                      // Afficher une notification de confirmation
+                      showNotification(
+                        `✅ Arrosage effectué pour ${plantsCount} plantes - Prochains arrosages recalculés`,
+                        'success'
+                      );
+
+                      // Forcer le recalcul du calendrier en mettant à jour la date
+                      setCalendarDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '16px',
+                      padding: '0.75rem 1.5rem',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: '0 4px 15px rgba(16,185,129,0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(16,185,129,0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 15px rgba(16,185,129,0.3)';
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1rem' }}>💧</span>
+                    Tout arroser
+                  </button>
+
                   <button
                     onClick={() => setCalendarDate(new Date(currentYear, currentMonth - 1, 1))}
                     style={{
@@ -4734,7 +4766,7 @@ return (
 
       {/* Modal Détail Jour - Affichage des plantes à arroser */}
       {(() => {
-        console.log('🎯 Rendu modal - showDayDetail:', showDayDetail, 'selectedDayPlants:', selectedDayPlants.length);
+        // console.log('🎯 Rendu modal - showDayDetail:', showDayDetail, 'selectedDayPlants:', selectedDayPlants.length);
         return showDayDetail && (
         <div
           style={{
@@ -7994,37 +8026,6 @@ return (
                 Calendrier Projets
               </button>
 
-              <button
-                onClick={() => setShowProjectTemplates(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '20px',
-                  padding: '1rem 2rem',
-                  fontSize: '1.1rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: 'var(--shadow-lg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = 'var(--shadow-lg)';
-                }}
-              >
-                <span style={{ fontSize: '1.3rem' }}>📋</span>
-                Templates Projets
-              </button>
             </div>
             
             <Suspense fallback={
@@ -9839,19 +9840,19 @@ return (
                             }}>
                               {(() => {
                                 // AUDIT MODAL: Voir les matériaux reçus dans le modal
-                                console.log(`🎭 MODAL OUVERT - AUDIT MATERIALS pour projet:`, {
-                                  projectId: project.id,
-                                  projectTitle: project.title,
-                                  materialsCount: project.materials.length,
-                                  materialsDetails: project.materials.map((mat, idx) => ({
-                                    index: idx,
-                                    name: mat.name,
-                                    reference: mat.reference,
-                                    uniqueId: mat.uniqueId,
-                                    hasImage: !!mat.image,
-                                    fullMat: mat
-                                  }))
-                                });
+                                // console.log(`🎭 MODAL OUVERT - AUDIT MATERIALS pour projet:`, {
+                                //   projectId: project.id,
+                                //   projectTitle: project.title,
+                                //   materialsCount: project.materials.length,
+                                //   materialsDetails: project.materials.map((mat, idx) => ({
+                                //     index: idx,
+                                //     name: mat.name,
+                                //     reference: mat.reference,
+                                //     uniqueId: mat.uniqueId,
+                                //     hasImage: !!mat.image,
+                                //     fullMat: mat
+                                //   }))
+                                // });
                                 return null;
                               })()}
                               
@@ -10286,6 +10287,15 @@ return (
             )}
           </motion.section>
         )}
+
+        {/* Modales pour les projets */}
+        {showProjectHistory && selectedProjectForHistory && (
+          <ProjectHistory
+            projectId={selectedProjectForHistory._id}
+            onClose={handleCloseHistory}
+          />
+        )}
+
 
         {activeSection === "Opérations diverses" && (
           <motion.section key="operations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-6">

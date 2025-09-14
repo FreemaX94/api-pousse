@@ -36,12 +36,15 @@ const ProjectTemplates = ({ onClose, onSelectTemplate }) => {
 
   const categories = ['general', 'installation', 'entretien', 'design', 'commercial', 'residential'];
 
-  const filteredTemplates = templates.filter(template => {
-    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchTerm.toLowerCase());
+  // Debug: Log the templates to see what we're getting
+  console.log('ProjectTemplates - templates:', templates, 'type:', typeof templates, 'isArray:', Array.isArray(templates));
+
+  const filteredTemplates = Array.isArray(templates) ? templates.filter(template => {
+    const matchesSearch = template.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeTab === 'all' || template.category === activeTab;
     return matchesSearch && matchesCategory;
-  });
+  }) : [];
 
   const handleCreateTemplate = async (e) => {
     e.preventDefault();
@@ -237,12 +240,12 @@ const ProjectTemplates = ({ onClose, onSelectTemplate }) => {
           {/* Onglets */}
           <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
             {[
-              { key: 'all', label: '📋 Tous', count: templates.length },
-              { key: 'popular', label: '🔥 Populaires', count: popularTemplates.length },
+              { key: 'all', label: '📋 Tous', count: Array.isArray(templates) ? templates.length : 0 },
+              { key: 'popular', label: '🔥 Populaires', count: Array.isArray(popularTemplates) ? popularTemplates.length : 0 },
               ...categories.map(cat => ({
                 key: cat,
                 label: `📁 ${cat.charAt(0).toUpperCase()}${cat.slice(1)}`,
-                count: templates.filter(t => t.category === cat).length
+                count: Array.isArray(templates) ? templates.filter(t => t.category === cat).length : 0
               }))
             ].map(tab => (
               <button
@@ -337,8 +340,24 @@ const ProjectTemplates = ({ onClose, onSelectTemplate }) => {
               padding: '3rem',
               color: 'var(--color-text-secondary)'
             }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📭</div>
-              <div>Aucun template trouvé</div>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+                {error ? '⚠️' : '📭'}
+              </div>
+              <div>
+                {error
+                  ? 'Les templates ne sont pas encore disponibles'
+                  : 'Aucun template trouvé'
+                }
+              </div>
+              {error && (
+                <div style={{
+                  marginTop: '0.5rem',
+                  fontSize: '0.9rem',
+                  opacity: 0.7
+                }}>
+                  Cette fonctionnalité sera bientôt disponible
+                </div>
+              )}
             </div>
           ) : (
             <div style={{
@@ -486,7 +505,7 @@ const ProjectTemplates = ({ onClose, onSelectTemplate }) => {
         )}
       </div>
 
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
