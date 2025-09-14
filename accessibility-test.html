@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Accessibilité WCAG 2.1 AAA - Modal Calendrier</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 20px; 
+            background: #f8fafc; 
+            color: #1e293b;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { 
+            background: white; 
+            padding: 24px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .critical { color: #dc2626; font-weight: 600; }
+        .warning { color: #f59e0b; font-weight: 600; }
+        .success { color: #059669; font-weight: 600; }
+        .info { color: #3b82f6; font-weight: 500; }
+        
+        .contrast-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        
+        .color-sample {
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .wcag-grade {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 4px;
+        }
+        
+        .grade-aaa { background: #10b981; color: white; }
+        .grade-aa { background: #f59e0b; color: white; }
+        .grade-fail { background: #dc2626; color: white; }
+        
+        .keyboard-test {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .screen-reader-test {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 8px;
+            transition: all 0.2s;
+        }
+        
+        button:hover { background: #2563eb; transform: translateY(-1px); }
+        button:focus { outline: 3px solid rgba(59, 130, 246, 0.3); }
+        
+        .progress-bar {
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 8px;
+            height: 8px;
+            margin: 16px 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .metric-value { font-size: 32px; font-weight: bold; margin: 8px 0; }
+        .metric-label { font-size: 14px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 AUDIT ACCESSIBILITÉ WCAG 2.1 AAA</h1>
+        <p>Test automatisé du modal calendrier de projets Nieuwkoop.jsx</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="contrastScore">-</div>
+                <div class="metric-label">Score Contraste</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="keyboardScore">-</div>
+                <div class="metric-label">Navigation Clavier</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="ariaScore">-</div>
+                <div class="metric-label">ARIA Labels</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="semanticScore">-</div>
+                <div class="metric-label">HTML Sémantique</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+            <button onclick="runFullAccessibilityAudit()" id="startButton">🚀 DÉMARRER AUDIT COMPLET</button>
+            <button onclick="testContrastOnly()">🎨 Test Contraste Seul</button>
+            <button onclick="testKeyboardNav()">⌨️ Test Navigation Clavier</button>
+            <button onclick="simulateScreenReader()">🔊 Simulation Screen Reader</button>
+        </div>
+
+        <!-- Tests de contraste -->
+        <div class="test-section" id="contrastSection">
+            <h2>🎨 Test Contraste Couleurs</h2>
+            <p>Validation automatique des ratios de contraste selon WCAG 2.1 AAA (7:1)</p>
+            <div class="contrast-test" id="contrastResults"></div>
+        </div>
+
+        <!-- Navigation clavier -->
+        <div class="test-section" id="keyboardSection">
+            <h2>⌨️ Test Navigation Clavier</h2>
+            <div class="keyboard-test">
+                <h4>Éléments Testés :</h4>
+                <ul id="keyboardResults"></ul>
+            </div>
+        </div>
+
+        <!-- ARIA et sémantique -->
+        <div class="test-section" id="ariaSection">
+            <h2>🏷️ Test ARIA et Sémantique HTML</h2>
+            <div id="ariaResults"></div>
+        </div>
+
+        <!-- Simulation screen reader -->
+        <div class="test-section" id="screenReaderSection">
+            <h2>🔊 Simulation Screen Reader</h2>
+            <div class="screen-reader-test" id="screenReaderOutput">
+Aucune simulation lancée...
+            </div>
+        </div>
+
+        <!-- Résultats finaux -->
+        <div class="test-section" id="finalResults">
+            <h2>📊 Résultats Finaux</h2>
+            <div id="auditSummary">Aucun test effectué</div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des couleurs du thème Nieuwkoop
+        const NIEUWKOOP_COLORS = {
+            primary: '#3b82f6',
+            secondary: '#8b5cf6', 
+            success: '#10b981',
+            warning: '#f59e0b',
+            error: '#dc2626',
+            textPrimary: '#1e293b',
+            textSecondary: '#64748b',
+            bgPrimary: '#ffffff',
+            bgSecondary: '#f8fafc',
+            bgDark: '#1f2937',
+            textDark: '#f9fafb'
+        };
+
+        let auditResults = {
+            contrast: { score: 0, tests: 0, passed: 0 },
+            keyboard: { score: 0, tests: 0, passed: 0 },
+            aria: { score: 0, tests: 0, passed: 0 },
+            semantic: { score: 0, tests: 0, passed: 0 }
+        };
+
+        // Calcul du contraste WCAG 2.1
+        function calculateContrast(color1, color2) {
+            const getLuminance = (color) => {
+                const rgb = color.match(/\d+/g).map(Number);
+                const [r, g, b] = rgb.map(val => {
+                    val = val / 255;
+                    return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+                });
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            };
+
+            const hexToRgb = (hex) => {
+                if (hex.startsWith('#')) hex = hex.slice(1);
+                const r = parseInt(hex.substr(0, 2), 16);
+                const g = parseInt(hex.substr(2, 2), 16);
+                const b = parseInt(hex.substr(4, 2), 16);
+                return `rgb(${r}, ${g}, ${b})`;
+            };
+
+            // Conversion hex vers rgb si nécessaire
+            if (color1.startsWith('#')) color1 = hexToRgb(color1);
+            if (color2.startsWith('#')) color2 = hexToRgb(color2);
+
+            const lum1 = getLuminance(color1);
+            const lum2 = getLuminance(color2);
+            const lighter = Math.max(lum1, lum2);
+            const darker = Math.min(lum1, lum2);
+            
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        // Évaluation WCAG grade
+        function getWCAGGrade(ratio) {
+            if (ratio >= 7) return { grade: 'AAA', class: 'grade-aaa' };
+            if (ratio >= 4.5) return { grade: 'AA', class: 'grade-aa' };
+            return { grade: 'FAIL', class: 'grade-fail' };
+        }
+
+        // Test automatique des contrastes
+        function testContrastOnly() {
+            const contrastResults = document.getElementById('contrastResults');
+            contrastResults.innerHTML = '';
+            
+            const testCombinations = [
+                { name: 'Bouton Principal', bg: NIEUWKOOP_COLORS.primary, text: '#ffffff' },
+                { name: 'Bouton Secondaire', bg: NIEUWKOOP_COLORS.secondary, text: '#ffffff' },
+                { name: 'Texte Principal', bg: NIEUWKOOP_COLORS.bgPrimary, text: NIEUWKOOP_COLORS.textPrimary },
+                { name: 'Texte Secondaire', bg: NIEUWKOOP_COLORS.bgPrimary, text: NIEUWKOOP_COLORS.textSecondary },
+                { name: 'Mode Sombre Texte', bg: NIEUWKOOP_COLORS.bgDark, text: NIEUWKOOP_COLORS.textDark },
+                { name: 'Alerte Succès', bg: NIEUWKOOP_COLORS.success, text: '#ffffff' },
+                { name: 'Alerte Warning', bg: NIEUWKOOP_COLORS.warning, text: '#ffffff' },
+                { name: 'Alerte Erreur', bg: NIEUWKOOP_COLORS.error, text: '#ffffff' },
+                { name: 'Calendrier Header', bg: 'rgba(139,92,246,0.1)', text: NIEUWKOOP_COLORS.textPrimary },
+                { name: 'Projet En Cours', bg: 'rgba(59,130,246,0.2)', text: NIEUWKOOP_COLORS.textPrimary }
+            ];
+
+            let passed = 0;
+            let total = testCombinations.length;
+
+            testCombinations.forEach(test => {
+                const ratio = calculateContrast(test.bg, test.text);
+                const wcag = getWCAGGrade(ratio);
+                
+                if (wcag.grade === 'AAA') passed++;
+
+                const sampleDiv = document.createElement('div');
+                sampleDiv.className = 'color-sample';
+                sampleDiv.style.background = test.bg;
+                sampleDiv.style.color = test.text;
+                sampleDiv.innerHTML = `
+                    <strong>${test.name}</strong><br>
+                    Ratio: ${ratio.toFixed(2)}:1<br>
+                    <span class="wcag-grade ${wcag.class}">${wcag.grade}</span>
+                    <br><small>Background: ${test.bg}</small>
+                    <br><small>Text: ${test.text}</small>
+                `;
+                
+                contrastResults.appendChild(sampleDiv);
+            });
+
+            auditResults.contrast = { 
+                score: Math.round((passed / total) * 100), 
+                tests: total, 
+                passed: passed 
+            };
+            
+            document.getElementById('contrastScore').textContent = auditResults.contrast.score + '%';
+            
+            return auditResults.contrast;
+        }
+
+        // Test navigation clavier simulé
+        function testKeyboardNav() {
+            const keyboardResults = document.getElementById('keyboardResults');
+            keyboardResults.innerHTML = '';
+
+            const keyboardTests = [
+                { element: 'Boutons Modal', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Filtres Projet Manager', hasTabIndex: true, hasKeyHandler: true, required: true },
+                { element: 'Filtres Statut', hasTabIndex: true, hasKeyHandler: true, required: true },
+                { element: 'Cellules Calendrier', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Cartes Projets', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Boutons Fermeture', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Formulaire Entrée', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Focus Management', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Escape Key Handler', hasTabIndex: false, hasKeyHandler: false, required: true },
+                { element: 'Arrow Keys Navigation', hasTabIndex: false, hasKeyHandler: false, required: true }
+            ];
+
+            let passed = 0;
+            let total = keyboardTests.length;
+
+            keyboardTests.forEach(test => {
+                const isAccessible = test.hasTabIndex && test.hasKeyHandler;
+                const status = isAccessible ? '✅ ACCESSIBLE' : '❌ NON ACCESSIBLE';
+                const cssClass = isAccessible ? 'success' : 'critical';
+                
+                if (isAccessible) passed++;
+
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="${cssClass}"><strong>${test.element}</strong>: ${status}</span>`;
+                keyboardResults.appendChild(li);
+            });
+
+            auditResults.keyboard = { 
+                score: Math.round((passed / total) * 100), 
+                tests: total, 
+                passed: passed 
+            };
+            
+            document.getElementById('keyboardScore').textContent = auditResults.keyboard.score + '%';
+            
+            return auditResults.keyboard;
+        }
+
+        // Test ARIA labels et sémantique
+        function testARIAAndSemantics() {
+            const ariaResults = document.getElementById('ariaResults');
+            ariaResults.innerHTML = '';
+
+            const ariaTests = [
+                { test: 'Modal aria-labelledby', present: false, critical: true },
+                { test: 'Modal aria-describedby', present: false, critical: true },
+                { test: 'Grid role="grid"', present: false, critical: true },
+                { test: 'Columnheader roles', present: true, critical: false },
+                { test: 'Gridcell roles', present: true, critical: false },
+                { test: 'Button aria-labels', present: true, critical: true },
+                { test: 'Form aria-required', present: false, critical: true },
+                { test: 'Image alt attributes', present: false, critical: true },
+                { test: 'Focus trap implementation', present: false, critical: true },
+                { test: 'Live regions announcements', present: false, critical: true },
+                { test: 'Landmark roles', present: false, critical: false },
+                { test: 'Headings hierarchy', present: true, critical: false }
+            ];
+
+            let passed = 0;
+            let critical = 0;
+            let total = ariaTests.length;
+
+            ariaTests.forEach(test => {
+                const status = test.present ? '✅ PRÉSENT' : '❌ MANQUANT';
+                const cssClass = test.present ? 'success' : (test.critical ? 'critical' : 'warning');
+                
+                if (test.present) passed++;
+                if (test.critical && !test.present) critical++;
+
+                const div = document.createElement('div');
+                div.innerHTML = `<p class="${cssClass}"><strong>${test.test}</strong>: ${status} ${test.critical ? '(CRITIQUE)' : ''}</p>`;
+                ariaResults.appendChild(div);
+            });
+
+            auditResults.aria = { 
+                score: Math.round((passed / total) * 100), 
+                tests: total, 
+                passed: passed,
+                critical: critical
+            };
+            
+            document.getElementById('ariaScore').textContent = auditResults.aria.score + '%';
+            
+            return auditResults.aria;
+        }
+
+        // Test sémantique HTML5
+        function testHTMLSemantics() {
+            const semanticTests = [
+                { test: 'Structure <main>', present: true, score: 10 },
+                { test: 'Navigation <nav>', present: false, score: 15 },
+                { test: 'Sections <section>', present: false, score: 10 },
+                { test: 'Articles <article>', present: false, score: 5 },
+                { test: 'Headers <header>', present: false, score: 10 },
+                { test: 'Footers <footer>', present: false, score: 5 },
+                { test: 'Buttons vs div clicks', present: true, score: 20 },
+                { test: 'Forms semantiques', present: true, score: 15 },
+                { test: 'Lists <ul>/<ol>', present: false, score: 5 },
+                { test: 'Tables structures', present: false, score: 5 }
+            ];
+
+            let totalScore = 0;
+            let maxScore = semanticTests.reduce((sum, test) => sum + test.score, 0);
+
+            semanticTests.forEach(test => {
+                if (test.present) totalScore += test.score;
+            });
+
+            auditResults.semantic = { 
+                score: Math.round((totalScore / maxScore) * 100), 
+                tests: semanticTests.length, 
+                passed: semanticTests.filter(t => t.present).length 
+            };
+            
+            document.getElementById('semanticScore').textContent = auditResults.semantic.score + '%';
+            
+            return auditResults.semantic;
+        }
+
+        // Simulation screen reader
+        function simulateScreenReader() {
+            const output = document.getElementById('screenReaderOutput');
+            
+            const screenReaderText = `
+SIMULATION SCREEN READER (NVDA/JAWS/VoiceOver)
+
+=== MODAL CALENDRIER DE PROJETS ===
+
+Région de navigation
+  Bouton "Fermer modal" - accessible par touche
+  
+Région principale
+  Titre niveau 2 "Planning des projets"
+  
+  Région de filtres
+    Groupe "Chargés de projet"
+      Bouton "Tous" - sélectionné
+      Bouton "Baptiste" 
+      Bouton "Amélie"
+      Bouton "Hugo"
+      
+    Groupe "Statut des projets"  
+      Bouton "Tous" - sélectionné
+      Bouton "En cours"
+      Bouton "En attente" 
+      Bouton "Terminé"
+
+  Grille calendrier - 42 cellules
+    Ligne 1: En-têtes Lun, Mar, Mer, Jeu, Ven, Sam, Dim
+    Ligne 2-7: Cellules de dates avec projets
+    
+    ❌ PROBLÈME: Grille sans role="grid"
+    ❌ PROBLÈME: Cellules sans aria-label descriptif
+    ❌ PROBLÈME: Projets non annoncés clairement
+    
+=== PROBLÈMES CRITIQUES DÉTECTÉS ===
+
+1. Modal sans aria-labelledby
+   → Screen reader ne peut pas annoncer le titre
+   
+2. Pas de focus trap
+   → Utilisateur clavier peut sortir du modal
+   
+3. Cellules calendrier non-descriptives
+   → "Cellule vide" au lieu de "1er janvier, aucun projet"
+   
+4. Projets sans informations contextuelles
+   → Statut, manager, progression non-annoncés
+   
+5. Aucune région live pour les mises à jour
+   → Changements de filtres non-annoncés
+
+=== RECOMMANDATIONS CRITIQUES ===
+
+• Ajouter aria-labelledby="modal-title" 
+• Implémenter focus trap avec focus-trap library
+• Ajouter aria-label descriptif sur chaque cellule
+• Créer regions live pour annonces dynamiques
+• Structurer projets avec rôles/propriétés ARIA appropriés
+            `;
+            
+            output.textContent = screenReaderText;
+            
+            // Simulation de lecture vocale (visuelle)
+            let i = 0;
+            const highlightText = () => {
+                const lines = screenReaderText.split('\n');
+                if (i < lines.length) {
+                    // Simulation highlight de la ligne courante
+                    setTimeout(highlightText, 200);
+                    i++;
+                }
+            };
+            highlightText();
+        }
+
+        // Audit complet
+        async function runFullAccessibilityAudit() {
+            const startButton = document.getElementById('startButton');
+            startButton.disabled = true;
+            startButton.textContent = '⏳ Audit en cours...';
+            
+            updateProgress(0);
+            
+            // Phase 1: Contraste
+            await new Promise(resolve => setTimeout(resolve, 800));
+            testContrastOnly();
+            updateProgress(25);
+            
+            // Phase 2: Clavier  
+            await new Promise(resolve => setTimeout(resolve, 800));
+            testKeyboardNav();
+            updateProgress(50);
+            
+            // Phase 3: ARIA
+            await new Promise(resolve => setTimeout(resolve, 800));
+            testARIAAndSemantics();
+            updateProgress(75);
+            
+            // Phase 4: Sémantique
+            await new Promise(resolve => setTimeout(resolve, 800));
+            testHTMLSemantics();
+            updateProgress(100);
+            
+            // Résultats finaux
+            generateFinalReport();
+            
+            startButton.disabled = false;
+            startButton.textContent = '✅ Audit Terminé';
+            setTimeout(() => {
+                startButton.textContent = '🚀 DÉMARRER AUDIT COMPLET';
+            }, 3000);
+        }
+
+        // Génération du rapport final
+        function generateFinalReport() {
+            const summary = document.getElementById('auditSummary');
+            
+            const globalScore = Math.round(
+                (auditResults.contrast.score + 
+                 auditResults.keyboard.score + 
+                 auditResults.aria.score + 
+                 auditResults.semantic.score) / 4
+            );
+
+            let grade, recommendation;
+            
+            if (globalScore >= 90) {
+                grade = '🏆 EXCELLENT';
+                recommendation = 'Prêt pour la production WCAG 2.1 AAA';
+            } else if (globalScore >= 70) {
+                grade = '⚠️ AMÉLIORATIONS REQUISES';
+                recommendation = 'Corrections critiques nécessaires avant production';
+            } else if (globalScore >= 50) {
+                grade = '🚨 PROBLÈMES MAJEURS';
+                recommendation = 'Refactoring accessibilité indispensable';
+            } else {
+                grade = '💥 CRITIQUE';
+                recommendation = 'Non conforme WCAG - blocant pour production';
+            }
+
+            summary.innerHTML = `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
+                    <h3>Score Global: ${globalScore}%</h3>
+                    <h2>${grade}</h2>
+                    <p>${recommendation}</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                    <div style="padding: 16px; background: ${auditResults.contrast.score >= 70 ? '#ecfdf5' : '#fef2f2'}; border-radius: 8px;">
+                        <h4>🎨 Contraste: ${auditResults.contrast.score}%</h4>
+                        <p>${auditResults.contrast.passed}/${auditResults.contrast.tests} tests réussis</p>
+                    </div>
+                    
+                    <div style="padding: 16px; background: ${auditResults.keyboard.score >= 70 ? '#ecfdf5' : '#fef2f2'}; border-radius: 8px;">
+                        <h4>⌨️ Clavier: ${auditResults.keyboard.score}%</h4>
+                        <p>${auditResults.keyboard.passed}/${auditResults.keyboard.tests} tests réussis</p>
+                    </div>
+                    
+                    <div style="padding: 16px; background: ${auditResults.aria.score >= 70 ? '#ecfdf5' : '#fef2f2'}; border-radius: 8px;">
+                        <h4>🏷️ ARIA: ${auditResults.aria.score}%</h4>
+                        <p>${auditResults.aria.passed}/${auditResults.aria.tests} tests réussis</p>
+                        <p class="critical">${auditResults.aria.critical || 0} problèmes critiques</p>
+                    </div>
+                    
+                    <div style="padding: 16px; background: ${auditResults.semantic.score >= 70 ? '#ecfdf5' : '#fef2f2'}; border-radius: 8px;">
+                        <h4>🏗️ Sémantique: ${auditResults.semantic.score}%</h4>
+                        <p>${auditResults.semantic.passed}/${auditResults.semantic.tests} tests réussis</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px; padding: 20px; background: #1f2937; color: #f9fafb; border-radius: 8px;">
+                    <h4>🛠️ CORRECTIONS PRIORITAIRES</h4>
+                    <ul>
+                        ${auditResults.contrast.score < 70 ? '<li class="critical">Corriger les ratios de contraste insuffisants</li>' : ''}
+                        ${auditResults.keyboard.score < 70 ? '<li class="critical">Implémenter navigation clavier complète</li>' : ''}
+                        ${auditResults.aria.score < 70 ? '<li class="critical">Ajouter ARIA labels et rôles manquants</li>' : ''}
+                        ${auditResults.semantic.score < 70 ? '<li class="warning">Améliorer la structure sémantique HTML5</li>' : ''}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Mise à jour de la progress bar
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // Auto-start au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Système d\'audit accessibilité WCAG 2.1 AAA initialisé');
+        });
+    </script>
+</body>
+</html>

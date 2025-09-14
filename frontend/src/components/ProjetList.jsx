@@ -54,8 +54,18 @@ const TrashIcon = (props) => (
   </svg>
 );
 
-export default function ProjetList({ projects, onUpdate, onDelete, showHistory }) {
+export default function ProjetList({
+  projects,
+  onUpdate,
+  onDelete,
+  showHistory,
+  onEdit,
+  onCopy,
+  onShowMenu,
+  onContextMenu
+}) {
   const [pdfViewerData, setPdfViewerData] = useState(null);
+  const [hoveredProject, setHoveredProject] = useState(null);
 
   if (!projects?.length) {
     return (
@@ -148,11 +158,14 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -20 }}
-            whileHover={{ 
-              scale: 1.02, 
-              boxShadow: 'var(--shadow-2xl)', 
-              y: -6 
+            whileHover={{
+              scale: 1.02,
+              boxShadow: 'var(--shadow-2xl)',
+              y: -6
             }}
+            onMouseEnter={() => setHoveredProject(p._id)}
+            onMouseLeave={() => setHoveredProject(null)}
+            onContextMenu={(e) => onContextMenu && onContextMenu(e, p)}
             style={{
               background: 'var(--color-surface)',
               borderRadius: 'var(--radius-xl)',
@@ -175,6 +188,126 @@ export default function ProjetList({ projects, onUpdate, onDelete, showHistory }
               pointerEvents: 'none',
               opacity: 0.1
             }} />
+
+            {/* Boutons d'actions au survol */}
+            {hoveredProject === p._id && onEdit && onCopy && onShowMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                zIndex: 10,
+                display: 'flex',
+                gap: '0.5rem',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '0.5rem',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(p);
+                  }}
+                  title="Modifier le projet"
+                  style={{
+                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopy(p);
+                  }}
+                  title="Dupliquer le projet"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #047857)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowMenu(p, e);
+                  }}
+                  title="Plus d'options"
+                  style={{
+                    background: 'linear-gradient(135deg, #6366f1, #4338ca)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+              </div>
+            )}
 
             {/* En-tête premium */}
             <div style={{

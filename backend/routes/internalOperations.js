@@ -73,7 +73,7 @@ router.post('/',
         quantity,
         coefficient,
         notes,
-        createdBy: req.user.id,
+        createdBy: req.user._id, // FIX: utiliser _id au lieu de id
         stockReference,
         status: 'completed' // Automatiquement finalisée pour les ventes inter-pôles
       });
@@ -106,7 +106,7 @@ router.post('/',
 
       logger.info('Opération interne créée', {
         operationId: operation.operationId,
-        userId: req.user.id,
+        userId: req.user._id,
         sellingDepartment: operation.sellingDepartment,
         buyingDepartment: operation.buyingDepartment,
         totalAmount: operation.totalAmount
@@ -269,12 +269,12 @@ router.put('/:id/validate',
         });
       }
 
-      operation.validate(req.user.id);
+      operation.validate(req.user._id);
       await operation.save();
 
       logger.info('Opération validée', {
         operationId: operation.operationId,
-        validatedBy: req.user.id
+        validatedBy: req.user._id
       });
 
       await operation.populate('createdBy', 'fullname email');
@@ -338,7 +338,7 @@ router.put('/:id/complete',
 
       logger.info('Opération complétée', {
         operationId: operation.operationId,
-        completedBy: req.user.id
+        completedBy: req.user._id
       });
 
       res.json({
@@ -376,7 +376,7 @@ router.delete('/:id',
       }
 
       // Seul le créateur ou un admin/manager peut annuler
-      if (operation.createdBy.toString() !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
+      if (operation.createdBy.toString() !== req.user._id && !['admin', 'manager'].includes(req.user.role)) {
         return res.status(403).json({
           success: false,
           message: 'Vous n\'êtes pas autorisé à annuler cette opération'
@@ -402,7 +402,7 @@ router.delete('/:id',
 
       logger.info('Opération annulée', {
         operationId: operation.operationId,
-        cancelledBy: req.user.id
+        cancelledBy: req.user._id
       });
 
       res.json({

@@ -2,7 +2,30 @@ import React, { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { Search } from 'lucide-react';
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ProjectHistory from '../../../components/ProjectHistory';
+import ProjectTemplates from '../../../components/ProjectTemplates';
+import { useProjectExport } from '../../../hooks/useProjectsApi';
 // useScroll, useTransform supprimés pour optimiser les performances
+
+// CSS-in-JS pour les animations
+const criticalPulseKeyframes = `
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+`;
+
+// Injecter les styles globaux une seule fois
+if (typeof document !== 'undefined' && !document.querySelector('#critical-pulse-styles')) {
+  const style = document.createElement('style');
+  style.id = 'critical-pulse-styles';
+  style.textContent = criticalPulseKeyframes;
+  document.head.appendChild(style);
+}
 import "../../../pages/Nieuwkoop.css";
 
 // Ajout des animations CSS pour le calendrier
@@ -613,6 +636,91 @@ function ExternalEntryForm({ onSaved, currentUser }) {
   );
 }
 
+// ✨ MICRO-INTERACTIONS - Styles et animations CSS-in-JS
+const microInteractionStyles = `
+  @keyframes pulseUrgent {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+      transform: scale(1.02);
+    }
+  }
+  
+  @keyframes pulseCritical {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+      transform: scale(1.01);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeInModal {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  @keyframes progressFill {
+    from { width: 0%; }
+    to { width: var(--progress-width); }
+  }
+  
+  .project-urgent {
+    animation: pulseUrgent 2s infinite;
+  }
+  
+  .project-critical {
+    animation: pulseCritical 1.5s infinite;
+  }
+  
+  .calendar-slide {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  .modal-fade {
+    animation: fadeInModal 0.4s ease-out;
+  }
+  
+  .progress-bar {
+    animation: progressFill 1s ease-out;
+  }
+  
+  .tooltip-preview {
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  }
+`;
+
+// Injecter les styles dans le document
+if (typeof document !== 'undefined' && !document.querySelector('#micro-interactions-styles')) {
+  const style = document.createElement('style');
+  style.id = 'micro-interactions-styles';
+  style.textContent = microInteractionStyles;
+  document.head.appendChild(style);
+}
+
 const Nieuwkoop = () => {
   // Hook pour le thème
   const { isDark, theme, isBeige, isNeon, isOcean, isTropical, isLavender, isGalaxy, isAutumn, isGlacier, isSakura, isMidnight, isLava } = useTheme();
@@ -633,6 +741,56 @@ const Nieuwkoop = () => {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [showDayDetail, setShowDayDetail] = useState(false);
   const [selectedDayPlants, setSelectedDayPlants] = useState([]);
+  
+  // États pour le calendrier de projets
+  const [showProjectCalendar, setShowProjectCalendar] = useState(false);
+  const [projectCalendarDate, setProjectCalendarDate] = useState(new Date());
+  const [showProjectDayDetail, setShowProjectDayDetail] = useState(false);
+  const [selectedDayProjects, setSelectedDayProjects] = useState([]);
+  
+  // États pour les filtres et stats des chargés de projet
+  const [selectedProjectManager, setSelectedProjectManager] = useState('all'); // 'all' | 'baptiste' | 'amelie' | 'hugo'
+  const [selectedProjectStatus, setSelectedProjectStatus] = useState('all'); // 'all' | 'active' | 'pending' | 'completed'
+  const [showManagerStats, setShowManagerStats] = useState(false);
+  
+  // États pour les modes d'affichage avancés
+  const [calendarViewMode, setCalendarViewMode] = useState('month'); // 'month' | 'week' | 'year' | 'kanban'
+  const [draggedProject, setDraggedProject] = useState(null);
+
+  // États pour les nouvelles fonctionnalités
+  const [showProjectHistory, setShowProjectHistory] = useState(false);
+  const [showProjectTemplates, setShowProjectTemplates] = useState(false);
+  const [selectedProjectForHistory, setSelectedProjectForHistory] = useState(null);
+
+  // Hook pour l'export
+  const { exportProjectPDF, exportProjectExcel, loading: exportLoading } = useProjectExport();
+  
+  // États pour les actions rapides
+  const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
+  const [newProjectDate, setNewProjectDate] = useState(null);
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, project: null });
+  
+  // États pour les micro-interactions
+  const [projectTooltip, setProjectTooltip] = useState({ visible: false, x: 0, y: 0, project: null });
+  const [hoveredProject, setHoveredProject] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [weekStartDate, setWeekStartDate] = useState(() => {
+    const today = new Date();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + 1);
+    return monday;
+  });
+  
+  // Réinitialiser les filtres quand le modal se ferme - Optimisé
+  const prevShowProjectCalendar = React.useRef(showProjectCalendar);
+  React.useEffect(() => {
+    // Ne reset que si le modal vient de se fermer (transition true → false)
+    if (prevShowProjectCalendar.current && !showProjectCalendar) {
+      setSelectedProjectManager('all');
+      setSelectedProjectStatus('all');
+    }
+    prevShowProjectCalendar.current = showProjectCalendar;
+  }, [showProjectCalendar]);
   const [selectedDayInfo, setSelectedDayInfo] = useState({ day: 0, month: '', year: 0 });
 
   // useEffect(() => {
@@ -1371,8 +1529,8 @@ const Nieuwkoop = () => {
     const potHeight = Math.min(diameter * 1.2, height * 0.3); // Estimation hauteur pot
     const totalPotVolume = (potSurfaceArea * potHeight) / 1000; // litres
     
-    // Volume d'arrosage optimal: 20-25% du volume total du pot
-    const baseWaterVolume = totalPotVolume * 0.22;
+    // Volume d'arrosage optimal: 15-20% du volume total du pot (ajusté)
+    const baseWaterVolume = totalPotVolume * 0.18;
     
     // 🌿 CALCUL DE L'ÂGE ET MATURITÉ
     const ageWeeks = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24 * 7));
@@ -1381,12 +1539,12 @@ const Nieuwkoop = () => {
     const plantTypeConfigs = {
       // 🏝️ STRELITZIA - Oiseau du paradis (recherche professionnelle 2024)
       strelitzia_nicolai: {
-        baseDays: 7, // 1x/semaine standard professionnel
-        summerFactor: 0.8, // 3-4x/semaine été (recherche confirmée)
-        winterFactor: 1.8, // 1x/semaine hiver
-        waterMultiplier: 1.5, // 15-20L adultes, 5-10L jeunes (recherche pro)
-        minWater: 0.8, maxWater: 4.5,
-        heightFactor: 0.008, // Très sensible à la taille
+        baseDays: 6, // 1-2x/semaine, aime l'humidité constante
+        summerFactor: 0.7, // Plus fréquent en période chaude
+        winterFactor: 1.5, // Réduction modérée l'hiver
+        waterMultiplier: 0.8, // Arrosage généreux mais pas excessif
+        minWater: 0.4, maxWater: 2.2, // 400ml-2.2L selon taille
+        heightFactor: 0.005, // Modérément sensible à la taille
         description: 'Strelitzia nicolai (Oiseau du paradis)',
         species: ['strelitzia nicolai', 'strelitzia reginae'],
         isPlant: true
@@ -1394,12 +1552,12 @@ const Nieuwkoop = () => {
       
       // 🌿 FICUS - Figuier lyre (recherche professionnelle 2024)
       ficus_lyrata: {
-        baseDays: 10, // 1-2 semaines standard professionnel
-        summerFactor: 0.7, // Augmenter quantité, pas fréquence
-        winterFactor: 2.0, // Réduction hivernale
-        waterMultiplier: 2.2, // 8oz/semaine petites, 3x plus grandes
-        minWater: 0.6, maxWater: 3.8,
-        heightFactor: 0.012, // Très sensible taille (triple pour grandes)
+        baseDays: 9, // 1-2 semaines, préfère sécher entre arrosages
+        summerFactor: 0.8, // Arrosage plus profond mais pas plus fréquent
+        winterFactor: 1.8, // Réduction hivernale modérée
+        waterMultiplier: 0.9, // Arrosage modéré, déteste l'excès d'eau
+        minWater: 0.3, maxWater: 1.8, // 300ml-1.8L selon taille
+        heightFactor: 0.008, // Sensible à la taille mais modérément
         description: 'Ficus lyrata (Figuier lyre)',
         species: ['ficus lyrata', 'ficus cyathistipula'],
         isPlant: true
@@ -1407,12 +1565,12 @@ const Nieuwkoop = () => {
       
       // 🌴 KENTIA - Palmier Kentia (5 références dans stock)
       kentia_forsteriana: {
-        baseDays: 6, // 5 jours été, 10 jours hiver (recherches confirmées)
-        summerFactor: 0.8, // Croissance active
-        winterFactor: 1.7, // Métabolisme ralenti
-        waterRatio: 0.06, // Sol constamment humide mais pas détrempé
-        minWater: 0.2, maxWater: 2.0,
-        heightFactor: 0.0025,
+        baseDays: 7, // Palmier robuste, arrosage hebdomadaire
+        summerFactor: 0.8, // Légèrement plus fréquent l'été
+        winterFactor: 1.6, // Réduction modérée l'hiver
+        waterMultiplier: 0.7, // Arrosage modéré, résistant à la sécheresse
+        minWater: 0.25, maxWater: 1.5, // 250ml-1.5L selon taille
+        heightFactor: 0.003, // Peu sensible à la taille
         description: 'Kentia (Howea) forsteriana',
         species: ['howea forsteriana', 'kentia'],
         isPlant: true
@@ -1420,12 +1578,12 @@ const Nieuwkoop = () => {
       
       // 🥥 DYPSIS/ARECA - Palmier Areca (4 références dans stock)
       dypsis_lutescens: {
-        baseDays: 4, // Sol toujours légèrement humide
-        summerFactor: 0.7,
-        winterFactor: 2.0,
-        waterRatio: 0.05, // Sensible au sur-arrosage
-        minWater: 0.15, maxWater: 1.5,
-        heightFactor: 0.002,
+        baseDays: 5, // Aime l'humidité constante mais légère
+        summerFactor: 0.8, // Plus fréquent l'été mais pas excessif
+        winterFactor: 1.8, // Réduction hivernale
+        waterMultiplier: 0.6, // TRÈS sensible au sur-arrosage, petites quantités
+        minWater: 0.2, maxWater: 1.2, // 200ml-1.2L maximum (sensible!)
+        heightFactor: 0.002, // Peu sensible à la taille
         description: 'Dypsis (Areca) lutescens',
         species: ['dypsis lutescens', 'areca lutescens', 'dypsiss'],
         isPlant: true
@@ -1433,12 +1591,12 @@ const Nieuwkoop = () => {
       
       // 🌺 VEITCHIA - Palmier Adonidia (2 références dans stock)
       veitchia_merrillii: {
-        baseDays: 5,
-        summerFactor: 0.8,
-        winterFactor: 1.8,
-        waterRatio: 0.06,
-        minWater: 0.2, maxWater: 2.2,
-        heightFactor: 0.0025,
+        baseDays: 6, // Palmier tropical, arrosage régulier mais modéré
+        summerFactor: 0.8, // Plus fréquent l'été
+        winterFactor: 1.7, // Réduction hivernale
+        waterMultiplier: 0.8, // Arrosage généreux mais contrôlé
+        minWater: 0.3, maxWater: 2.0, // 300ml-2L selon taille
+        heightFactor: 0.004, // Modérément sensible à la taille
         description: 'Veitchia (Adonidia) merrillii',
         species: ['veitchia merrillii', 'adonidia merrillii'],
         isPlant: true
@@ -1485,12 +1643,12 @@ const Nieuwkoop = () => {
       
       // 🐉 DRACAENA - Dragonnier (recherche professionnelle 2024)
       dracaena_marginata: {
-        baseDays: 14, // Très résistant, 75% sol sec avant arrosage
-        summerFactor: 0.6, // Moins fréquent mais plus abondant
-        winterFactor: 3.0, // 1x/mois hiver, très espacé
-        waterMultiplier: 1.8, // Arrosage profond jusqu'aux trous
-        minWater: 0.4, maxWater: 2.8,
-        heightFactor: 0.006, // Modérément sensible à la taille
+        baseDays: 12, // Très résistant, laisse sécher entre arrosages
+        summerFactor: 0.8, // Légèrement plus fréquent l'été
+        winterFactor: 2.2, // Arrosage très espacé l'hiver
+        waterMultiplier: 0.7, // Arrosage modéré, déteste l'excès
+        minWater: 0.3, maxWater: 1.5, // 300ml-1.5L selon taille
+        heightFactor: 0.004, // Peu sensible à la taille
         description: 'Dracaena marginata (Dragonnier)',
         species: ['dracaena marginata', 'dracaena fragrans'],
         isPlant: true
@@ -1498,12 +1656,12 @@ const Nieuwkoop = () => {
       
       // 🍃 MONSTERA - Plante fromage suisse (4 références dans stock)
       monstera_deliciosa: {
-        baseDays: 6,
-        summerFactor: 0.7,
-        winterFactor: 1.7,
-        waterRatio: 0.10,
-        minWater: 0.25, maxWater: 2.0,
-        heightFactor: 0.0018,
+        baseDays: 7, // Aime l'humidité constante mais modérée
+        summerFactor: 0.8, // Plus fréquent l'été
+        winterFactor: 1.5, // Réduction modérée l'hiver
+        waterMultiplier: 0.9, // Arrosage généreux mais pas excessif
+        minWater: 0.35, maxWater: 1.8, // 350ml-1.8L selon taille
+        heightFactor: 0.003, // Peu sensible à la taille
         description: 'Monstera deliciosa',
         species: ['monstera deliciosa'],
         isPlant: true
@@ -1511,12 +1669,12 @@ const Nieuwkoop = () => {
       
       // 🌿 PHILODENDRON - (3 références dans stock)
       philodendron: {
-        baseDays: 7,
-        summerFactor: 0.8,
-        winterFactor: 1.6,
-        waterRatio: 0.11,
-        minWater: 0.2, maxWater: 1.8,
-        heightFactor: 0.0015,
+        baseDays: 8, // Aime l'humidité mais supporte quelques jours de sécheresse
+        summerFactor: 0.8, // Plus fréquent l'été
+        winterFactor: 1.6, // Réduction hivernale
+        waterMultiplier: 0.8, // Arrosage modéré à généreux
+        minWater: 0.25, maxWater: 1.6, // 250ml-1.6L selon taille
+        heightFactor: 0.002, // Peu sensible à la taille
         description: 'Philodendron',
         species: ['philodendron imperial green', 'philodendron xanadu'],
         isPlant: true
@@ -1999,6 +2157,566 @@ const Nieuwkoop = () => {
     }
   }, [activeSection, projects.length]);
 
+  // Configuration des chargés de projet
+  const PROJECT_MANAGERS = {
+    all: { name: 'Tous les projets', color: '#8b5cf6', emoji: '👥' },
+    baptiste: { name: 'Baptiste', color: '#3b82f6', emoji: '👨‍💼' },
+    amelie: { name: 'Amélie', color: '#ec4899', emoji: '👩‍💼' },
+    hugo: { name: 'Hugo', color: '#10b981', emoji: '👨‍💻' }
+  };
+
+  // Fonctions utilitaires pour les managers
+  const getManagerFromString = (managerString) => {
+    if (!managerString) return 'all';
+    const manager = managerString.toLowerCase();
+    if (manager.includes('baptiste')) return 'baptiste';
+    if (manager.includes('amelie') || manager.includes('amélie')) return 'amelie';
+    if (manager.includes('hugo')) return 'hugo';
+    return 'all';
+  };
+
+  const getProjectManagerColor = (project) => {
+    // Support à la fois la nouvelle structure (team.projectManager) et les anciennes (fallbacks)
+    const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+    const managerString = typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+    const managerKey = getManagerFromString(managerString);
+    return PROJECT_MANAGERS[managerKey]?.color || PROJECT_MANAGERS.all.color;
+  };
+
+  // Calculer les statistiques par manager
+  const managerStats = React.useMemo(() => {
+    if (!projects || projects.length === 0) return {};
+
+    const currentDate = new Date();
+    const stats = {};
+    
+    // Initialiser les stats pour tous les managers
+    Object.keys(PROJECT_MANAGERS).forEach(key => {
+      stats[key] = {
+        total: 0,
+        active: 0,
+        completed: 0,
+        pending: 0,
+        overdue: 0,
+        critical: 0, // projets critiques (< 3 jours)
+        workload: 0 // nombre de matériaux total
+      };
+    });
+
+    projects.forEach(project => {
+      // Support à la fois la nouvelle structure (team.projectManager) et les anciennes
+      const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+      const managerString = typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+      const managerKey = getManagerFromString(managerString);
+      
+      // Stats globales
+      stats.all.total++;
+      stats[managerKey].total++;
+      
+      // Calculer si le projet est en retard - Utilise dates avec fallback
+      const endDateRaw = project.dates?.end || project.dateFin || project.endDate;
+      const isOverdue = endDateRaw && new Date(endDateRaw) < currentDate;
+      const daysDiff = endDateRaw ? Math.ceil((new Date(endDateRaw) - currentDate) / (1000 * 60 * 60 * 24)) : 999;
+      const isCritical = daysDiff > 0 && daysDiff <= 3;
+      
+      // Stats par status
+      const status = project.status || 'pending';
+      stats.all[status] = (stats.all[status] || 0) + 1;
+      stats[managerKey][status] = (stats[managerKey][status] || 0) + 1;
+      
+      if (isOverdue) {
+        stats.all.overdue++;
+        stats[managerKey].overdue++;
+      }
+      
+      if (isCritical) {
+        stats.all.critical++;
+        stats[managerKey].critical++;
+      }
+      
+      // Charge de travail (nombre de matériaux)
+      const materialsCount = project.materials?.length || 0;
+      stats.all.workload += materialsCount;
+      stats[managerKey].workload += materialsCount;
+    });
+
+    return stats;
+  }, [projects]); // projectCalendarDate supprimé car non utilisé dans les stats
+
+  // Filtrer les projets selon le manager sélectionné
+  const filteredProjects = React.useMemo(() => {
+    if (!projects) return [];
+    
+    if (selectedProjectManager === 'all') return projects;
+    
+    return projects.filter(project => {
+      // Support à la fois la nouvelle structure (team.projectManager) et les anciennes
+      const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+      const managerString = typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+      const managerKey = getManagerFromString(managerString);
+      return managerKey === selectedProjectManager;
+    });
+  }, [projects, selectedProjectManager]);
+
+  // Fonctions utilitaires pour les différentes vues
+  const getWeekDays = (startDate) => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  };
+
+  const getWeekRange = (date) => {
+    const start = new Date(date);
+    start.setDate(date.getDate() - date.getDay() + 1); // Lundi
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6); // Dimanche
+    return { start, end };
+  };
+
+  // Données pour la vue semaine
+  const weekData = React.useMemo(() => {
+    const weekDays = getWeekDays(weekStartDate);
+    const weekProjects = {};
+    
+    // Initialiser les jours
+    weekDays.forEach(day => {
+      const dayKey = day.toISOString().split('T')[0];
+      weekProjects[dayKey] = [];
+    });
+    
+    // Répartir les projets filtrés sur la semaine
+    filteredProjects.forEach(project => {
+      if (!project.dates?.start || !project.dates?.end) return;
+      
+      const projectStart = new Date(project.dates.start);
+      const projectEnd = new Date(project.dates.end);
+      
+      weekDays.forEach(day => {
+        const dayKey = day.toISOString().split('T')[0];
+        const dayStart = new Date(day);
+        const dayEnd = new Date(day);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        // Vérifier si le projet est actif ce jour
+        if (projectStart <= dayEnd && projectEnd >= dayStart) {
+          weekProjects[dayKey].push({
+            ...project,
+            isStart: projectStart.toDateString() === day.toDateString(),
+            isEnd: projectEnd.toDateString() === day.toDateString(),
+            color: getProjectManagerColor(project),
+            duration: Math.ceil((projectEnd - projectStart) / (1000 * 60 * 60 * 24)) + 1
+          });
+        }
+      });
+    });
+    
+    return { days: weekDays, projects: weekProjects };
+  }, [weekStartDate, filteredProjects]);
+
+  // Données pour la vue année (12 mini-calendriers)
+  const yearData = React.useMemo(() => {
+    const year = projectCalendarDate.getFullYear();
+    const months = [];
+    
+    for (let month = 0; month < 12; month++) {
+      const monthDate = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = monthDate.getDay();
+      const monthProjects = {};
+      
+      // Compter les projets par jour du mois
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        monthProjects[day] = filteredProjects.filter(project => {
+          if (!project.dates?.start || !project.dates?.end) return false;
+          
+          const projectStart = new Date(project.dates.start);
+          const projectEnd = new Date(project.dates.end);
+          const currentDay = new Date(year, month, day);
+          
+          return projectStart <= currentDay && projectEnd >= currentDay;
+        });
+      }
+      
+      months.push({
+        name: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+               'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][month],
+        month,
+        year,
+        daysInMonth,
+        firstDay,
+        projects: monthProjects
+      });
+    }
+    
+    return months;
+  }, [projectCalendarDate, filteredProjects]);
+
+  // Données pour la vue Kanban (colonnes par status)
+  const kanbanData = React.useMemo(() => {
+    const columns = {
+      draft: { title: '📝 Brouillon', projects: [], color: '#9ca3af' },
+      planned: { title: '📅 Planifié', projects: [], color: '#3b82f6' },
+      active: { title: '🚀 En cours', projects: [], color: '#10b981' },
+      on_hold: { title: '⏸️ En pause', projects: [], color: '#f59e0b' },
+      completed: { title: '✅ Terminé', projects: [], color: '#6b7280' },
+      cancelled: { title: '❌ Annulé', projects: [], color: '#ef4444' }
+    };
+    
+    filteredProjects.forEach(project => {
+      const status = project.status || 'draft';
+      if (columns[status]) {
+        columns[status].projects.push({
+          ...project,
+          color: getProjectManagerColor(project)
+        });
+      }
+    });
+    
+    return columns;
+  }, [filteredProjects]);
+
+  // Fonctions de drag & drop
+  const handleDragStart = (e, project) => {
+    setDraggedProject(project);
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.dataTransfer.setDragImage(e.target, 0, 0);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e, targetDate, targetStatus = null) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (!draggedProject) return;
+    
+    try {
+      const updatedProject = { ...draggedProject };
+      
+      if (targetDate) {
+        // Déplacement de date
+        const originalDuration = draggedProject.dates?.end && draggedProject.dates?.start
+          ? Math.ceil((new Date(draggedProject.dates.end) - new Date(draggedProject.dates.start)) / (1000 * 60 * 60 * 24))
+          : 1;
+        
+        updatedProject.dates = {
+          ...updatedProject.dates,
+          start: targetDate,
+          end: new Date(targetDate.getTime() + (originalDuration * 24 * 60 * 60 * 1000))
+        };
+      }
+      
+      if (targetStatus) {
+        // Changement de statut
+        updatedProject.status = targetStatus;
+      }
+      
+      // Appel API pour mettre à jour le projet
+      const response = await fetch(`/api/projets/${updatedProject._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProject)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      // Mise à jour locale pour l'instant
+      setProjects(prevProjects =>
+        prevProjects.map(p => p._id === draggedProject._id ? updatedProject : p)
+      );
+      
+      // Notification de succès
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: 'success',
+        message: `Projet "${draggedProject.title}" déplacé avec succès`,
+        duration: 3000
+      }]);
+      
+    } catch (error) {
+      console.error('Erreur lors du déplacement du projet:', error);
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: 'error',
+        message: 'Erreur lors du déplacement du projet',
+        duration: 5000
+      }]);
+    }
+    
+    setDraggedProject(null);
+  };
+
+  // 🔧 FIX CRITIQUE: useMemo déplacé hors du rendu conditionnel pour éviter hooks order violation  
+  const projectSchedule = React.useMemo(() => {
+    const currentMonth = projectCalendarDate.getMonth();
+    const currentYear = projectCalendarDate.getFullYear();
+    
+    // Fonction de génération du planning mensuel (déplacée depuis modal)
+    const generateMonthlyProjectSchedule = (month, year, managerFilter, statusFilter) => {
+      const schedule = {};
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      if (!Number.isInteger(month) || month < 0 || month > 11) {
+        console.warn('⚠️ Mois invalide:', month);
+        return schedule;
+      }
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        schedule[day] = [];
+      }
+      
+      const filteredProjects = (projects || []).filter(project => {
+        if (managerFilter !== 'all') {
+          const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+          const manager = String(typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef).trim();
+          if (!manager) return false;
+          const managerLower = manager.toLowerCase();
+          if (managerFilter === 'baptiste' && !managerLower.includes('baptiste')) return false;
+          if (managerFilter === 'amelie' && !managerLower.includes('amelie') && !managerLower.includes('amélie')) return false;
+          if (managerFilter === 'hugo' && !managerLower.includes('hugo')) return false;
+        }
+        
+        if (statusFilter !== 'all') {
+          const status = project.status || 'active';
+          const statusLower = status.toLowerCase();
+          if (statusFilter === 'active' && 
+              !['active', 'actif', 'en_cours', 'en cours', 'running'].includes(statusLower)) return false;
+          if (statusFilter === 'pending' && 
+              !['pending', 'en_attente', 'en attente', 'waiting'].includes(statusLower)) return false;
+          if (statusFilter === 'completed' && 
+              !['completed', 'termine', 'terminé', 'fini', 'done'].includes(statusLower)) return false;
+        }
+        
+        return true;
+      });
+      
+      filteredProjects.forEach(project => {
+        if (!project.dates?.start || !project.dates?.end) return;
+        
+        const startDate = new Date(project.dates.start);
+        const endDate = new Date(project.dates.end);
+        
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+        if (startDate > endDate) return;
+        
+        if ((startDate.getFullYear() === year && startDate.getMonth() === month) ||
+            (endDate.getFullYear() === year && endDate.getMonth() === month) ||
+            (startDate <= new Date(year, month, 1) && endDate >= new Date(year, month + 1, 0))) {
+          
+          const monthStart = Math.max(1, startDate.getMonth() === month ? startDate.getDate() : 1);
+          const monthEnd = Math.min(daysInMonth, endDate.getMonth() === month ? endDate.getDate() : daysInMonth);
+          
+          for (let day = monthStart; day <= monthEnd; day++) {
+            const projectColor = getProjectManagerColor(project);
+            
+            // Debug: Voir ce qu'on a dans le stock
+            if (project._id === projects[0]?._id) { // Log seulement pour le premier projet pour éviter le spam
+              console.log('📦 Stock disponible (addedItems):', {
+                count: addedItems.length,
+                sampleItems: addedItems.slice(0, 3).map(item => ({
+                  name: item.name,
+                  designation: item.designation,
+                  reference: item.reference,
+                  hasImage: !!item.image,
+                  hasImagesArray: !!item.images
+                }))
+              });
+            }
+            
+            // AUDIT DÉTAILLÉ: Analyser TOUS les matériaux du projet
+            console.log(`🔍 AUDIT PROJET [${project._id}]:`, {
+              title: project.title,
+              materialsCount: project.materials?.length || 0,
+              materialsRaw: project.materials
+            });
+            
+            // Enrichir les matériaux avec les données du stock pour avoir les images
+            const enrichedMaterials = (project.materials || []).map((material, matIndex) => {
+              console.log(`\n📋 === MATERIAL ${matIndex} AUDIT COMPLET ===`);
+              console.log(`📦 Material brut [${matIndex}]:`, material);
+              console.log(`🔑 Material keys [${matIndex}]:`, Object.keys(material));
+              
+              // Montrer TOUTES les valeurs importantes
+              console.log(`📝 Material détaillé [${matIndex}]:`, {
+                name: material.name,
+                designation: material.designation,
+                libelle: material.libelle,
+                reference: material.reference,
+                category: material.category,
+                id: material.id,
+                _id: material._id,
+                Itemcode: material.Itemcode,
+                item_code: material.item_code
+              });
+              
+              // Chercher dans les données du stock avec MATCHING STRICT et PRIORITAIRE
+              let stockItem = null;
+              
+              // 1. PRIORITÉ ABSOLUE: Match exact par référence
+              if (material.reference && material.reference.trim()) {
+                stockItem = addedItems.find(item => 
+                  item.reference === material.reference ||
+                  item.Itemcode === material.reference ||
+                  item.item_code === material.reference
+                );
+                if (stockItem) {
+                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR RÉFÉRENCE:`, material.reference);
+                }
+              }
+              
+              // 2. PRIORITÉ HAUTE: Match exact par nom
+              if (!stockItem && material.name && material.name.trim()) {
+                stockItem = addedItems.find(item => 
+                  item.name === material.name ||
+                  item.designation === material.name ||
+                  item.libelle === material.name
+                );
+                if (stockItem) {
+                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR NOM:`, material.name);
+                }
+              }
+              
+              // 3. PRIORITÉ MOYENNE: Match exact par designation
+              if (!stockItem && material.designation && material.designation.trim()) {
+                stockItem = addedItems.find(item => 
+                  item.designation === material.designation ||
+                  item.name === material.designation ||
+                  item.libelle === material.designation
+                );
+                if (stockItem) {
+                  console.log(`🎯 [${matIndex}] MATCH EXACT PAR DESIGNATION:`, material.designation);
+                }
+              }
+              
+              // 4. PRIORITÉ BASSE: Match par similarité (plus strict)
+              if (!stockItem && material.name && material.name.trim() && material.name.length > 3) {
+                stockItem = addedItems.find(item => 
+                  (item.name && item.name.toLowerCase().includes(material.name.toLowerCase())) ||
+                  (item.designation && item.designation.toLowerCase().includes(material.name.toLowerCase()))
+                );
+                if (stockItem) {
+                  console.log(`🎯 [${matIndex}] MATCH SIMILARITÉ PAR NOM:`, material.name);
+                }
+              }
+              
+              // 5. DERNIÈRE CHANCE: Si toujours pas trouvé, pas de match
+              if (!stockItem) {
+                console.log(`❌ [${matIndex}] AUCUN MATCH TROUVÉ pour:`, {
+                  name: material.name,
+                  designation: material.designation,
+                  reference: material.reference
+                });
+              }
+              
+              console.log(`🎯 [${matIndex}] Match trouvé:`, stockItem ? {
+                name: stockItem.name,
+                designation: stockItem.designation,
+                reference: stockItem.reference,
+                image: stockItem.image,
+                hasImages: !!stockItem.images,
+                imagesArray: stockItem.images
+              } : 'AUCUN MATCH');
+              
+              if (stockItem) {
+                // Fusionner les données du matériau avec celles du stock - CONSERVATEUR
+                const enrichedMaterial = {
+                  ...JSON.parse(JSON.stringify(material)), // Copie profonde du matériau original
+                  // IMAGES: Prendre celles du stock
+                  image: stockItem.images?.[0]?.webPath || stockItem.image,
+                  imageUrl: stockItem.images?.[0]?.webPath || stockItem.imageUrl, 
+                  photo: stockItem.images?.[0]?.webPath || stockItem.photo,
+                  // PRIX: Prendre celui du stock si disponible
+                  price: stockItem.price || material.price,
+                  // RÉFÉRENCE: GARDER L'ORIGINALE si elle existe, sinon prendre celle du stock
+                  reference: material.reference || stockItem.reference,
+                  // DIMENSIONS: Enrichir si manquantes
+                  height: material.height || stockItem.height,
+                  diameter: material.diameter || stockItem.diameter,
+                  // DATA: Ajouter les données du stock sans écraser
+                  stockData: { ...stockItem },
+                  uniqueId: `${material.name || material.designation}-${matIndex}-${Date.now()}` // ID unique
+                };
+                
+                console.log(`✅ [${matIndex}] Material enrichi FINAL:`, {
+                  originalName: material.name,
+                  originalRef: material.reference,
+                  enrichedName: enrichedMaterial.name,
+                  enrichedRef: enrichedMaterial.reference,
+                  enrichedImage: enrichedMaterial.image,
+                  uniqueId: enrichedMaterial.uniqueId,
+                  fullEnriched: enrichedMaterial
+                });
+                
+                return enrichedMaterial;
+              }
+              
+              // Si pas trouvé dans le stock, garde le matériau original avec ID unique
+              const originalMaterial = {
+                ...JSON.parse(JSON.stringify(material)),
+                uniqueId: `${material.name || material.designation}-${matIndex}-original-${Date.now()}`
+              };
+              
+              console.log(`❌ [${matIndex}] Pas de match, matériau original FINAL:`, {
+                name: originalMaterial.name,
+                reference: originalMaterial.reference,
+                uniqueId: originalMaterial.uniqueId,
+                fullOriginal: originalMaterial
+              });
+              
+              return originalMaterial;
+            });
+            
+            // AUDIT FINAL: Vérifier les matériaux enrichis avant ajout au calendrier
+            console.log(`🏁 FINAL MATERIALS POUR PROJET [${project._id}]:`, {
+              count: enrichedMaterials.length,
+              materials: enrichedMaterials.map((mat, idx) => ({
+                index: idx,
+                name: mat.name,
+                reference: mat.reference,
+                uniqueId: mat.uniqueId,
+                hasImage: !!mat.image
+              }))
+            });
+
+            schedule[day].push({
+              id: project._id,
+              title: project.client?.name || project.title || 'Projet sans titre',
+              status: project.status || 'active',
+              materials: enrichedMaterials,
+              isStart: day === monthStart,
+              isEnd: day === monthEnd,
+              location: project.location?.address || '',
+              color: projectColor,
+              projectManager: (() => {
+                const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+                return typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+              })(),
+              fullProject: project
+            });
+          }
+        }
+      });
+      
+      return schedule;
+    };
+    
+    return generateMonthlyProjectSchedule(currentMonth, currentYear, selectedProjectManager, selectedProjectStatus);
+  }, [projectCalendarDate, selectedProjectManager, selectedProjectStatus, projects, addedItems]);
+
   const handleSubmitProject = async (formData) => {
     console.log('📤 Submitting project with formData:', formData);
     if (formData instanceof FormData) {
@@ -2021,6 +2739,380 @@ const Nieuwkoop = () => {
   const handleDeleteProject = async (id) => {
     await deleteProject(id);
     fetchProjects();
+  };
+
+  // 🔥 ACTIONS RAPIDES - Fonctions pour double-clic et menu contextuel
+  const handleCreateQuickProject = async (selectedDate) => {
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    const quickProject = {
+      title: `Nouveau projet ${selectedDate.toLocaleDateString('fr-FR')}`,
+      description: 'Projet créé rapidement depuis le calendrier',
+      client: '',
+      status: 'pending',
+      startDate: dateStr,
+      endDate: dateStr,
+      team: {
+        projectManager: selectedProjectManager !== 'all' ? selectedProjectManager : 'baptiste'
+      },
+      materials: []
+    };
+    
+    try {
+      await handleSubmitProject(quickProject);
+      console.log('🚀 Projet rapide créé pour le', dateStr);
+    } catch (error) {
+      console.error('❌ Erreur création projet rapide:', error);
+    }
+  };
+
+  const handleContextMenu = (e, project) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      project: project
+    });
+  };
+
+  const handleContextMenuAction = async (action, project) => {
+    try {
+      switch (action) {
+        case 'history':
+          handleShowHistory(project);
+          break;
+
+        case 'exportPdf':
+          await handleExportProject(project, 'pdf');
+          break;
+
+        case 'exportExcel':
+          await handleExportProject(project, 'excel');
+          break;
+
+        case 'duplicate':
+          const duplicatedProject = {
+            ...project,
+            title: `${project.title} (Copie)`,
+            status: 'pending'
+          };
+          await handleSubmitProject(duplicatedProject);
+          break;
+          
+        case 'archive':
+          const response = await fetch(`/api/projets/${project._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...project, status: 'archived' })
+          });
+          if (response.ok) await fetchProjects();
+          break;
+          
+        case 'complete':
+          const completeResponse = await fetch(`/api/projets/${project._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...project, status: 'completed' })
+          });
+          if (completeResponse.ok) await fetchProjects();
+          break;
+          
+        case 'delete':
+          if (confirm(`Supprimer le projet "${project.title}" ?`)) {
+            const deleteResponse = await fetch(`/api/projets/${project._id}`, {
+              method: 'DELETE'
+            });
+            if (deleteResponse.ok) await fetchProjects();
+          }
+          break;
+      }
+    } catch (error) {
+      console.error(`❌ Erreur action ${action}:`, error);
+    }
+    setContextMenu({ visible: false, x: 0, y: 0, project: null });
+  };
+
+  // Nouvelles fonctions pour les actions des cartes de projet
+  const [showProjectActionsMenu, setShowProjectActionsMenu] = useState({ visible: false, project: null, x: 0, y: 0 });
+  const [editingProject, setEditingProject] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Fonction pour éditer un projet
+  const handleEditProject = (project) => {
+    setEditingProject(project);
+    setShowEditModal(true);
+  };
+
+  // Fonction pour copier/dupliquer un projet
+  const handleCopyProject = async (project) => {
+    try {
+      const duplicatedProject = {
+        ...project,
+        title: `${project.title} (Copie)`,
+        client: project.client ? { ...project.client } : null,
+        dates: {
+          start: new Date(project.dates?.start || new Date()),
+          end: new Date(project.dates?.end || new Date(Date.now() + 7*24*60*60*1000)) // +7 jours
+        },
+        status: 'draft', // Nouveau projet en brouillon
+        team: project.team ? { ...project.team } : null,
+        materials: project.materials ? [...project.materials] : [],
+        location: project.location ? { ...project.location } : null
+      };
+
+      await handleSubmitProject(duplicatedProject);
+
+      // Notification de succès
+      alert(`✅ Projet "${duplicatedProject.title}" créé avec succès !`);
+
+    } catch (error) {
+      console.error('❌ Erreur lors de la duplication:', error);
+      alert('❌ Erreur lors de la duplication du projet');
+    }
+  };
+
+  // Fonction pour afficher le menu contextuel avancé
+  const handleShowProjectMenu = (project, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setShowProjectActionsMenu({
+      visible: true,
+      project,
+      x: rect.left,
+      y: rect.bottom + 5
+    });
+  };
+
+  // Fonction pour supprimer un projet depuis la carte
+  const handleDeleteProjectFromCard = async (project) => {
+    if (!confirm(`⚠️ Êtes-vous sûr de vouloir supprimer le projet "${project.title}" ?\n\nCette action est irréversible.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/projets/${project._id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        await fetchProjects();
+        alert('✅ Projet supprimé avec succès');
+      } else {
+        throw new Error('Erreur lors de la suppression');
+      }
+    } catch (error) {
+      console.error('❌ Erreur suppression projet:', error);
+      alert('❌ Erreur lors de la suppression du projet');
+    }
+  };
+
+  // Fonction pour exporter un projet
+  const handleExportProject = async (project, format = 'pdf') => {
+    try {
+      const filename = `projet-${project.title}-${new Date().toISOString().split('T')[0]}.${format}`;
+
+      if (format === 'pdf') {
+        await exportProjectPDF(project._id, filename);
+      } else if (format === 'excel') {
+        await exportProjectExcel(project._id, filename);
+      }
+
+      // Succès géré par le hook useProjectExport
+    } catch (error) {
+      console.error('Erreur export:', error);
+      alert('❌ Erreur lors de l\'export du projet');
+    }
+  };
+
+  // Fonctions pour les nouvelles fonctionnalités
+  const handleShowHistory = (project) => {
+    setSelectedProjectForHistory(project);
+    setShowProjectHistory(true);
+  };
+
+  const handleCloseHistory = () => {
+    setShowProjectHistory(false);
+    setSelectedProjectForHistory(null);
+  };
+
+  const handleShowTemplates = () => {
+    setShowProjectTemplates(true);
+  };
+
+  const handleCloseTemplates = () => {
+    setShowProjectTemplates(false);
+  };
+
+  const handleSelectTemplate = (project) => {
+    // Ajouter le projet créé à partir du template à la liste
+    setProjects(prev => [project, ...prev]);
+    console.log('🎯 Nouveau projet créé depuis template:', project);
+  };
+
+  // Fonction pour changer le statut d'un projet
+  const handleChangeProjectStatus = async (project, newStatus) => {
+    try {
+      const response = await fetch(`/api/projets/${project._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...project, status: newStatus })
+      });
+
+      if (response.ok) {
+        await fetchProjects();
+        alert(`✅ Statut du projet changé vers "${newStatus}"`);
+      }
+    } catch (error) {
+      console.error('❌ Erreur changement statut:', error);
+      alert('❌ Erreur lors du changement de statut');
+    }
+  };
+
+  // Fermer le menu d'actions au clic extérieur
+  React.useEffect(() => {
+    const handleClickOutside = () => {
+      if (showProjectActionsMenu.visible) {
+        setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+      }
+    };
+
+    if (showProjectActionsMenu.visible) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showProjectActionsMenu.visible]);
+
+  // Raccourcis clavier
+  React.useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!showProjectCalendar) return;
+      
+      const currentDate = projectCalendarDate;
+      
+      switch (e.key.toLowerCase()) {
+        case 'j': // Mois précédent
+          e.preventDefault();
+          if (calendarViewMode === 'month') {
+            setProjectCalendarDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+          }
+          break;
+          
+        case 'k': // Mois suivant  
+          e.preventDefault();
+          if (calendarViewMode === 'month') {
+            setProjectCalendarDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+          }
+          break;
+          
+        case 'n': // Nouveau projet
+          e.preventDefault();
+          setNewProjectDate(new Date());
+          setShowCreateProjectForm(true);
+          break;
+          
+        case 'escape':
+          e.preventDefault();
+          setContextMenu({ visible: false, x: 0, y: 0, project: null });
+          setShowCreateProjectForm(false);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showProjectCalendar, calendarViewMode, projectCalendarDate]);
+
+  // Fermer menu contextuel au clic extérieur
+  React.useEffect(() => {
+    const handleClickOutside = () => {
+      if (contextMenu.visible) {
+        setContextMenu({ visible: false, x: 0, y: 0, project: null });
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [contextMenu.visible]);
+
+  // Gestion des tooltips de projets
+  const showProjectTooltip = (e, project) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setProjectTooltip({
+      visible: true,
+      x: rect.right + 10,
+      y: rect.top,
+      project: formatProjectTooltip(project)
+    });
+    setHoveredProject(project._id);
+  };
+
+  const hideProjectTooltip = () => {
+    setProjectTooltip({ visible: false, x: 0, y: 0, project: null });
+    setHoveredProject(null);
+  };
+
+  // ✨ MICRO-INTERACTIONS - Fonctions utilitaires
+  const calculateProjectProgress = (project) => {
+    if (!project.dates?.start || !project.dates?.end) return 0;
+    
+    const startDate = new Date(project.dates.start);
+    const endDate = new Date(project.dates.end);
+    const today = new Date();
+    
+    const totalDuration = endDate.getTime() - startDate.getTime();
+    const elapsed = today.getTime() - startDate.getTime();
+    
+    if (elapsed < 0) return 0; // Projet pas encore commencé
+    if (elapsed > totalDuration) return 100; // Projet terminé
+    
+    return Math.round((elapsed / totalDuration) * 100);
+  };
+
+  const getProjectUrgency = (project) => {
+    if (!project.dates?.end) return 'normal';
+    
+    const endDate = new Date(project.dates.end);
+    const today = new Date();
+    const daysUntilEnd = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilEnd < 0) return 'overdue';
+    if (daysUntilEnd <= 1) return 'critical';
+    if (daysUntilEnd <= 3) return 'urgent';
+    if (daysUntilEnd <= 7) return 'warning';
+    return 'normal';
+  };
+
+  const getManagerAvatar = (manager) => {
+    const avatars = {
+      'baptiste': '👨‍💼',
+      'amelie': '👩‍💼', 
+      'hugo': '👨‍💻',
+      'all': '👥'
+    };
+    return avatars[manager] || '👤';
+  };
+
+  const formatProjectTooltip = (project) => {
+    const progress = calculateProjectProgress(project);
+    const urgency = getProjectUrgency(project);
+    const manager = getManagerFromString(
+      typeof (project.team?.projectManager || project.projectManager) === 'object' 
+        ? (project.team?.projectManager?.username || project.projectManager?.username || '') 
+        : (project.team?.projectManager || project.projectManager || '')
+    );
+    
+    return {
+      title: project.title || 'Projet',
+      description: project.description || 'Aucune description',
+      progress,
+      urgency,
+      manager,
+      avatar: getManagerAvatar(manager),
+      startDate: project.dates?.start ? new Date(project.dates.start).toLocaleDateString('fr-FR') : 'Non définie',
+      endDate: project.dates?.end ? new Date(project.dates.end).toLocaleDateString('fr-FR') : 'Non définie',
+      status: project.status || 'pending',
+      materialsCount: project.materials?.length || 0
+    };
   };
 
   const updateCategory = (id, category) => {
@@ -2420,30 +3512,6 @@ const Nieuwkoop = () => {
     }
   };
 
-  // Drag and drop handlers natifs
-  const handleDragStart = (e, item) => {
-    setDraggedItem(item);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.outerHTML);
-    e.target.style.opacity = '0.5';
-  };
-
-  const handleDragEnd = (e) => {
-    e.target.style.opacity = '';
-    setDraggedItem(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e, targetItem) => {
-    e.preventDefault();
-    if (draggedItem && draggedItem._id !== targetItem._id) {
-      showNotification('Réorganisation des articles simulée', 'info');
-    }
-  };
 
   const handleClearAll = () => {
     axiosApi.delete("/catalog/nieuwkoop/stock/all")
@@ -3999,6 +5067,10 @@ return (
         </div>
         );
       })()}
+
+      {/* MODAL DÉPLACÉ DANS L'ONGLET PROJETS */}
+
+      {/* MODAL DÉTAIL JOUR DÉPLACÉ DANS L'ONGLET PROJETS */}
       
       <motion.div 
         className="flex min-h-screen" 
@@ -4093,7 +5165,7 @@ return (
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            {["Catalogue", "Produits", "Stock", "Entrée", "Sortie", "Projets", "Opérations diverses"].map((item, index) => (
+            {["Stock", "Entrée", "Sortie", "Projets", "Opérations diverses"].map((item, index) => (
               <button
                 key={item}
                 style={{
@@ -4125,8 +5197,6 @@ return (
                 }}
                 onClick={() => setActiveSection(item)}
               >
-                {item === "Catalogue" && "🌿"}
-                {item === "Produits" && "🧺"}
                 {item === "Stock" && "📦"}
                 {item === "Entrée" && "📥"}
                 {item === "Sortie" && "📤"}
@@ -6126,7 +7196,6 @@ return (
                         data-focused={focusedCard}
                         draggable
                         onDragStart={(e) => handleDragStart(e, prod)}
-                        onDragEnd={handleDragEnd}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, prod)}
                         onClick={(e) => {
@@ -6858,10 +7927,11 @@ return (
               <ProjetForm onSubmit={handleSubmitProject} />
             </Suspense>
             
-            {/* Bouton Historique */}
+            {/* Boutons Historique et Calendrier */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
+              gap: '1rem',
               margin: '2rem 0'
             }}>
               <button
@@ -6891,6 +7961,70 @@ return (
                 </span>
                 {showHistory ? 'Masquer l\'historique' : 'Afficher l\'historique'}
               </button>
+              
+              <button
+                onClick={() => setShowProjectCalendar(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '20px',
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'var(--shadow-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'var(--shadow-lg)';
+                }}
+              >
+                <span style={{ fontSize: '1.3rem' }}>📅</span>
+                Calendrier Projets
+              </button>
+
+              <button
+                onClick={() => setShowProjectTemplates(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '20px',
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'var(--shadow-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'var(--shadow-lg)';
+                }}
+              >
+                <span style={{ fontSize: '1.3rem' }}>📋</span>
+                Templates Projets
+              </button>
             </div>
             
             <Suspense fallback={
@@ -6909,13 +8043,2247 @@ return (
                 Chargement de la liste des projets...
               </div>
             }>
-              <ProjetList 
-                projects={showHistory ? projects : projects.filter(p => p.status !== 'completed' && p.status !== 'archived')} 
-                onUpdate={handleUpdateProject} 
-                onDelete={handleDeleteProject} 
+              <ProjetList
+                projects={showHistory ? projects : projects.filter(p => p.status !== 'completed' && p.status !== 'archived')}
+                onUpdate={handleUpdateProject}
+                onDelete={handleDeleteProject}
                 showHistory={showHistory}
+                onEdit={handleEditProject}
+                onCopy={handleCopyProject}
+                onShowMenu={handleShowProjectMenu}
+                onContextMenu={handleContextMenu}
               />
             </Suspense>
+            
+            {/* 📅 MODAL CALENDRIER DE PROJETS - Maintenant dans l'onglet Projets */}
+            {showProjectCalendar && (() => {
+              const currentMonth = projectCalendarDate.getMonth();
+              const currentYear = projectCalendarDate.getFullYear();
+              
+              
+              const today = new Date();
+              const isCurrentMonth = today.getMonth() === projectCalendarDate.getMonth() && today.getFullYear() === projectCalendarDate.getFullYear();
+
+              return (
+                <div
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: isDark ? 'rgba(0,0,0,0.95)' : 'rgba(0,0,0,0.85)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    backdropFilter: 'blur(15px)',
+                  }}
+                  onClick={() => setShowProjectCalendar(false)}
+                >
+                  <div 
+                    className="modal-fade"
+                    style={{
+                      background: isDark 
+                        ? 'linear-gradient(135deg, rgba(31,41,55,0.98), rgba(17,24,39,0.95))' 
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95))',
+                      borderRadius: '24px',
+                      padding: '2rem',
+                      maxWidth: '95vw',
+                      maxHeight: '95vh',
+                      width: '1200px',
+                      border: isDark 
+                        ? '2px solid rgba(139,92,246,0.3)' 
+                        : '2px solid rgba(139,92,246,0.2)',
+                      boxShadow: isDark
+                        ? '0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.1)'
+                        : '0 25px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(139,92,246,0.1)',
+                      position: 'relative',
+                      overflow: 'auto',
+                    }}
+                  onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <h3 style={{
+                      fontSize: '1.75rem',
+                      fontWeight: '700',
+                      color: isDark ? '#f9fafb' : '#1f2937',
+                      textAlign: 'center',
+                      margin: 0,
+                      marginBottom: '2rem'
+                    }}>
+                      📅 Calendrier des Projets - {['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][projectCalendarDate.getMonth()]} {projectCalendarDate.getFullYear()}
+                    </h3>
+                    
+                    {/* Filtres Chargés de Projet */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: '1rem',
+                      marginBottom: '1.5rem',
+                      flexWrap: 'wrap'
+                    }}>
+                      {Object.entries(PROJECT_MANAGERS).map(([key, manager]) => {
+                        const isSelected = selectedProjectManager === key;
+                        const stats = managerStats[key] || {};
+                        
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => setSelectedProjectManager(key)}
+                            style={{
+                              background: isSelected 
+                                ? `linear-gradient(135deg, ${manager.color}, ${manager.color}dd)`
+                                : isDark 
+                                  ? 'linear-gradient(135deg, rgba(55,65,81,0.8), rgba(75,85,99,0.6))'
+                                  : 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(248,250,252,0.6))',
+                              border: isSelected 
+                                ? `2px solid ${manager.color}` 
+                                : isDark ? '2px solid rgba(75,85,99,0.3)' : '2px solid rgba(229,231,235,0.6)',
+                              borderRadius: '16px',
+                              padding: '1rem 1.5rem',
+                              cursor: 'pointer',
+                              color: isSelected 
+                                ? 'white' 
+                                : isDark ? '#f3f4f6' : '#374151',
+                              fontSize: '0.95rem',
+                              fontWeight: '600',
+                              transition: 'all 0.3s ease',
+                              backdropFilter: 'blur(10px)',
+                              boxShadow: isSelected 
+                                ? `0 8px 32px ${manager.color}40`
+                                : isDark 
+                                  ? '0 4px 16px rgba(0,0,0,0.2)' 
+                                  : '0 4px 16px rgba(0,0,0,0.1)',
+                              transform: isSelected ? 'translateY(-2px)' : 'translateY(0)',
+                              minWidth: '140px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '0.5rem'
+                            }}
+                          >
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              fontSize: '1rem'
+                            }}>
+                              <span style={{ fontSize: '1.2rem' }}>{manager.emoji}</span>
+                              <span>{manager.name}</span>
+                            </div>
+                            
+                            {/* Statistiques rapides */}
+                            <div style={{
+                              display: 'flex',
+                              gap: '0.75rem',
+                              fontSize: '0.8rem',
+                              opacity: 0.9
+                            }}>
+                              <span style={{
+                                background: isSelected ? 'rgba(255,255,255,0.2)' : `${manager.color}20`,
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '8px',
+                                color: isSelected ? 'white' : manager.color,
+                                fontWeight: '600'
+                              }}>
+                                {stats.total || 0} projets
+                              </span>
+                              
+                              {stats.critical > 0 && (
+                                <span style={{
+                                  background: '#ef4444',
+                                  color: 'white',
+                                  padding: '0.2rem 0.5rem',
+                                  borderRadius: '8px',
+                                  fontWeight: '600',
+                                  animation: 'pulse 2s infinite'
+                                }}>
+                                  🚨 {stats.critical}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Stats Dashboard (si activé) */}
+                    {showManagerStats && (
+                      <div style={{
+                        background: isDark 
+                          ? 'linear-gradient(135deg, rgba(17,24,39,0.8), rgba(31,41,55,0.6))'
+                          : 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(248,250,252,0.6))',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        marginBottom: '1.5rem',
+                        border: isDark ? '1px solid rgba(75,85,99,0.3)' : '1px solid rgba(229,231,235,0.6)',
+                        backdropFilter: 'blur(10px)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '1rem'
+                        }}>
+                          <h4 style={{
+                            fontSize: '1.2rem',
+                            fontWeight: '600',
+                            color: isDark ? '#f3f4f6' : '#374151',
+                            margin: 0
+                          }}>
+                            📊 Statistiques - {PROJECT_MANAGERS[selectedProjectManager]?.name}
+                          </h4>
+                          <button
+                            onClick={() => setShowManagerStats(false)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: isDark ? '#9ca3af' : '#6b7280',
+                              fontSize: '1.2rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                        
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                          gap: '1rem'
+                        }}>
+                          {(() => {
+                            const currentStats = managerStats[selectedProjectManager] || {};
+                            const statItems = [
+                              { label: 'Total', value: currentStats.total || 0, color: '#8b5cf6', emoji: '📁' },
+                              { label: 'Actifs', value: currentStats.active || 0, color: '#10b981', emoji: '✅' },
+                              { label: 'En attente', value: currentStats.pending || 0, color: '#f59e0b', emoji: '⏳' },
+                              { label: 'Terminés', value: currentStats.completed || 0, color: '#6b7280', emoji: '🎯' },
+                              { label: 'En retard', value: currentStats.overdue || 0, color: '#ef4444', emoji: '⚠️' },
+                              { label: 'Critiques', value: currentStats.critical || 0, color: '#dc2626', emoji: '🚨' },
+                              { label: 'Matériaux', value: currentStats.workload || 0, color: '#3b82f6', emoji: '📦' }
+                            ];
+                            
+                            return statItems.map(stat => (
+                              <div key={stat.label} style={{
+                                background: `${stat.color}10`,
+                                border: `1px solid ${stat.color}30`,
+                                borderRadius: '12px',
+                                padding: '0.75rem',
+                                textAlign: 'center'
+                              }}>
+                                <div style={{
+                                  fontSize: '1.5rem',
+                                  fontWeight: '700',
+                                  color: stat.color
+                                }}>
+                                  {stat.emoji} {stat.value}
+                                </div>
+                                <div style={{
+                                  fontSize: '0.8rem',
+                                  color: isDark ? '#9ca3af' : '#6b7280',
+                                  marginTop: '0.25rem'
+                                }}>
+                                  {stat.label}
+                                </div>
+                              </div>
+                            ));
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Toggle Stats Button */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '1rem'
+                    }}>
+                      <button
+                        onClick={() => setShowManagerStats(!showManagerStats)}
+                        style={{
+                          background: showManagerStats 
+                            ? 'linear-gradient(135deg, #10b981, #059669)'
+                            : 'linear-gradient(135deg, #6b7280, #4b5563)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '0.5rem 1rem',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          fontWeight: '600',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        {showManagerStats ? '📊 Masquer les stats' : '📊 Voir les stats'}
+                      </button>
+                    </div>
+                    
+                    {/* Sélecteur de Mode d'Affichage */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      marginBottom: '2rem',
+                      flexWrap: 'wrap'
+                    }}>
+                      {[
+                        { key: 'month', label: 'Mois', emoji: '📅' },
+                        { key: 'week', label: 'Semaine', emoji: '📋' },
+                        { key: 'year', label: 'Année', emoji: '🗓️' },
+                        { key: 'kanban', label: 'Kanban', emoji: '📊' }
+                      ].map(mode => (
+                        <button
+                          key={mode.key}
+                          onClick={() => setCalendarViewMode(mode.key)}
+                          style={{
+                            background: calendarViewMode === mode.key
+                              ? 'linear-gradient(135deg, #8b5cf6, #7c3aed)'
+                              : isDark 
+                                ? 'linear-gradient(135deg, rgba(55,65,81,0.6), rgba(75,85,99,0.4))'
+                                : 'linear-gradient(135deg, rgba(255,255,255,0.6), rgba(248,250,252,0.4))',
+                            border: calendarViewMode === mode.key
+                              ? '2px solid #8b5cf6'
+                              : isDark ? '2px solid rgba(75,85,99,0.2)' : '2px solid rgba(229,231,235,0.4)',
+                            borderRadius: '10px',
+                            padding: '0.5rem 1rem',
+                            cursor: 'pointer',
+                            color: calendarViewMode === mode.key
+                              ? 'white'
+                              : isDark ? '#d1d5db' : '#374151',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            transition: 'all 0.2s ease',
+                            backdropFilter: 'blur(8px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            minWidth: '90px'
+                          }}
+                        >
+                          <span>{mode.emoji}</span>
+                          <span>{mode.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Navigation Conditionnelle */}
+                    {calendarViewMode === 'month' && (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '1rem',
+                        marginBottom: '1.5rem'
+                      }}>
+                        <button
+                          onClick={() => setProjectCalendarDate(new Date(currentYear, currentMonth - 1, 1))}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ← Mois précédent
+                        </button>
+                        
+                        {(() => {
+                          const todayCheck = new Date();
+                          const isCurrentMonthCheck = todayCheck.getMonth() === currentMonth && todayCheck.getFullYear() === currentYear;
+                          return (
+                            <button
+                              onClick={() => setProjectCalendarDate(new Date())}
+                              style={{
+                                background: isCurrentMonthCheck 
+                                  ? 'linear-gradient(135deg, #10b981, #059669)'
+                                  : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '12px',
+                                padding: '0.75rem 1.5rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {isCurrentMonthCheck ? '📅 Mois actuel' : '🏠 Aujourd\'hui'}
+                            </button>
+                          );
+                        })()}
+                        
+                        <button
+                          onClick={() => setProjectCalendarDate(new Date(currentYear, currentMonth + 1, 1))}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Mois suivant →
+                        </button>
+                      </div>
+                    )}
+                    
+                    {calendarViewMode === 'week' && (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '1rem',
+                        marginBottom: '1.5rem'
+                      }}>
+                        <button
+                          onClick={() => {
+                            const newWeek = new Date(weekStartDate);
+                            newWeek.setDate(weekStartDate.getDate() - 7);
+                            setWeekStartDate(newWeek);
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ← Semaine précédente
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            const today = new Date();
+                            const monday = new Date(today);
+                            monday.setDate(today.getDate() - today.getDay() + 1);
+                            setWeekStartDate(monday);
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📅 Cette semaine
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            const newWeek = new Date(weekStartDate);
+                            newWeek.setDate(weekStartDate.getDate() + 7);
+                            setWeekStartDate(newWeek);
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Semaine suivante →
+                        </button>
+                      </div>
+                    )}
+                    
+                    {calendarViewMode === 'year' && (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '1rem',
+                        marginBottom: '1.5rem'
+                      }}>
+                        <button
+                          onClick={() => setProjectCalendarDate(new Date(currentYear - 1, currentMonth, 1))}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ← Année précédente
+                        </button>
+                        
+                        <button
+                          onClick={() => setProjectCalendarDate(new Date())}
+                          style={{
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          🗓️ Cette année
+                        </button>
+                        
+                        <button
+                          onClick={() => setProjectCalendarDate(new Date(currentYear + 1, currentMonth, 1))}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.75rem 1.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Année suivante →
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Message si pas de projets */}
+                    {(!projects || projects.length === 0) ? (
+                      <div style={{
+                        textAlign: 'center',
+                        padding: '3rem',
+                        color: isDark ? '#9ca3af' : '#6b7280',
+                        fontSize: '1.2rem'
+                      }}>
+                        📝 Aucun projet trouvé. Ajoutez des projets pour les voir dans le calendrier.
+                      </div>
+                    ) : (
+                      <>
+                        {/* VUE MOIS - Calendrier traditionnel */}
+                        {calendarViewMode === 'month' && (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(7, 1fr)',
+                        gap: '0.5rem',
+                        marginBottom: '1rem'
+                      }}>
+                        {/* En-têtes jours */}
+                        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
+                          <div key={index} style={{
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            color: isDark ? '#d1d5db' : '#4b5563',
+                            padding: '0.5rem'
+                          }}>
+                            {day}
+                          </div>
+                        ))}
+                        
+                        {/* Cellules du calendrier */}
+                        {(() => {
+                          const firstDay = new Date(currentYear, currentMonth, 1);
+                          const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                          const daysInMonth = lastDay.getDate();
+                          const startDate = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                          
+                          const cells = [];
+                          
+                          // Cellules vides pour les jours précédents
+                          for (let i = 0; i < startDate; i++) {
+                            cells.push(
+                              <div key={`empty-${i}`} style={{ minHeight: '80px' }} />
+                            );
+                          }
+                          
+                          // Jours du mois
+                          for (let day = 1; day <= daysInMonth; day++) {
+                            const dayProjects = projectSchedule[day] || [];
+                            const hasProjects = Array.isArray(dayProjects) && dayProjects.length > 0;
+                            const isToday = day === today.getDate() && isCurrentMonth;
+                            
+                            cells.push(
+                              <div
+                                key={day}
+                                style={{
+                                  minHeight: '80px',
+                                  border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                                  borderRadius: '8px',
+                                  padding: '0.5rem',
+                                  background: isToday 
+                                    ? (isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.1)')
+                                    : (isDark ? '#1f2937' : '#ffffff'),
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  position: 'relative'
+                                }}
+                                onClick={() => {
+                                  if (hasProjects) {
+                                    setSelectedDayProjects(dayProjects);
+                                    setShowProjectDayDetail(true);
+                                  }
+                                }}
+                                onDoubleClick={() => {
+                                  const selectedDate = new Date(currentYear, currentMonth, day);
+                                  handleCreateQuickProject(selectedDate);
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!hasProjects) {
+                                    e.currentTarget.style.background = isDark ? '#374151' : '#f3f4f6';
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                    
+                                    // Afficher tooltip pour double-clic
+                                    const tooltip = document.createElement('div');
+                                    tooltip.id = 'double-click-tooltip';
+                                    tooltip.innerHTML = '✨ Double-clic → Nouveau projet';
+                                    tooltip.style.cssText = `
+                                      position: absolute;
+                                      bottom: -30px;
+                                      left: 50%;
+                                      transform: translateX(-50%);
+                                      background: #1f2937;
+                                      color: white;
+                                      padding: 4px 8px;
+                                      border-radius: 4px;
+                                      font-size: 0.7rem;
+                                      white-space: nowrap;
+                                      z-index: 1000;
+                                      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                                    `;
+                                    e.currentTarget.appendChild(tooltip);
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!hasProjects && !isToday) {
+                                    e.currentTarget.style.background = isDark ? '#1f2937' : '#ffffff';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    
+                                    // Supprimer tooltip
+                                    const tooltip = e.currentTarget.querySelector('#double-click-tooltip');
+                                    if (tooltip) tooltip.remove();
+                                  }
+                                }}
+                              >
+                                <div style={{
+                                  fontWeight: isToday ? '700' : '500',
+                                  color: isToday 
+                                    ? '#3b82f6' 
+                                    : (isDark ? '#f9fafb' : '#1f2937'),
+                                  marginBottom: '0.25rem'
+                                }}>
+                                  {day}
+                                </div>
+                                {hasProjects && (
+                                  <div style={{ fontSize: '0.75rem' }}>
+                                    {dayProjects.slice(0, 2).map((project, idx) => {
+                                      const urgency = getProjectUrgency(project);
+                                      const manager = getManagerFromString(
+                                        typeof (project.team?.projectManager || project.projectManager) === 'object' 
+                                          ? (project.team?.projectManager?.username || project.projectManager?.username || '') 
+                                          : (project.team?.projectManager || project.projectManager || '')
+                                      );
+                                      
+                                      return (
+                                        <div
+                                          key={idx}
+                                          className={`
+                                            ${urgency === 'critical' ? 'project-critical' : ''}
+                                            ${urgency === 'urgent' ? 'project-urgent' : ''}
+                                          `}
+                                          style={{
+                                            background: getProjectManagerColor(project),
+                                            color: 'white',
+                                            padding: '1px 4px',
+                                            borderRadius: '3px',
+                                            marginBottom: '1px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            cursor: 'context-menu',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '2px',
+                                            position: 'relative',
+                                            transition: 'all 0.2s ease'
+                                          }}
+                                          onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setContextMenu({
+                                              visible: true,
+                                              x: e.clientX,
+                                              y: e.clientY,
+                                              project: project
+                                            });
+                                          }}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedDayProjects([project]);
+                                            setShowProjectDayDetail(true);
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            showProjectTooltip(e, project);
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                            e.currentTarget.style.zIndex = '100';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            hideProjectTooltip();
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.zIndex = 'auto';
+                                          }}
+                                        >
+                                          {/* Mini-avatar du chargé de projet */}
+                                          <span style={{ 
+                                            fontSize: '0.6rem',
+                                            lineHeight: 1,
+                                            opacity: 0.9
+                                          }}>
+                                            {getManagerAvatar(manager)}
+                                          </span>
+                                          
+                                          {/* Titre du projet */}
+                                          <span style={{ flex: 1 }}>
+                                            {project.title || 'Projet'}
+                                          </span>
+                                          
+                                          {/* Indicateur d'urgence */}
+                                          {urgency === 'critical' && (
+                                            <span style={{ fontSize: '0.5rem', opacity: 0.8 }}>🔥</span>
+                                          )}
+                                          {urgency === 'urgent' && (
+                                            <span style={{ fontSize: '0.5rem', opacity: 0.8 }}>⚠️</span>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                    {dayProjects.length > 2 && (
+                                      <div style={{
+                                        color: isDark ? '#9ca3af' : '#6b7280',
+                                        fontSize: '0.7rem'
+                                      }}>
+                                        +{dayProjects.length - 2} autres
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          
+                          return cells;
+                        })()}
+                      </div>
+                        )}
+                        
+                        {/* VUE SEMAINE - Scroll horizontal */}
+                        {calendarViewMode === 'week' && (
+                          <div style={{
+                            overflowX: 'auto',
+                            paddingBottom: '1rem',
+                            borderRadius: '16px',
+                            background: isDark 
+                              ? 'linear-gradient(135deg, rgba(17,24,39,0.4), rgba(31,41,55,0.2))'
+                              : 'linear-gradient(135deg, rgba(255,255,255,0.4), rgba(248,250,252,0.2))',
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              minWidth: '1400px',
+                              gap: '1rem',
+                              padding: '1rem'
+                            }}>
+                              {weekData.days.map((day, index) => {
+                                const dayKey = day.toISOString().split('T')[0];
+                                const dayProjects = weekData.projects[dayKey] || [];
+                                const isToday = day.toDateString() === new Date().toDateString();
+                                
+                                return (
+                                  <div
+                                    key={dayKey}
+                                    style={{
+                                      flex: '1 0 180px',
+                                      minHeight: '400px',
+                                      background: isToday
+                                        ? 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05))'
+                                        : isDark 
+                                          ? 'linear-gradient(135deg, rgba(31,41,55,0.6), rgba(17,24,39,0.8))'
+                                          : 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,250,251,0.6))',
+                                      borderRadius: '12px',
+                                      border: isToday 
+                                        ? '2px solid #10b981'
+                                        : isDark ? '1px solid rgba(75,85,99,0.3)' : '1px solid rgba(229,231,235,0.6)',
+                                      padding: '1rem',
+                                      backdropFilter: 'blur(10px)'
+                                    }}
+                                    onDragOver={handleDragOver}
+                                    onDrop={(e) => handleDrop(e, day)}
+                                  >
+                                    {/* En-tête jour */}
+                                    <div style={{
+                                      textAlign: 'center',
+                                      marginBottom: '1rem',
+                                      borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                                      paddingBottom: '0.5rem'
+                                    }}>
+                                      <div style={{
+                                        fontSize: '0.9rem',
+                                        fontWeight: '600',
+                                        color: isDark ? '#f3f4f6' : '#374151'
+                                      }}>
+                                        {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'][index]}
+                                      </div>
+                                      <div style={{
+                                        fontSize: '1.5rem',
+                                        fontWeight: '700',
+                                        color: isToday ? '#10b981' : isDark ? '#f9fafb' : '#1f2937',
+                                        marginTop: '0.25rem'
+                                      }}>
+                                        {day.getDate()}
+                                      </div>
+                                      <div style={{
+                                        fontSize: '0.75rem',
+                                        color: isDark ? '#9ca3af' : '#6b7280'
+                                      }}>
+                                        {day.toLocaleDateString('fr-FR', { month: 'short' })}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Projets du jour */}
+                                    <div style={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '0.5rem',
+                                      height: 'calc(100% - 80px)',
+                                      overflowY: 'auto'
+                                    }}>
+                                      {dayProjects.map((project, pIndex) => (
+                                        <div
+                                          key={`${project._id}-${pIndex}`}
+                                          draggable
+                                          onDragStart={(e) => handleDragStart(e, project)}
+                                          style={{
+                                            background: `${project.color}20`,
+                                            border: `2px solid ${project.color}`,
+                                            borderRadius: '8px',
+                                            padding: '0.75rem',
+                                            cursor: 'grab',
+                                            transition: 'all 0.2s ease',
+                                            backdropFilter: 'blur(5px)'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.transform = 'translateY(-2px)';
+                                            e.target.style.boxShadow = `0 8px 25px ${project.color}40`;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.transform = 'translateY(0)';
+                                            e.target.style.boxShadow = 'none';
+                                          }}
+                                          onClick={() => {
+                                            setSelectedDayProjects([project]);
+                                            setShowProjectDayDetail(true);
+                                          }}
+                                        >
+                                          <div style={{
+                                            fontSize: '0.85rem',
+                                            fontWeight: '600',
+                                            color: project.color,
+                                            marginBottom: '0.25rem',
+                                            lineHeight: '1.2'
+                                          }}>
+                                            {project.client?.name || project.title || 'Projet'}
+                                          </div>
+                                          <div style={{
+                                            fontSize: '0.7rem',
+                                            color: isDark ? '#d1d5db' : '#6b7280',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.25rem'
+                                          }}>
+                                            {project.isStart && <span>🟢</span>}
+                                            {project.isEnd && <span>🔴</span>}
+                                            <span>{project.duration}j</span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                      
+                                      {dayProjects.length === 0 && (
+                                        <div style={{
+                                          textAlign: 'center',
+                                          color: isDark ? '#6b7280' : '#9ca3af',
+                                          fontSize: '0.8rem',
+                                          padding: '2rem',
+                                          fontStyle: 'italic'
+                                        }}>
+                                          Aucun projet
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* VUE ANNÉE - 12 mini-calendriers */}
+                        {calendarViewMode === 'year' && (
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                            gap: '1.5rem',
+                            padding: '1rem'
+                          }}>
+                            {yearData.map((month) => (
+                              <div
+                                key={`${month.year}-${month.month}`}
+                                style={{
+                                  background: isDark 
+                                    ? 'linear-gradient(135deg, rgba(31,41,55,0.6), rgba(17,24,39,0.8))'
+                                    : 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,250,251,0.6))',
+                                  borderRadius: '16px',
+                                  border: isDark ? '1px solid rgba(75,85,99,0.3)' : '1px solid rgba(229,231,235,0.6)',
+                                  padding: '1rem',
+                                  backdropFilter: 'blur(10px)'
+                                }}
+                              >
+                                {/* En-tête mois */}
+                                <div style={{
+                                  textAlign: 'center',
+                                  fontSize: '1.1rem',
+                                  fontWeight: '700',
+                                  color: isDark ? '#f3f4f6' : '#374151',
+                                  marginBottom: '1rem',
+                                  borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                                  paddingBottom: '0.5rem'
+                                }}>
+                                  {month.name} {month.year}
+                                </div>
+                                
+                                {/* Mini-calendrier */}
+                                <div style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(7, 1fr)',
+                                  gap: '2px',
+                                  fontSize: '0.7rem'
+                                }}>
+                                  {/* En-têtes jours */}
+                                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day) => (
+                                    <div key={day} style={{
+                                      textAlign: 'center',
+                                      fontWeight: '600',
+                                      color: isDark ? '#9ca3af' : '#6b7280',
+                                      padding: '0.25rem'
+                                    }}>
+                                      {day}
+                                    </div>
+                                  ))}
+                                  
+                                  {/* Cellules vides pour le début du mois */}
+                                  {Array.from({ length: month.firstDay === 0 ? 6 : month.firstDay - 1 }).map((_, i) => (
+                                    <div key={`empty-${i}`} style={{ height: '24px' }} />
+                                  ))}
+                                  
+                                  {/* Jours du mois */}
+                                  {Array.from({ length: month.daysInMonth }).map((_, dayIndex) => {
+                                    const day = dayIndex + 1;
+                                    const dayProjects = month.projects[day] || [];
+                                    const projectCount = dayProjects.length;
+                                    const managers = [...new Set(dayProjects.map(p => getManagerFromString(
+                                      typeof (p.team?.projectManager || p.projectManager) === 'object' 
+                                        ? (p.team?.projectManager?.username || p.projectManager?.username || '') 
+                                        : (p.team?.projectManager || p.projectManager || '')
+                                    )))];
+                                    
+                                    return (
+                                      <div
+                                        key={day}
+                                        style={{
+                                          height: '24px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          borderRadius: '4px',
+                                          background: projectCount > 0 
+                                            ? `linear-gradient(135deg, ${PROJECT_MANAGERS[managers[0]]?.color || '#8b5cf6'}40, ${PROJECT_MANAGERS[managers[0]]?.color || '#8b5cf6'}20)`
+                                            : 'transparent',
+                                          color: isDark ? '#f3f4f6' : '#374151',
+                                          cursor: projectCount > 0 ? 'pointer' : 'default',
+                                          position: 'relative',
+                                          fontSize: '0.75rem',
+                                          fontWeight: projectCount > 0 ? '600' : '400'
+                                        }}
+                                        onClick={() => {
+                                          if (projectCount > 0) {
+                                            setProjectCalendarDate(new Date(month.year, month.month, day));
+                                            setCalendarViewMode('month');
+                                          }
+                                        }}
+                                      >
+                                        <span>{day}</span>
+                                        {projectCount > 0 && (
+                                          <div style={{
+                                            position: 'absolute',
+                                            top: '-2px',
+                                            right: '-2px',
+                                            background: managers.length > 1 ? '#8b5cf6' : PROJECT_MANAGERS[managers[0]]?.color || '#8b5cf6',
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            width: '12px',
+                                            height: '12px',
+                                            fontSize: '0.6rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: '700'
+                                          }}>
+                                            {projectCount > 9 ? '9+' : projectCount}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* VUE KANBAN - Colonnes par statut */}
+                        {calendarViewMode === 'kanban' && (
+                          <div style={{
+                            display: 'flex',
+                            gap: '1.5rem',
+                            overflowX: 'auto',
+                            paddingBottom: '1rem',
+                            minHeight: '600px'
+                          }}>
+                            {Object.entries(kanbanData).map(([status, column]) => (
+                              <div
+                                key={status}
+                                style={{
+                                  flex: '0 0 300px',
+                                  background: isDark 
+                                    ? 'linear-gradient(135deg, rgba(31,41,55,0.6), rgba(17,24,39,0.8))'
+                                    : 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,250,251,0.6))',
+                                  borderRadius: '16px',
+                                  border: isDark ? '1px solid rgba(75,85,99,0.3)' : '1px solid rgba(229,231,235,0.6)',
+                                  backdropFilter: 'blur(10px)',
+                                  display: 'flex',
+                                  flexDirection: 'column'
+                                }}
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => handleDrop(e, null, status)}
+                              >
+                                {/* En-tête colonne */}
+                                <div style={{
+                                  padding: '1.5rem',
+                                  borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                                  background: `${column.color}20`,
+                                  borderRadius: '16px 16px 0 0'
+                                }}>
+                                  <h3 style={{
+                                    margin: 0,
+                                    fontSize: '1.1rem',
+                                    fontWeight: '700',
+                                    color: column.color,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between'
+                                  }}>
+                                    <span>{column.title}</span>
+                                    <span style={{
+                                      background: column.color,
+                                      color: 'white',
+                                      borderRadius: '50%',
+                                      width: '24px',
+                                      height: '24px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      {column.projects.length}
+                                    </span>
+                                  </h3>
+                                </div>
+                                
+                                {/* Projets de la colonne */}
+                                <div style={{
+                                  flex: 1,
+                                  padding: '1rem',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '1rem',
+                                  overflowY: 'auto'
+                                }}>
+                                  {column.projects.map((project) => (
+                                    <div
+                                      key={project._id}
+                                      draggable
+                                      onDragStart={(e) => handleDragStart(e, project)}
+                                      style={{
+                                        background: isDark 
+                                          ? 'linear-gradient(135deg, rgba(55,65,81,0.8), rgba(75,85,99,0.6))'
+                                          : 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.7))',
+                                        borderRadius: '12px',
+                                        padding: '1rem',
+                                        border: `2px solid ${project.color}30`,
+                                        cursor: 'grab',
+                                        transition: 'all 0.2s ease',
+                                        backdropFilter: 'blur(5px)'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = `0 8px 25px ${project.color}40`;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = 'none';
+                                      }}
+                                      onClick={() => {
+                                        setSelectedDayProjects([project]);
+                                        setShowProjectDayDetail(true);
+                                      }}
+                                    >
+                                      {/* Titre projet */}
+                                      <div style={{
+                                        fontSize: '1rem',
+                                        fontWeight: '600',
+                                        color: isDark ? '#f3f4f6' : '#374151',
+                                        marginBottom: '0.5rem',
+                                        lineHeight: '1.3'
+                                      }}>
+                                        {project.client?.name || project.title || 'Projet sans titre'}
+                                      </div>
+                                      
+                                      {/* Manager */}
+                                      {(() => {
+                                        const managerRef = project.team?.projectManager || project.projectManager || '';
+                                        const managerString = typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+                                        if (!managerString) return null;
+                                        
+                                        return (
+                                          <div style={{
+                                            display: 'inline-block',
+                                            background: project.color,
+                                            color: 'white',
+                                            fontSize: '0.7rem',
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: '6px',
+                                            fontWeight: '600',
+                                            marginBottom: '0.5rem'
+                                          }}>
+                                            👤 {managerString}
+                                          </div>
+                                        );
+                                      })()}
+                                      
+                                      {/* Dates */}
+                                      {project.dates?.start && (
+                                        <div style={{
+                                          fontSize: '0.75rem',
+                                          color: isDark ? '#9ca3af' : '#6b7280',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '0.25rem'
+                                        }}>
+                                          📅 {new Date(project.dates.start).toLocaleDateString('fr-FR')}
+                                          {project.dates.end && (
+                                            <>
+                                              <span>→</span>
+                                              <span>{new Date(project.dates.end).toLocaleDateString('fr-FR')}</span>
+                                            </>
+                                          )}
+                                        </div>
+                                      )}
+                                      
+                                      {/* Matériaux */}
+                                      {project.materials && project.materials.length > 0 && (
+                                        <div style={{
+                                          fontSize: '0.75rem',
+                                          color: isDark ? '#9ca3af' : '#6b7280',
+                                          marginTop: '0.25rem'
+                                        }}>
+                                          📦 {project.materials.length} article{project.materials.length > 1 ? 's' : ''}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                  
+                                  {column.projects.length === 0 && (
+                                    <div style={{
+                                      textAlign: 'center',
+                                      color: isDark ? '#6b7280' : '#9ca3af',
+                                      fontSize: '0.9rem',
+                                      padding: '2rem',
+                                      fontStyle: 'italic',
+                                      border: isDark ? '2px dashed #374151' : '2px dashed #d1d5db',
+                                      borderRadius: '8px'
+                                    }}>
+                                      Glissez des projets ici
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                    
+                    {/* 🔥 MENU CONTEXTUEL - Actions rapides pour projets */}
+                    {contextMenu.visible && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          left: contextMenu.x,
+                          top: contextMenu.y,
+                          background: isDark ? '#1f2937' : '#ffffff',
+                          border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                          zIndex: 10000,
+                          minWidth: '160px',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div style={{
+                          padding: '0.5rem 0',
+                          borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                          margin: '0 0.5rem'
+                        }}>
+                          <div style={{
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            color: isDark ? '#9ca3af' : '#6b7280',
+                            padding: '0.25rem 0.5rem'
+                          }}>
+                            {contextMenu.project?.title || 'Projet'}
+                          </div>
+                        </div>
+                        
+                        {[
+                          { action: 'history', icon: '📚', label: 'Voir l\'historique', color: '#8b5cf6' },
+                          { action: 'exportPdf', icon: '📄', label: 'Exporter PDF', color: '#ef4444' },
+                          { action: 'exportExcel', icon: '📊', label: 'Exporter Excel', color: '#10b981' },
+                          { action: 'duplicate', icon: '📋', label: 'Dupliquer', color: '#3b82f6' },
+                          { action: 'complete', icon: '✅', label: 'Terminer', color: '#10b981' },
+                          { action: 'archive', icon: '📦', label: 'Archiver', color: '#f59e0b' },
+                          { action: 'delete', icon: '🗑️', label: 'Supprimer', color: '#ef4444' }
+                        ].map(({ action, icon, label, color }) => (
+                          <button
+                            key={action}
+                            onClick={() => handleContextMenuAction(action, contextMenu.project)}
+                            style={{
+                              width: '100%',
+                              padding: '0.75rem 1rem',
+                              background: 'transparent',
+                              border: 'none',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              fontSize: '0.9rem',
+                              color: isDark ? '#f3f4f6' : '#374151',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = isDark ? '#374151' : '#f3f4f6';
+                              e.currentTarget.style.color = color;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.color = isDark ? '#f3f4f6' : '#374151';
+                            }}
+                          >
+                            <span style={{ fontSize: '1rem' }}>{icon}</span>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* ✨ TOOLTIP PREVIEW - Aperçu détaillé des projets au hover */}
+                    {projectTooltip.visible && projectTooltip.project && (
+                      <div
+                        className="tooltip-preview modal-fade"
+                        style={{
+                          position: 'fixed',
+                          left: projectTooltip.x,
+                          top: projectTooltip.y,
+                          background: isDark 
+                            ? 'linear-gradient(135deg, rgba(31,41,55,0.95), rgba(17,24,39,0.98))' 
+                            : 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.98))',
+                          border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                          borderRadius: '12px',
+                          padding: '1rem',
+                          zIndex: 10001,
+                          minWidth: '280px',
+                          maxWidth: '320px',
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                          backdropFilter: 'blur(15px)',
+                          transform: 'translateY(-10px)'
+                        }}
+                        onMouseEnter={(e) => e.stopPropagation()}
+                      >
+                        {/* Header avec avatar et titre */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          marginBottom: '0.75rem',
+                          paddingBottom: '0.75rem',
+                          borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb'
+                        }}>
+                          <div style={{
+                            fontSize: '1.5rem',
+                            background: PROJECT_MANAGERS[projectTooltip.project.manager]?.color || '#6b7280',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {projectTooltip.project.avatar}
+                          </div>
+                          
+                          <div style={{ flex: 1 }}>
+                            <div style={{
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              color: isDark ? '#f3f4f6' : '#1f2937',
+                              marginBottom: '0.25rem'
+                            }}>
+                              {projectTooltip.project.title}
+                            </div>
+                            <div style={{
+                              fontSize: '0.8rem',
+                              color: isDark ? '#9ca3af' : '#6b7280',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.25rem'
+                            }}>
+                              <span>{PROJECT_MANAGERS[projectTooltip.project.manager]?.emoji}</span>
+                              {PROJECT_MANAGERS[projectTooltip.project.manager]?.name}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Progression */}
+                        <div style={{ marginBottom: '0.75rem' }}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '0.25rem'
+                          }}>
+                            <span style={{
+                              fontSize: '0.8rem',
+                              color: isDark ? '#d1d5db' : '#4b5563',
+                              fontWeight: '500'
+                            }}>
+                              Progression
+                            </span>
+                            <span style={{
+                              fontSize: '0.8rem',
+                              fontWeight: '600',
+                              color: projectTooltip.project.progress >= 80 ? '#10b981' 
+                                    : projectTooltip.project.progress >= 50 ? '#f59e0b' 
+                                    : '#ef4444'
+                            }}>
+                              {projectTooltip.project.progress}%
+                            </span>
+                          </div>
+                          
+                          <div style={{
+                            height: '6px',
+                            background: isDark ? '#374151' : '#e5e7eb',
+                            borderRadius: '3px',
+                            overflow: 'hidden'
+                          }}>
+                            <div
+                              className="progress-bar"
+                              style={{
+                                height: '100%',
+                                '--progress-width': `${projectTooltip.project.progress}%`,
+                                width: `${projectTooltip.project.progress}%`,
+                                background: `linear-gradient(90deg, 
+                                  ${projectTooltip.project.progress >= 80 ? '#10b981, #059669' 
+                                    : projectTooltip.project.progress >= 50 ? '#f59e0b, #d97706' 
+                                    : '#ef4444, #dc2626'})`,
+                                borderRadius: '3px',
+                                transition: 'width 1s ease-out'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Informations détaillées */}
+                        <div style={{
+                          display: 'grid',
+                          gap: '0.5rem',
+                          fontSize: '0.8rem'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <span style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>📅 Début</span>
+                            <span style={{ color: isDark ? '#d1d5db' : '#374151', fontWeight: '500' }}>
+                              {projectTooltip.project.startDate}
+                            </span>
+                          </div>
+                          
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <span style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>🏁 Fin</span>
+                            <span style={{ 
+                              color: isDark ? '#d1d5db' : '#374151', 
+                              fontWeight: '500',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.25rem'
+                            }}>
+                              {projectTooltip.project.endDate}
+                              {projectTooltip.project.urgency === 'critical' && <span>🔥</span>}
+                              {projectTooltip.project.urgency === 'urgent' && <span>⚠️</span>}
+                            </span>
+                          </div>
+                          
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <span style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>📦 Articles</span>
+                            <span style={{ color: isDark ? '#d1d5db' : '#374151', fontWeight: '500' }}>
+                              {projectTooltip.project.materialsCount}
+                            </span>
+                          </div>
+                          
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <span style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>🎯 Statut</span>
+                            <span style={{
+                              color: projectTooltip.project.status === 'completed' ? '#10b981' 
+                                    : projectTooltip.project.status === 'active' ? '#3b82f6'
+                                    : '#f59e0b',
+                              fontWeight: '500',
+                              textTransform: 'capitalize'
+                            }}>
+                              {projectTooltip.project.status === 'pending' ? 'En attente' 
+                               : projectTooltip.project.status === 'active' ? 'Actif'
+                               : projectTooltip.project.status === 'completed' ? 'Terminé'
+                               : projectTooltip.project.status}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Description tronquée */}
+                        {projectTooltip.project.description && projectTooltip.project.description !== 'Aucune description' && (
+                          <div style={{
+                            marginTop: '0.75rem',
+                            paddingTop: '0.75rem',
+                            borderTop: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                            fontSize: '0.8rem',
+                            color: isDark ? '#9ca3af' : '#6b7280',
+                            fontStyle: 'italic',
+                            lineHeight: '1.4'
+                          }}>
+                            "{projectTooltip.project.description.slice(0, 100)}{projectTooltip.project.description.length > 100 ? '...' : ''}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Bouton fermer */}
+                    <button
+                      onClick={() => setShowProjectCalendar(false)}
+                      style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        right: '1rem',
+                        background: 'linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,1))',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '40px',
+                        height: '40px',
+                        cursor: 'pointer',
+                        fontSize: '1.2rem'
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            
+            {/* Modal Détail Jour Projets avec Articles */}
+            {showProjectDayDetail && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.8)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10001,
+                  backdropFilter: 'blur(10px)',
+                }}
+                onClick={() => setShowProjectDayDetail(false)}
+              >
+                <div
+                  style={{
+                    background: isDark 
+                      ? 'linear-gradient(135deg, rgba(17,24,39,0.98), rgba(31,41,55,0.95))'
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95))',
+                    borderRadius: '24px',
+                    padding: '2rem',
+                    maxWidth: '90vw',
+                    maxHeight: '90vh',
+                    width: '800px',
+                    border: isDark 
+                      ? '2px solid rgba(139,92,246,0.3)' 
+                      : '2px solid rgba(139,92,246,0.2)',
+                    boxShadow: isDark
+                      ? '0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.1)'
+                      : '0 25px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(139,92,246,0.1)',
+                    position: 'relative',
+                    overflow: 'auto',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '2rem',
+                    borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                    paddingBottom: '1rem'
+                  }}>
+                    <h3 style={{
+                      fontSize: '1.8rem',
+                      fontWeight: '700',
+                      color: isDark ? '#f9fafb' : '#1f2937',
+                      textAlign: 'center',
+                      margin: 0
+                    }}>
+                      📋 Projets du jour
+                    </h3>
+                  </div>
+
+                  {/* Projets */}
+                  {selectedDayProjects && selectedDayProjects.length > 0 ? (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1.5rem'
+                    }}>
+                      {selectedDayProjects.map((project, index) => (
+                        <div
+                          key={project.id || index}
+                          style={{
+                            background: isDark
+                              ? 'linear-gradient(135deg, rgba(31,41,55,0.8), rgba(17,24,39,0.9))'
+                              : 'linear-gradient(135deg, rgba(249,250,251,0.8), rgba(243,244,246,0.9))',
+                            borderRadius: '16px',
+                            padding: '1.5rem',
+                            border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                            boxShadow: isDark
+                              ? '0 4px 12px rgba(0,0,0,0.3)'
+                              : '0 4px 12px rgba(0,0,0,0.1)',
+                            position: 'relative',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = isDark
+                              ? '0 8px 20px rgba(0,0,0,0.4)'
+                              : '0 8px 20px rgba(0,0,0,0.15)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = isDark
+                              ? '0 4px 12px rgba(0,0,0,0.3)'
+                              : '0 4px 12px rgba(0,0,0,0.1)';
+                          }}
+                        >
+                          {/* Menu d'actions */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            display: 'flex',
+                            gap: '0.5rem',
+                            opacity: 0,
+                            transition: 'opacity 0.3s ease',
+                            zIndex: 10
+                          }}
+                          className="project-actions"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.opacity = '1';
+                          }}
+                          >
+                            {/* Bouton Modifier */}
+                            <button
+                              style={{
+                                background: '#3b82f6',
+                                border: 'none',
+                                borderRadius: '8px',
+                                width: '36px',
+                                height: '36px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)'
+                              }}
+                              title="Modifier le projet"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditProject(project);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#2563eb';
+                                e.currentTarget.style.transform = 'scale(1.1)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#3b82f6';
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
+                            >
+                              <span style={{ color: 'white', fontSize: '16px' }}>✏️</span>
+                            </button>
+
+                            {/* Bouton Copier */}
+                            <button
+                              style={{
+                                background: '#10b981',
+                                border: 'none',
+                                borderRadius: '8px',
+                                width: '36px',
+                                height: '36px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)'
+                              }}
+                              title="Dupliquer le projet"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyProject(project);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#059669';
+                                e.currentTarget.style.transform = 'scale(1.1)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#10b981';
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
+                            >
+                              <span style={{ color: 'white', fontSize: '16px' }}>📋</span>
+                            </button>
+
+                            {/* Bouton Plus d'options */}
+                            <button
+                              style={{
+                                background: '#6b7280',
+                                border: 'none',
+                                borderRadius: '8px',
+                                width: '36px',
+                                height: '36px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 4px rgba(107, 114, 128, 0.3)'
+                              }}
+                              title="Plus d'options"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleShowProjectMenu(project, e);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#4b5563';
+                                e.currentTarget.style.transform = 'scale(1.1)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#6b7280';
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
+                            >
+                              <span style={{ color: 'white', fontSize: '16px' }}>⋯</span>
+                            </button>
+                          </div>
+
+                          {/* Titre et Manager */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              marginBottom: '1rem',
+                              paddingRight: '8rem' // Espace pour les boutons
+                            }}
+                            onMouseEnter={(e) => {
+                              const actions = e.currentTarget.parentElement.querySelector('.project-actions');
+                              if (actions) actions.style.opacity = '1';
+                            }}
+                            onMouseLeave={(e) => {
+                              const actions = e.currentTarget.parentElement.querySelector('.project-actions');
+                              if (actions) actions.style.opacity = '0';
+                            }}
+                          >
+                            <h4 style={{
+                              fontSize: '1.3rem',
+                              fontWeight: '600',
+                              color: isDark ? '#f9fafb' : '#1f2937',
+                              margin: 0,
+                              flex: 1
+                            }}>
+                              {project.client?.name || project.title || 'Projet sans titre'}
+                            </h4>
+                            
+                            {(() => {
+                              const managerRef = project.team?.projectManager || project.projectManager || project.chargeProjet || project.responsable || '';
+                              const managerString = typeof managerRef === 'object' ? (managerRef.username || managerRef.name || '') : managerRef;
+
+                              // Afficher une valeur par défaut si aucun chargé de projet n'est défini
+                              const displayManager = managerString || 'Non assigné';
+                              
+                              return (
+                                <div style={{
+                                  background: (() => {
+                                    const manager = displayManager.toLowerCase();
+                                    if (manager.includes('baptiste')) return '#3b82f6';
+                                    if (manager.includes('amelie') || manager.includes('amélie')) return '#ec4899';
+                                    if (manager.includes('hugo')) return '#10b981';
+                                    if (manager.includes('non assigné')) return '#6b7280'; // Gris pour non assigné
+                                    return '#8b5cf6';
+                                  })(),
+                                  color: 'white',
+                                  padding: '0.5rem 1rem',
+                                  borderRadius: '12px',
+                                  fontSize: '0.9rem',
+                                  fontWeight: '600',
+                                  marginLeft: '1rem'
+                                }}>
+                                  👤 {displayManager}
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Location */}
+                          {project.location?.address && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              marginBottom: '1rem',
+                              color: isDark ? '#d1d5db' : '#6b7280',
+                              fontSize: '0.95rem'
+                            }}>
+                              <span>📍</span>
+                              <span>{project.location.address}</span>
+                            </div>
+                          )}
+
+                          {/* Status */}
+                          {project.status && (
+                            <div style={{
+                              display: 'inline-block',
+                              background: (() => {
+                                switch(project.status) {
+                                  case 'active': case 'actif': case 'en_cours': return '#10b981';
+                                  case 'completed': case 'termine': case 'terminé': return '#6b7280';
+                                  case 'pending': case 'en_attente': return '#f59e0b';
+                                  default: return '#8b5cf6';
+                                }
+                              })(),
+                              color: 'white',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '8px',
+                              fontSize: '0.8rem',
+                              fontWeight: '600',
+                              marginBottom: '1rem'
+                            }}>
+                              {project.status}
+                            </div>
+                          )}
+
+                          {/* Matériaux avec style Stock */}
+                          {project.materials && project.materials.length > 0 && (
+                            <div style={{
+                              marginTop: '1rem',
+                              borderTop: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                              paddingTop: '1rem'
+                            }}>
+                              {(() => {
+                                // AUDIT MODAL: Voir les matériaux reçus dans le modal
+                                console.log(`🎭 MODAL OUVERT - AUDIT MATERIALS pour projet:`, {
+                                  projectId: project.id,
+                                  projectTitle: project.title,
+                                  materialsCount: project.materials.length,
+                                  materialsDetails: project.materials.map((mat, idx) => ({
+                                    index: idx,
+                                    name: mat.name,
+                                    reference: mat.reference,
+                                    uniqueId: mat.uniqueId,
+                                    hasImage: !!mat.image,
+                                    fullMat: mat
+                                  }))
+                                });
+                                return null;
+                              })()}
+                              
+                              <h5 style={{
+                                fontSize: '1.1rem',
+                                fontWeight: '600',
+                                color: isDark ? '#f3f4f6' : '#374151',
+                                margin: '0 0 1.5rem 0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
+                              }}>
+                                <span>📦</span>
+                                Articles du projet ({project.materials.length})
+                              </h5>
+                              
+                              {/* Grille de cartes style Stock */}
+                              <div 
+                                className="stock-grid-3"
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                                  gap: '1.5rem',
+                                  marginTop: '1rem'
+                                }}
+                              >
+                                {project.materials.slice(0, 9).map((material, matIndex) => {
+                                  const isLowStock = material.quantity && material.quantity < 5;
+                                  const isOutOfStock = !material.quantity || material.quantity === 0;
+                                  
+                                  return (
+                                    <div
+                                      key={matIndex}
+                                      className="stock-card fade-in-up"
+                                      style={{
+                                        background: 'var(--glass-bg)',
+                                        backdropFilter: 'var(--glass-backdrop)',
+                                        border: isOutOfStock ? '3px solid var(--color-danger)' : 
+                                               isLowStock ? '3px solid var(--color-warning)' : 
+                                               '3px solid transparent',
+                                        borderRadius: 'var(--radius-xl)',
+                                        padding: '1.5rem',
+                                        boxShadow: 'var(--shadow-lg)',
+                                        transition: 'all var(--transition-base) var(--ease-spring)',
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                      }}
+                                    >
+                                      {/* Header avec nom et prix */}
+                                      <div style={{
+                                        background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                                        borderRadius: '12px',
+                                        padding: '1rem',
+                                        marginBottom: '1rem',
+                                        position: 'relative'
+                                      }}>
+                                        <div style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'flex-start',
+                                          gap: '1rem'
+                                        }}>
+                                          <h6 style={{
+                                            fontSize: '1rem',
+                                            fontWeight: '600',
+                                            color: 'var(--color-text-primary)',
+                                            margin: 0,
+                                            lineHeight: '1.3',
+                                            flex: 1
+                                          }}>
+                                            {material.name || material.designation || material.libelle || 'Article'}
+                                          </h6>
+                                          
+                                          {material.price && (
+                                            <div style={{
+                                              background: 'var(--color-success)',
+                                              color: 'white',
+                                              padding: '0.25rem 0.75rem',
+                                              borderRadius: '8px',
+                                              fontSize: '0.85rem',
+                                              fontWeight: '600',
+                                              whiteSpace: 'nowrap'
+                                            }}>
+                                              {material.price}€
+                                            </div>
+                                          )}
+                                        </div>
+                                        
+                                        {/* Référence */}
+                                        {material.reference && (
+                                          <div style={{
+                                            fontSize: '0.8rem',
+                                            color: 'var(--color-text-secondary)',
+                                            marginTop: '0.5rem',
+                                            fontFamily: 'monospace'
+                                          }}>
+                                            Réf: {material.reference}
+                                          </div>
+                                        )}
+                                        
+                                        {/* Badges de statut */}
+                                        <div style={{
+                                          display: 'flex',
+                                          gap: '0.5rem',
+                                          marginTop: '0.75rem',
+                                          flexWrap: 'wrap'
+                                        }}>
+                                          <span style={{
+                                            background: material.quantity > 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                                            color: 'white',
+                                            fontSize: '0.7rem',
+                                            padding: '0.2rem 0.5rem',
+                                            borderRadius: '6px',
+                                            fontWeight: '600'
+                                          }}>
+                                            {material.quantity > 0 ? 'Disponible' : 'Indisponible'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Image */}
+                                      <div style={{
+                                        height: '120px',
+                                        marginBottom: '1rem',
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1))',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                      }}>
+{(() => {
+                                          // Multiple champs possibles pour l'image
+                                          const imageUrl = material.image || 
+                                                          material.imageUrl || 
+                                                          material.photo || 
+                                                          material.picture || 
+                                                          material.img ||
+                                                          (material.stockData && material.stockData.image) ||
+                                                          (material.stockData && material.stockData.images && material.stockData.images[0] && material.stockData.images[0].webPath) ||
+                                                          null;
+                                          
+                                          const materialName = material.name || material.designation || material.libelle || 'Article';
+                                          const uniqueKey = material.uniqueId || `${materialName}-${matIndex}-${imageUrl || 'no-image'}`;
+                                          
+                                          console.log(`🖼️ Debug image pour [${matIndex}]:`, {
+                                            name: materialName,
+                                            imageUrl: imageUrl,
+                                            uniqueId: material.uniqueId,
+                                            uniqueKey: uniqueKey
+                                          });
+                                          console.log(`📋 Material complet [${matIndex}]:`, material);
+                                          
+                                          if (imageUrl) {
+                                            return (
+                                              <img
+                                                key={`img-${uniqueKey}-${imageUrl.slice(-20)}`}
+                                                src={imageUrl}
+                                                alt={`${materialName}-${uniqueKey}`}
+                                                style={{
+                                                  width: '100%',
+                                                  height: '100%',
+                                                  objectFit: 'contain',
+                                                  padding: '0.5rem'
+                                                }}
+                                                onLoad={() => console.log(`✅ Image chargée [${matIndex}]:`, imageUrl)}
+                                                onError={(e) => {
+                                                  console.log(`❌ Erreur image [${matIndex}]:`, imageUrl);
+                                                  // Remplacer par le fallback sans changer l'état
+                                                  e.target.style.display = 'none';
+                                                  const fallback = e.target.parentNode.querySelector('.fallback-emoji');
+                                                  if (fallback) {
+                                                    fallback.style.display = 'flex';
+                                                  }
+                                                }}
+                                              />
+                                            );
+                                          } else {
+                                            return (
+                                              <div 
+                                                key={`fallback-${uniqueKey}`}
+                                                className="fallback-emoji"
+                                                style={{ 
+                                                  fontSize: '2.5rem', 
+                                                  color: '#10b981',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  height: '100%'
+                                                }}
+                                              >
+                                                🌱
+                                              </div>
+                                            );
+                                          }
+                                        })()}
+                                        
+                                        {/* Fallback caché pour les erreurs d'image */}
+                                        {imageUrl && (
+                                          <div 
+                                            className="fallback-emoji"
+                                            style={{ 
+                                              fontSize: '2.5rem', 
+                                              color: '#10b981',
+                                              display: 'none',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              height: '100%',
+                                              position: 'absolute',
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              bottom: 0
+                                            }}
+                                          >
+                                            🌱
+                                          </div>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Informations techniques */}
+                                      {(material.height || material.diameter) && (
+                                        <div style={{
+                                          display: 'grid',
+                                          gridTemplateColumns: 'repeat(2, 1fr)',
+                                          gap: '0.75rem',
+                                          marginBottom: '1rem'
+                                        }}>
+                                          {material.height && (
+                                            <div style={{
+                                              background: 'var(--color-bg-tertiary)',
+                                              borderRadius: '8px',
+                                              padding: '0.75rem',
+                                              textAlign: 'center'
+                                            }}>
+                                              <div style={{
+                                                fontSize: '0.7rem',
+                                                color: 'var(--color-text-secondary)',
+                                                marginBottom: '0.25rem',
+                                                fontWeight: '600'
+                                              }}>
+                                                HAUTEUR
+                                              </div>
+                                              <div style={{
+                                                fontSize: '1rem',
+                                                color: 'var(--color-text-primary)',
+                                                fontWeight: '700'
+                                              }}>
+                                                {material.height} cm
+                                              </div>
+                                            </div>
+                                          )}
+                                          
+                                          {material.diameter && (
+                                            <div style={{
+                                              background: 'var(--color-bg-tertiary)',
+                                              borderRadius: '8px',
+                                              padding: '0.75rem',
+                                              textAlign: 'center'
+                                            }}>
+                                              <div style={{
+                                                fontSize: '0.7rem',
+                                                color: 'var(--color-text-secondary)',
+                                                marginBottom: '0.25rem',
+                                                fontWeight: '600'
+                                              }}>
+                                                DIAMÈTRE
+                                              </div>
+                                              <div style={{
+                                                fontSize: '1rem',
+                                                color: 'var(--color-text-primary)',
+                                                fontWeight: '700'
+                                              }}>
+                                                {material.diameter} cm
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                      
+                                      {/* Barre de stock */}
+                                      <div style={{
+                                        background: 'var(--color-bg-tertiary)',
+                                        borderRadius: '12px',
+                                        padding: '1rem',
+                                        marginBottom: '1rem'
+                                      }}>
+                                        <div style={{
+                                          display: 'grid',
+                                          gridTemplateColumns: 'repeat(3, 1fr)',
+                                          gap: '0.75rem',
+                                          textAlign: 'center'
+                                        }}>
+                                          <div>
+                                            <div style={{
+                                              fontSize: '0.7rem',
+                                              color: 'var(--color-text-secondary)',
+                                              marginBottom: '0.25rem',
+                                              fontWeight: '600'
+                                            }}>
+                                              STOCK
+                                            </div>
+                                            <div style={{
+                                              fontSize: '1.1rem',
+                                              fontWeight: '700',
+                                              color: isOutOfStock ? 'var(--color-danger)' : 
+                                                     isLowStock ? 'var(--color-warning)' : 
+                                                     'var(--color-success)'
+                                            }}>
+                                              {material.quantity || 0}
+                                            </div>
+                                          </div>
+                                          
+                                          <div>
+                                            <div style={{
+                                              fontSize: '0.7rem',
+                                              color: 'var(--color-text-secondary)',
+                                              marginBottom: '0.25rem',
+                                              fontWeight: '600'
+                                            }}>
+                                              RÉSERVÉS
+                                            </div>
+                                            <div style={{
+                                              fontSize: '1.1rem',
+                                              fontWeight: '700',
+                                              color: 'var(--color-text-primary)'
+                                            }}>
+                                              {material.reservedQuantity || 0}
+                                            </div>
+                                          </div>
+                                          
+                                          <div>
+                                            <div style={{
+                                              fontSize: '0.7rem',
+                                              color: 'var(--color-text-secondary)',
+                                              marginBottom: '0.25rem',
+                                              fontWeight: '600'
+                                            }}>
+                                              DISPONIBLE
+                                            </div>
+                                            <div style={{
+                                              fontSize: '1.1rem',
+                                              fontWeight: '700',
+                                              color: 'var(--color-text-primary)'
+                                            }}>
+                                              {(material.quantity || 0) - (material.reservedQuantity || 0)}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Catégorie si disponible */}
+                                      {material.category && (
+                                        <div style={{
+                                          background: 'var(--color-primary)',
+                                          color: 'white',
+                                          padding: '0.5rem 1rem',
+                                          borderRadius: '8px',
+                                          fontSize: '0.8rem',
+                                          fontWeight: '600',
+                                          textAlign: 'center'
+                                        }}>
+                                          {material.category}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                                
+                                {project.materials.length > 9 && (
+                                  <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'var(--glass-bg)',
+                                    backdropFilter: 'var(--glass-backdrop)',
+                                    border: '2px dashed var(--glass-border)',
+                                    borderRadius: 'var(--radius-xl)',
+                                    padding: '2rem',
+                                    color: 'var(--color-text-secondary)',
+                                    fontSize: '1.1rem',
+                                    fontWeight: '600',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem'
+                                  }}>
+                                    <span style={{ fontSize: '2rem' }}>📦</span>
+                                    <div>+{project.materials.length - 9}</div>
+                                    <div style={{ fontSize: '0.9rem' }}>autres articles</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '3rem',
+                      color: isDark ? '#9ca3af' : '#6b7280',
+                      fontSize: '1.2rem'
+                    }}>
+                      📝 Aucun projet pour cette date
+                    </div>
+                  )}
+
+                  {/* Bouton fermer */}
+                  <button
+                    onClick={() => setShowProjectDayDetail(false)}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: 'linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,1))',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.section>
         )}
 
@@ -7969,6 +11337,247 @@ return (
             />
           </Suspense>
         )}
+
+        {/* Menu contextuel avancé pour les projets */}
+        {showProjectActionsMenu.visible && (
+          <div
+            style={{
+              position: 'fixed',
+              top: showProjectActionsMenu.y,
+              left: showProjectActionsMenu.x,
+              background: isDark ? '#1f2937' : 'white',
+              borderRadius: '12px',
+              boxShadow: isDark
+                ? '0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)'
+                : '0 10px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.1)',
+              zIndex: 1000,
+              minWidth: '200px',
+              padding: '0.5rem 0',
+              backdropFilter: 'blur(10px)',
+              border: isDark ? '1px solid #374151' : '1px solid #e5e7eb'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Titre du menu */}
+            <div style={{
+              padding: '0.75rem 1rem',
+              borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+              marginBottom: '0.5rem'
+            }}>
+              <span style={{
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                color: isDark ? '#d1d5db' : '#374151'
+              }}>
+                🎯 Actions du projet
+              </span>
+            </div>
+
+            {/* Options du menu */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Voir détails */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: isDark ? '#e5e7eb' : '#374151',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  // Logique pour voir les détails du projet
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                  alert(`📋 Détails du projet: ${showProjectActionsMenu.project?.title}`);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>👁️</span>
+                <span>Voir détails</span>
+              </button>
+
+              {/* Changer statut */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: isDark ? '#e5e7eb' : '#374151',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  const project = showProjectActionsMenu.project;
+                  const statuses = ['draft', 'active', 'completed', 'on_hold', 'cancelled'];
+                  const currentIndex = statuses.indexOf(project.status);
+                  const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+
+                  handleChangeProjectStatus(project, nextStatus);
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>🔄</span>
+                <span>Changer statut</span>
+              </button>
+
+              {/* Exporter */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: isDark ? '#e5e7eb' : '#374151',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  handleExportProject(showProjectActionsMenu.project);
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>📄</span>
+                <span>Exporter PDF</span>
+              </button>
+
+              {/* Divider */}
+              <div style={{
+                height: '1px',
+                background: isDark ? '#374151' : '#e5e7eb',
+                margin: '0.5rem 0'
+              }} />
+
+              {/* Assigner équipe */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: isDark ? '#e5e7eb' : '#374151',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                  alert(`👥 Assigner équipe: ${showProjectActionsMenu.project?.title}`);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>👥</span>
+                <span>Assigner équipe</span>
+              </button>
+
+              {/* Planifier tâches */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: isDark ? '#e5e7eb' : '#374151',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                  alert(`📋 Planifier tâches: ${showProjectActionsMenu.project?.title}`);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>📋</span>
+                <span>Planifier tâches</span>
+              </button>
+
+              {/* Divider */}
+              <div style={{
+                height: '1px',
+                background: isDark ? '#374151' : '#e5e7eb',
+                margin: '0.5rem 0'
+              }} />
+
+              {/* Supprimer (action dangereuse) */}
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: '#ef4444',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => {
+                  handleDeleteProjectFromCard(showProjectActionsMenu.project);
+                  setShowProjectActionsMenu({ visible: false, project: null, x: 0, y: 0 });
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#431d20' : '#fef2f2';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span>🗑️</span>
+                <span>Supprimer projet</span>
+              </button>
+            </div>
+          </div>
+        )}
+
       </motion.main>
     </motion.div>
     </ThemeProvider>

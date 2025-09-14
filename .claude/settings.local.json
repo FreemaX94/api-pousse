@@ -53,7 +53,10 @@
       "Bash(del Nieuwkoop.jsx)",
       "Bash(ren:*)",
       "Bash(Remove-Item Nieuwkoop.jsx)",
-      "Bash(Rename-Item \"Nieuwkoop.jsx.modified\" \"Nieuwkoop.jsx\")"
+      "Bash(Rename-Item \"Nieuwkoop.jsx.modified\" \"Nieuwkoop.jsx\")",
+      "Bash(npm audit:*)",
+      "Bash(cat:*)",
+      "Bash(netstat:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Test - Modal Calendrier Projets</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-results { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 10px 0; }
+        .critical { color: #dc2626; font-weight: bold; }
+        .warning { color: #f59e0b; font-weight: bold; }
+        .success { color: #059669; font-weight: bold; }
+        .loading { color: #3b82f6; }
+        button { background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+        .metric { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric h4 { margin: 0 0 10px 0; color: #374151; }
+        .metric .value { font-size: 24px; font-weight: bold; }
+        .progress { width: 100%; background: #e5e7eb; border-radius: 4px; height: 20px; margin: 10px 0; }
+        .progress-bar { background: #3b82f6; height: 100%; border-radius: 4px; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <h1>🔥 AUDIT PERFORMANCE NIVEAU ENTERPRISE</h1>
+    <p>Test avec 10000+ projets simulant la charge réelle enterprise</p>
+
+    <div class="metrics" id="metrics">
+        <div class="metric">
+            <h4>Projets Générés</h4>
+            <div class="value" id="projectCount">0</div>
+        </div>
+        <div class="metric">
+            <h4>Temps Génération (ms)</h4>
+            <div class="value" id="generationTime">-</div>
+        </div>
+        <div class="metric">
+            <h4>Mémoire Utilisée (MB)</h4>
+            <div class="value" id="memoryUsage">-</div>
+        </div>
+        <div class="metric">
+            <h4>Temps Rendu (ms)</h4>
+            <div class="value" id="renderTime">-</div>
+        </div>
+        <div class="metric">
+            <h4>FPS Pendant Test</h4>
+            <div class="value" id="fpsCount">-</div>
+        </div>
+        <div class="metric">
+            <h4>Status Performance</h4>
+            <div class="value" id="performanceStatus">-</div>
+        </div>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <button onclick="startPerformanceTest()">🚀 DÉMARRER TEST PERFORMANCE</button>
+    <button onclick="startMemoryLeakTest()">🔍 TEST MEMORY LEAKS</button>
+    <button onclick="startStressTest()">⚡ STRESS TEST CONCURRENT</button>
+    <button onclick="clearTests()">🧹 NETTOYER TESTS</button>
+
+    <div class="test-results" id="results">
+        <h3>📊 Résultats des Tests</h3>
+        <p class="loading">Aucun test lancé...</p>
+    </div>
+
+    <script>
+        let testProjects = [];
+        let memoryMonitor = null;
+        let fpsMonitor = null;
+        let currentFPS = 0;
+
+        // Générateur de projets enterprise-grade
+        function generateMassiveProjectsDataset(count = 12000) {
+            const startTime = performance.now();
+            console.log(`🏗️ Génération de ${count} projets enterprise...`);
+            
+            const projects = [];
+            const projectManagers = ['baptiste', 'amelie', 'hugo', 'marie', 'thomas', 'claire'];
+            const statuses = ['active', 'pending', 'completed', 'cancelled', 'on-hold'];
+            const clients = ['Mairie Paris', 'Total Energies', 'SNCF', 'Orange', 'BNP Paribas', 'Carrefour', 'LVMH'];
+            
+            for (let i = 0; i < count; i++) {
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() + Math.floor(Math.random() * 365));
+                
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 90) + 7);
+                
+                projects.push({
+                    _id: `project_${i}_${Date.now()}`,
+                    title: `Projet Enterprise ${i + 1}`,
+                    client: {
+                        name: clients[Math.floor(Math.random() * clients.length)] + ` Site ${i + 1}`
+                    },
+                    projectManager: projectManagers[Math.floor(Math.random() * projectManagers.length)],
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    dates: {
+                        start: startDate.toISOString(),
+                        end: endDate.toISOString()
+                    },
+                    location: {
+                        address: `${Math.floor(Math.random() * 200)} Rue Enterprise ${i}, 750${Math.floor(Math.random() * 20).toString().padStart(2, '0')} Paris`
+                    },
+                    materials: Array.from({length: Math.floor(Math.random() * 50) + 5}, (_, j) => ({
+                        reference: `MAT${i}_${j}`,
+                        name: `Matériau ${j + 1} pour projet ${i}`,
+                        quantity: Math.floor(Math.random() * 100) + 1
+                    }))
+                });
+                
+                // Update progress
+                if (i % 1000 === 0) {
+                    updateProgress((i / count) * 100);
+                }
+            }
+            
+            const endTime = performance.now();
+            const generationTime = Math.round(endTime - startTime);
+            
+            document.getElementById('projectCount').textContent = count.toLocaleString();
+            document.getElementById('generationTime').textContent = generationTime;
+            
+            console.log(`✅ ${count} projets générés en ${generationTime}ms`);
+            return projects;
+        }
+
+        // Moniteur FPS temps réel
+        function startFPSMonitor() {
+            let frameCount = 0;
+            let lastTime = performance.now();
+            
+            function countFPS() {
+                const now = performance.now();
+                frameCount++;
+                
+                if (now - lastTime >= 1000) {
+                    currentFPS = Math.round(frameCount * 1000 / (now - lastTime));
+                    document.getElementById('fpsCount').textContent = currentFPS;
+                    frameCount = 0;
+                    lastTime = now;
+                }
+                
+                fpsMonitor = requestAnimationFrame(countFPS);
+            }
+            
+            countFPS();
+        }
+
+        // Moniteur mémoire enterprise
+        function startMemoryMonitor() {
+            memoryMonitor = setInterval(() => {
+                if (performance.memory) {
+                    const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                    document.getElementById('memoryUsage').textContent = memoryMB;
+                    
+                    // Alertes memory leak
+                    if (memoryMB > 500) {
+                        logResult('🚨 MEMORY LEAK CRITIQUE: ' + memoryMB + 'MB utilisés', 'critical');
+                    } else if (memoryMB > 250) {
+                        logResult('⚠️ Consommation mémoire élevée: ' + memoryMB + 'MB', 'warning');
+                    }
+                } else {
+                    document.getElementById('memoryUsage').textContent = 'N/A (non Chrome)';
+                }
+            }, 500);
+        }
+
+        // Simulation du calendrier enterprise avec 10000+ projets
+        function simulateCalendarRendering(projects) {
+            const renderStart = performance.now();
+            
+            // Simulation de la logique réelle du calendrier Nieuwkoop
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            // Génération du planning mensuel (algorithme réel)
+            const schedule = {};
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Initialisation des jours
+            for (let day = 1; day <= daysInMonth; day++) {
+                schedule[day] = [];
+            }
+            
+            // Algorithme de placement des projets (simulation)
+            let processedProjects = 0;
+            projects.forEach(project => {
+                if (!project.dates?.start || !project.dates?.end) return;
+                
+                const startDate = new Date(project.dates.start);
+                const endDate = new Date(project.dates.end);
+                
+                // Calculs de dates (logique réelle)
+                const projectStartMonth = startDate.getMonth();
+                const projectEndMonth = endDate.getMonth();
+                const projectStartYear = startDate.getFullYear();
+                const projectEndYear = endDate.getFullYear();
+                
+                // Placement dans le calendrier mensuel
+                if ((projectStartYear === currentYear && projectStartMonth === currentMonth) ||
+                    (projectEndYear === currentYear && projectEndMonth === currentMonth) ||
+                    (startDate <= new Date(currentYear, currentMonth, 1) && endDate >= new Date(currentYear, currentMonth + 1, 0))) {
+                    
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dayDate = new Date(currentYear, currentMonth, day);
+                        if (dayDate >= startDate && dayDate <= endDate) {
+                            // Calcul de progression (algorithme réel)
+                            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                            const elapsedDays = Math.ceil((dayDate - startDate) / (1000 * 60 * 60 * 24));
+                            const progress = totalDays > 0 ? Math.round((elapsedDays / totalDays) * 100) : 0;
+                            
+                            schedule[day].push({
+                                id: project._id,
+                                title: project.client?.name || project.title,
+                                progress: progress,
+                                materials: project.materials || [],
+                                projectManager: project.projectManager
+                            });
+                        }
+                    }
+                    processedProjects++;
+                }
+            });
+            
+            const renderEnd = performance.now();
+            const renderTime = Math.round(renderEnd - renderStart);
+            
+            document.getElementById('renderTime').textContent = renderTime;
+            
+            // Analyse performance
+            let status = 'success';
+            if (renderTime > 5000) {
+                status = 'critical';
+                logResult(`🚨 PERFORMANCE CRITIQUE: ${renderTime}ms pour rendre ${processedProjects} projets`, 'critical');
+            } else if (renderTime > 2000) {
+                status = 'warning';
+                logResult(`⚠️ Performance dégradée: ${renderTime}ms pour ${processedProjects} projets`, 'warning');
+            } else {
+                status = 'success';
+                logResult(`✅ Performance excellente: ${renderTime}ms pour ${processedProjects} projets`, 'success');
+            }
+            
+            document.getElementById('performanceStatus').textContent = status.toUpperCase();
+            document.getElementById('performanceStatus').className = `value ${status}`;
+            
+            return { renderTime, processedProjects, schedule };
+        }
+
+        // Test principal de performance
+        async function startPerformanceTest() {
+            logResult('🚀 DÉMARRAGE TEST PERFORMANCE ENTERPRISE...', 'loading');
+            
+            // Nettoyage préalable
+            if (memoryMonitor) clearInterval(memoryMonitor);
+            if (fpsMonitor) cancelAnimationFrame(fpsMonitor);
+            
+            startMemoryMonitor();
+            startFPSMonitor();
+            
+            try {
+                // Phase 1: Génération massive
+                logResult('📊 Phase 1: Génération de 12000 projets enterprise...', 'loading');
+                testProjects = generateMassiveProjectsDataset(12000);
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Phase 2: Test de rendu
+                logResult('🎨 Phase 2: Simulation rendu calendrier...', 'loading');
+                const renderResults = simulateCalendarRendering(testProjects);
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Phase 3: Test de filtrage enterprise
+                logResult('🔍 Phase 3: Test filtrage & recherche enterprise...', 'loading');
+                const filterStart = performance.now();
+                
+                const filteredByManager = testProjects.filter(p => p.projectManager === 'baptiste');
+                const filteredByStatus = testProjects.filter(p => p.status === 'active');
+                const searchResults = testProjects.filter(p => 
+                    p.client?.name?.toLowerCase().includes('total') ||
+                    p.title?.toLowerCase().includes('enterprise')
+                );
+                
+                const filterTime = Math.round(performance.now() - filterStart);
+                
+                // Résultats finaux
+                logResult(`✅ TEST PERFORMANCE TERMINÉ`, 'success');
+                logResult(`📊 Projets générés: ${testProjects.length.toLocaleString()}`, 'success');
+                logResult(`⚡ Temps rendu: ${renderResults.renderTime}ms`, renderResults.renderTime > 2000 ? 'warning' : 'success');
+                logResult(`🔍 Temps filtrage: ${filterTime}ms`, filterTime > 500 ? 'warning' : 'success');
+                logResult(`🎯 Projets traités: ${renderResults.processedProjects}`, 'success');
+                logResult(`👤 Filtrés par manager: ${filteredByManager.length}`, 'success');
+                logResult(`📈 Filtrés par statut: ${filteredByStatus.length}`, 'success');
+                logResult(`🔍 Résultats recherche: ${searchResults.length}`, 'success');
+                
+                // Analyse finale
+                const memoryMB = performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : 'N/A';
+                if (renderResults.renderTime < 2000 && filterTime < 500 && (memoryMB === 'N/A' || memoryMB < 300)) {
+                    logResult('🏆 VERDICT: PERFORMANCE ENTERPRISE READY ✅', 'success');
+                } else {
+                    logResult('🚨 VERDICT: OPTIMISATIONS REQUISES POUR PRODUCTION', 'critical');
+                }
+                
+            } catch (error) {
+                logResult(`💥 ERREUR TEST: ${error.message}`, 'critical');
+                console.error(error);
+            }
+            
+            updateProgress(100);
+        }
+
+        // Test memory leaks spécifique
+        async function startMemoryLeakTest() {
+            logResult('🔍 DÉMARRAGE TEST MEMORY LEAKS...', 'loading');
+            
+            if (!performance.memory) {
+                logResult('⚠️ Test disponible uniquement sur Chrome/Edge', 'warning');
+                return;
+            }
+            
+            const initialMemory = performance.memory.usedJSHeapSize;
+            logResult(`📊 Mémoire initiale: ${Math.round(initialMemory / 1048576)}MB`, 'loading');
+            
+            // Simulation des fuites mémoires typiques
+            let leakedObjects = [];
+            
+            for (let cycle = 0; cycle < 10; cycle++) {
+                logResult(`🔄 Cycle ${cycle + 1}/10 - Création massive d'objets...`, 'loading');
+                
+                // Création/destruction massive
+                const tempProjects = generateMassiveProjectsDataset(1000);
+                leakedObjects.push(...tempProjects.map(p => ({ ...p, extraData: new Array(1000).fill('leak test') })));
+                
+                // Simulation React re-renders
+                for (let i = 0; i < 100; i++) {
+                    const tempCache = new Map();
+                    tempProjects.forEach(p => {
+                        tempCache.set(p._id, { progress: Math.random() * 100, calculated: Date.now() });
+                    });
+                }
+                
+                const currentMemory = performance.memory.usedJSHeapSize;
+                const memoryMB = Math.round(currentMemory / 1048576);
+                logResult(`💾 Cycle ${cycle + 1}: ${memoryMB}MB (+${Math.round((currentMemory - initialMemory) / 1048576)}MB)`, memoryMB > 400 ? 'warning' : 'loading');
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Garbage collection forcée
+            if (window.gc) {
+                logResult('🧹 Déclenchement garbage collection...', 'loading');
+                window.gc();
+            }
+            
+            // Libération manuelle
+            leakedObjects = null;
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const finalMemory = performance.memory.usedJSHeapSize;
+            const leakMB = Math.round((finalMemory - initialMemory) / 1048576);
+            
+            if (leakMB > 50) {
+                logResult(`🚨 MEMORY LEAK DÉTECTÉ: +${leakMB}MB non libérés`, 'critical');
+            } else if (leakMB > 20) {
+                logResult(`⚠️ Fuite mineure détectée: +${leakMB}MB`, 'warning');
+            } else {
+                logResult(`✅ Pas de memory leak détecté: +${leakMB}MB (acceptable)`, 'success');
+            }
+        }
+
+        // Test stress concurrent users
+        async function startStressTest() {
+            logResult('⚡ DÉMARRAGE STRESS TEST CONCURRENT...', 'loading');
+            
+            const concurrentUsers = 50;
+            const actionsPerUser = 20;
+            
+            logResult(`👥 Simulation de ${concurrentUsers} utilisateurs simultanés...`, 'loading');
+            
+            const stressStart = performance.now();
+            
+            // Simulation d'utilisateurs concurrents
+            const userPromises = Array.from({length: concurrentUsers}, async (_, userId) => {
+                const userProjects = generateMassiveProjectsDataset(200);
+                
+                for (let action = 0; action < actionsPerUser; action++) {
+                    // Actions utilisateur typiques
+                    const randomProject = userProjects[Math.floor(Math.random() * userProjects.length)];
+                    
+                    // Simulation filtrage
+                    userProjects.filter(p => p.projectManager === 'baptiste');
+                    
+                    // Simulation recherche
+                    userProjects.filter(p => p.client?.name?.includes('Paris'));
+                    
+                    // Simulation calcul progression
+                    const progress = Math.random() * 100;
+                    
+                    // Micro-pause pour simulation réseau
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 10));
+                }
+                
+                return userId;
+            });
+            
+            try {
+                await Promise.all(userPromises);
+                
+                const stressTime = Math.round(performance.now() - stressStart);
+                
+                if (stressTime > 10000) {
+                    logResult(`🚨 STRESS TEST ÉCHOUÉ: ${stressTime}ms pour ${concurrentUsers} utilisateurs`, 'critical');
+                } else if (stressTime > 5000) {
+                    logResult(`⚠️ Performance dégradée sous stress: ${stressTime}ms`, 'warning');
+                } else {
+                    logResult(`✅ STRESS TEST RÉUSSI: ${stressTime}ms pour ${concurrentUsers} utilisateurs`, 'success');
+                }
+                
+            } catch (error) {
+                logResult(`💥 ERREUR STRESS TEST: ${error.message}`, 'critical');
+            }
+        }
+
+        // Utilitaires
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function logResult(message, type = 'loading') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.innerHTML += `<p class="${type}">[${timestamp}] ${message}</p>`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearTests() {
+            document.getElementById('results').innerHTML = '<h3>📊 Résultats des Tests</h3><p class="loading">Tests nettoyés...</p>';
+            testProjects = [];
+            
+            if (memoryMonitor) clearInterval(memoryMonitor);
+            if (fpsMonitor) cancelAnimationFrame(fpsMonitor);
+            
+            document.getElementById('projectCount').textContent = '0';
+            document.getElementById('generationTime').textContent = '-';
+            document.getElementById('memoryUsage').textContent = '-';
+            document.getElementById('renderTime').textContent = '-';
+            document.getElementById('fpsCount').textContent = '-';
+            document.getElementById('performanceStatus').textContent = '-';
+            updateProgress(0);
+            
+            // Force garbage collection si disponible
+            if (window.gc) {
+                window.gc();
+            }
+        }
+
+        // Auto-start monitoring
+        document.addEventListener('DOMContentLoaded', () => {
+            logResult('🛡️ Système de test performance enterprise prêt', 'success');
+            logResult('💡 Conseil: Ouvrez les DevTools pour activer window.gc()', 'loading');
+        });
+    </script>
+</body>
+</html>
