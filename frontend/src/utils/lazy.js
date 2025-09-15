@@ -17,7 +17,7 @@ export const createLazyComponent = (importFn, options = {}) => {
     retries = 3,
     delay = 0,
     preload = false
-  } = options;
+  } = options || {};
 
   // Wrapper pour retry automatique en cas d'échec
   const retryImport = async (fn, retriesLeft = retries) => {
@@ -84,13 +84,11 @@ export const createLazyComponent = (importFn, options = {}) => {
     }
   };
 
-  const LazyComponent = lazy(() => {
+  const LazyComponent = lazy(async () => {
     if (delay > 0) {
-      return new Promise(resolve => {
-        setTimeout(() => resolve(importWithMetrics()), delay);
-      });
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    return importWithMetrics();
+    return await importWithMetrics();
   });
 
   // Préchargement conditionnel
@@ -104,11 +102,11 @@ export const createLazyComponent = (importFn, options = {}) => {
   }
 
   // Wrapper avec Suspense
-  const WrappedComponent = (props) => React.createElement(
+  const WrappedComponent = React.memo((props) => React.createElement(
     Suspense,
     { fallback },
     React.createElement(LazyComponent, props)
-  );
+  ));
 
   // Ajouter une méthode de préchargement manuel
   WrappedComponent.preload = () => importWithMetrics();
