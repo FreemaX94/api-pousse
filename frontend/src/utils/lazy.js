@@ -1,5 +1,4 @@
 import React, { lazy, Suspense } from 'react';
-import LoadingFallback from '../components/LoadingFallback';
 
 /**
  * Créer un composant lazy simplifié
@@ -7,7 +6,18 @@ import LoadingFallback from '../components/LoadingFallback';
  * @param {Object} options - Options de configuration
  */
 export const createLazyComponent = (importFn, options = {}) => {
-  const { fallback = React.createElement(LoadingFallback) } = options || {};
+  const defaultFallback = React.createElement('div', {
+    style: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '200px',
+      fontSize: '14px',
+      color: '#666'
+    }
+  }, 'Chargement...');
+
+  const { fallback = defaultFallback } = options || {};
 
   const LazyComponent = lazy(importFn);
 

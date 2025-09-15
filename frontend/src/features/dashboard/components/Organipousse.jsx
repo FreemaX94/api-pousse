@@ -34,18 +34,15 @@ import LoadingFallback from '../../../components/LoadingFallback';
 
 // Composants Finance - Lazy loaded
 const ContratsEcheancesDepassees = createLazyComponent(
-  () => import('../../finance/components/ContratsEcheancesDepassees'),
-  { preload: false }
+  () => import('../../finance/components/ContratsEcheancesDepassees')
 );
 const ProduitsServicesEcheancesDepassees = createLazyComponent(
-  () => import('../../finance/components/ProduitsServicesEcheancesDepassees'),
-  { preload: false }
+  () => import('../../finance/components/ProduitsServicesEcheancesDepassees')
 );
 
 // Composants Projets - Lazy loaded
 const PointagesEcheancesDepassees = createLazyComponent(
-  () => import('../../projects/components/PointagesEcheancesDepassees'),
-  { preload: false }
+  () => import('../../projects/components/PointagesEcheancesDepassees')
 );
 
 // Composants Client - Lazy loaded  
