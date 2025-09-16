@@ -8,6 +8,19 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
   const [description, setDescription] = useState(initialData.description || "");
   const [address, setAddress] = useState(initialData.address || "");
   const [chargeProjet, setChargeProjet] = useState(initialData.chargeProjet || "");
+
+  // Liste des chargés de projet disponibles avec leurs couleurs
+  const chargesProjet = [
+    { name: 'Amélie', color: '#10b981', bgColor: '#dcfce7' }, // Vert
+    { name: 'Hugo', color: '#3b82f6', bgColor: '#dbeafe' },   // Bleu
+    { name: 'Baptiste', color: '#eab308', bgColor: '#fef08a' } // Jaune
+  ];
+
+  // Fonction pour obtenir la couleur d'un chargé
+  const getChargeColor = (chargeName) => {
+    const charge = chargesProjet.find(c => c.name === chargeName);
+    return charge ? charge.color : 'var(--color-text-primary)';
+  };
   const [dateDebut, setDateDebut] = useState(
     initialData.dateDebut ? initialData.dateDebut.slice(0, 10) : ""
   );
@@ -405,28 +418,36 @@ export default function ProjetForm({ onSubmit, initialData = {} }) {
         >
           👨‍💼 Chargé de projet
         </label>
-        <input
-          type="text"
+        <select
           id="chargeProjet"
           name="chargeProjet"
           value={chargeProjet}
           onChange={(e) => setChargeProjet(e.target.value)}
-          placeholder="Nom du responsable du projet"
           style={{
             width: '100%',
             padding: '1rem 1.5rem',
-            border: '1px solid var(--color-border)',
+            border: `2px solid ${chargeProjet ? getChargeColor(chargeProjet) : 'var(--color-border)'}`,
             borderRadius: '12px',
             fontSize: '1rem',
-            fontWeight: '500',
-            background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-            color: 'var(--color-text-primary)',
+            fontWeight: '600',
+            background: chargeProjet
+              ? `linear-gradient(135deg, ${chargesProjet.find(c => c.name === chargeProjet)?.bgColor || 'var(--color-bg-primary)'}, var(--color-bg-secondary))`
+              : 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+            color: chargeProjet ? getChargeColor(chargeProjet) : 'var(--color-text-primary)',
             transition: 'all 0.3s ease',
-            outline: 'none'
+            outline: 'none',
+            cursor: 'pointer'
           }}
-          onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-          onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
-        />
+          onFocus={(e) => e.target.style.borderColor = chargeProjet ? getChargeColor(chargeProjet) : 'var(--color-primary)'}
+          onBlur={(e) => e.target.style.borderColor = chargeProjet ? getChargeColor(chargeProjet) : 'var(--color-border)'}
+        >
+          <option value="">-- Sélectionnez un chargé de projet --</option>
+          {chargesProjet.map((charge) => (
+            <option key={charge.name} value={charge.name}>
+              {charge.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Description */}
