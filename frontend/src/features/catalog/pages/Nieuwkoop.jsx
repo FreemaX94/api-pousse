@@ -2158,9 +2158,9 @@ const Nieuwkoop = () => {
   // Configuration des chargés de projet
   const PROJECT_MANAGERS = {
     all: { name: 'Tous les projets', color: '#8b5cf6', emoji: '👥' },
-    baptiste: { name: 'Baptiste', color: '#3b82f6', emoji: '👨‍💼' },
-    amelie: { name: 'Amélie', color: '#ec4899', emoji: '👩‍💼' },
-    hugo: { name: 'Hugo', color: '#10b981', emoji: '👨‍💻' }
+    baptiste: { name: 'Baptiste', color: '#eab308', emoji: '👨‍💼' },
+    amelie: { name: 'Amélie', color: '#10b981', emoji: '👩‍💼' },
+    hugo: { name: 'Hugo', color: '#3b82f6', emoji: '👨‍💻' }
   };
 
   // Fonctions utilitaires pour les managers
