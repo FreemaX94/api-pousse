@@ -1,7 +1,8 @@
 // frontend/src/components/ProjetList.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
 
 const STATUS_GRADIENT = {
   "En cours": { from: "from-blue-400", to: "to-blue-600" },  // <-- changé en bleu
@@ -66,6 +67,63 @@ export default function ProjetList({
 }) {
   const [pdfViewerData, setPdfViewerData] = useState(null);
   const [hoveredProject, setHoveredProject] = useState(null);
+  const [showChargeProjetDropdown, setShowChargeProjetDropdown] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState(null);
+  const buttonRefs = useRef({});
+
+  // Liste des chargés de projet disponibles avec leurs couleurs
+  const chargesProjet = [
+    { name: 'Amélie', color: '#10b981', bgColor: '#dcfce7' }, // Vert
+    { name: 'Hugo', color: '#3b82f6', bgColor: '#dbeafe' },   // Bleu
+    { name: 'Baptiste', color: '#eab308', bgColor: '#fef08a' } // Jaune
+  ];
+
+  // Fonction pour obtenir la couleur d'un chargé
+  const getChargeColor = (chargeName) => {
+    const charge = chargesProjet.find(c => c.name === chargeName);
+    return charge ? charge.color : '#6b7280';
+  };
+
+  // Fonction pour obtenir la couleur de fond d'un chargé
+  const getChargeBgColor = (chargeName) => {
+    const charge = chargesProjet.find(c => c.name === chargeName);
+    return charge ? charge.bgColor : '#f3f4f6';
+  };
+
+  // Fonction pour assigner un chargé de projet
+  const handleAssignChargeProjet = async (project, chargeProjet) => {
+    if (onUpdate) {
+      await onUpdate(project._id, { chargeProjet });
+    }
+    setShowChargeProjetDropdown(null);
+    setDropdownPosition(null);
+  };
+
+  // Fonction pour ouvrir le dropdown avec positionnement
+  const handleOpenDropdown = (projectId, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setDropdownPosition({
+      top: rect.bottom + 8,
+      right: window.innerWidth - rect.right,
+      projectId
+    });
+    setShowChargeProjetDropdown(projectId);
+  };
+
+  // Fermer le dropdown quand on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showChargeProjetDropdown) {
+        setShowChargeProjetDropdown(null);
+        setDropdownPosition(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showChargeProjetDropdown]);
 
   if (!projects?.length) {
     return (
@@ -172,7 +230,7 @@ export default function ProjetList({
               boxShadow: 'var(--shadow-lg)',
               border: '1px solid var(--color-border)',
               position: 'relative',
-              overflow: 'hidden',
+              overflow: showChargeProjetDropdown === p._id ? 'visible' : 'hidden',
               transition: 'all 0.3s ease'
             }}
           >
@@ -189,12 +247,12 @@ export default function ProjetList({
               opacity: 0.1
             }} />
 
-            {/* Boutons d'actions au survol */}
+            {/* Boutons d'actions au survol - placés à gauche du bouton + */}
             {hoveredProject === p._id && onEdit && onCopy && onShowMenu && (
               <div style={{
                 position: 'absolute',
                 top: '1rem',
-                right: '1rem',
+                right: p.chargeProjet ? '11rem' : '5rem', // Ajustement fin
                 zIndex: 10,
                 display: 'flex',
                 gap: '0.5rem',
@@ -356,27 +414,81 @@ export default function ProjetList({
                   {displayStatus === 'Annulé' && '❌ Annulé'}
                 </div>
               </div>
-              
-              {/* Concepteur en haut à droite */}
-              {p.chargeProjet && (
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: 'var(--color-text-inverse)',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  <span>👨‍💼</span>
-                  {p.chargeProjet}
-                </div>
-              )}
+
+              {/* Chargé de projet en haut à droite */}
+              <div style={{ position: 'relative' }}>
+                {p.chargeProjet ? (
+                  <div style={{
+                    background: getChargeBgColor(p.chargeProjet),
+                    backdropFilter: 'blur(10px)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    color: getChargeColor(p.chargeProjet),
+                    border: `2px solid ${getChargeColor(p.chargeProjet)}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (showChargeProjetDropdown === p._id) {
+                      setShowChargeProjetDropdown(null);
+                      setDropdownPosition(null);
+                    } else {
+                      handleOpenDropdown(p._id, e);
+                    }
+                  }}
+                  >
+                    <span>👨‍💼</span>
+                    {p.chargeProjet}
+                    <span style={{ fontSize: '0.6rem', opacity: 0.8 }}>▼</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (showChargeProjetDropdown === p._id) {
+                        setShowChargeProjetDropdown(null);
+                        setDropdownPosition(null);
+                      } else {
+                        handleOpenDropdown(p._id, e);
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      backdropFilter: 'blur(10px)',
+                      padding: '0.5rem',
+                      borderRadius: '50%',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      color: 'var(--color-text-inverse)',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      width: '40px',
+                      height: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                      e.target.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                    title="Ajouter un chargé de projet"
+                  >
+                    +
+                  </button>
+                )}
+
+              </div>
             </div>
 
             {/* Contenu */}
@@ -871,6 +983,103 @@ export default function ProjetList({
           />
         </div>
       </div>
+    )}
+
+    {/* Dropdown en portail */}
+    {dropdownPosition && showChargeProjetDropdown && createPortal(
+      <div style={{
+        position: 'fixed',
+        top: `${dropdownPosition.top}px`,
+        right: `${dropdownPosition.right}px`,
+        background: 'var(--color-surface)',
+        borderRadius: '12px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        border: '1px solid var(--color-border)',
+        minWidth: '150px',
+        zIndex: 999999,
+        overflow: 'hidden'
+      }}>
+        {chargesProjet.map((charge) => {
+          const currentProject = projects.find(p => p._id === showChargeProjetDropdown);
+          return (
+            <button
+              key={charge.name}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAssignChargeProjet(currentProject, charge.name);
+              }}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                background: currentProject?.chargeProjet === charge.name ? charge.bgColor : 'transparent',
+                border: 'none',
+                color: charge.color,
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = charge.bgColor;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = currentProject?.chargeProjet === charge.name ? charge.bgColor : 'transparent';
+              }}
+            >
+              <span>👨‍💼</span>
+              {charge.name}
+              {currentProject?.chargeProjet === charge.name && (
+                <span style={{ marginLeft: 'auto', color: charge.color }}>✓</span>
+              )}
+            </button>
+          );
+        })}
+        {projects.find(p => p._id === showChargeProjetDropdown)?.chargeProjet && (
+          <>
+            <div style={{
+              height: '1px',
+              background: 'var(--color-border)',
+              margin: '0.25rem 0'
+            }} />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentProject = projects.find(p => p._id === showChargeProjetDropdown);
+                handleAssignChargeProjet(currentProject, null);
+              }}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-error)',
+                fontSize: '0.85rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--color-bg-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+              }}
+            >
+              <span>❌</span>
+              Retirer le chargé
+            </button>
+          </>
+        )}
+      </div>,
+      document.body
     )}
     </>
   );

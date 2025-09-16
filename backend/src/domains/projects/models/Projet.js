@@ -158,6 +158,13 @@ const projetSchema = new Schema(
         }
       }]
     },
+
+    // Chargé de projet (nom simple pour l'interface)
+    chargeProjet: {
+      type: String,
+      trim: true,
+      enum: ['Amélie', 'Hugo', 'Baptiste']
+    },
     
     // Budget et finances
     budget: {
