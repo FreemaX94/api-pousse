@@ -75,7 +75,7 @@ export default function ProjetList({
   const chargesProjet = [
     { name: 'Amélie', color: '#10b981', bgColor: '#dcfce7' }, // Vert
     { name: 'Hugo', color: '#3b82f6', bgColor: '#dbeafe' },   // Bleu
-    { name: 'Baptiste', color: '#eab308', bgColor: '#fef08a' } // Jaune
+    { name: 'Baptiste', color: '#facc15', bgColor: '#fef08a' } // Jaune pur (plus proche du citron)
   ];
 
   // Fonction pour obtenir la couleur d'un chargé
@@ -88,6 +88,14 @@ export default function ProjetList({
   const getChargeBgColor = (chargeName) => {
     const charge = chargesProjet.find(c => c.name === chargeName);
     return charge ? charge.bgColor : '#f3f4f6';
+  };
+
+  // Fonction pour convertir hex en rgba
+  const hexToRgba = (hex, alpha) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
   // Fonction pour assigner un chargé de projet
@@ -241,10 +249,17 @@ export default function ProjetList({
               right: '-30%',
               width: '100%',
               height: '100%',
-              background: 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))',
+              background: (() => {
+                if (!p.chargeProjet) {
+                  return 'linear-gradient(45deg, var(--color-primary-alpha), var(--color-accent-alpha))';
+                }
+                const color = getChargeColor(p.chargeProjet);
+                console.log(`Chargé: ${p.chargeProjet}, Couleur: ${color}`);
+                return `linear-gradient(45deg, ${hexToRgba(color, 0.2)}, ${hexToRgba(color, 0.4)})`;
+              })(),
               borderRadius: '50%',
               pointerEvents: 'none',
-              opacity: 0.1
+              opacity: 0.3
             }} />
 
             {/* Boutons d'actions au survol - placés à gauche du bouton + */}
@@ -369,11 +384,21 @@ export default function ProjetList({
 
             {/* En-tête premium */}
             <div style={{
-              background: displayStatus === 'En cours' 
-                ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' 
-                : displayStatus === 'Terminé'
-                ? 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))'
-                : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))',
+              background: (() => {
+                if (p.chargeProjet && displayStatus === 'En cours') {
+                  const color = getChargeColor(p.chargeProjet);
+                  // Créer une variante plus foncée pour le dégradé
+                  const darkerColor = color === '#10b981' ? '#047857' :
+                                     color === '#3b82f6' ? '#1d4ed8' :
+                                     color === '#facc15' ? '#eab308' : color;
+                  return `linear-gradient(135deg, ${color}, ${darkerColor})`;
+                }
+                return displayStatus === 'En cours'
+                  ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))'
+                  : displayStatus === 'Terminé'
+                  ? 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))'
+                  : 'linear-gradient(135deg, var(--color-secondary), var(--color-neutral))';
+              })(),
               padding: '1.5rem 2rem',
               position: 'relative',
               zIndex: 1,
