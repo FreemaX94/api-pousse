@@ -843,6 +843,9 @@ const Nieuwkoop = () => {
   const [operationsStockOptions, setOperationsStockOptions] = useState([]);
   const [selectedOperationArticle, setSelectedOperationArticle] = useState(null);
   const [operationBuyingDepartment, setOperationBuyingDepartment] = useState('');
+  const [operationSellingDepartment, setOperationSellingDepartment] = useState('');
+  const [operationBuyingProjectManager, setOperationBuyingProjectManager] = useState('');
+  const [operationSellingProjectManager, setOperationSellingProjectManager] = useState('');
 
   // État pour les quantités à commander
   const [toOrderQuantities, setToOrderQuantities] = useState({});
@@ -1202,7 +1205,7 @@ const Nieuwkoop = () => {
     setOperationSuccess('');
     
     // Validation des champs obligatoires
-    if (!selectedOperationArticle || !operationBuyingDepartment || !operationQuantity || !operationCoefficient) {
+    if (!selectedOperationArticle || !operationBuyingDepartment || !operationSellingDepartment || !operationQuantity || !operationCoefficient) {
       setOperationError('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -1221,6 +1224,9 @@ const Nieuwkoop = () => {
     // Préparer les données d'opération en dehors du try pour les réutiliser dans catch
     const operationData = {
       buyingDepartment: operationBuyingDepartment,
+      sellingDepartment: operationSellingDepartment,
+      buyingProjectManager: operationBuyingProjectManager || undefined,
+      sellingProjectManager: operationSellingProjectManager || undefined,
       article: {
         reference: selectedOperationArticle.reference,
         name: selectedOperationArticle.name,
@@ -1480,16 +1486,35 @@ const Nieuwkoop = () => {
       try {
         console.log('🔍 Recherche:', operationsStockQuery, '- Articles disponibles:', addedItems.length);
         
-        // Utiliser directement addedItems au lieu de sortedItems pour éviter les filtres
-        const filtered = addedItems.filter(item => 
-          item.name?.toLowerCase().includes(operationsStockQuery.toLowerCase()) ||
-          item.reference?.toLowerCase().includes(operationsStockQuery.toLowerCase())
-        );
-        
+        // 🎯 FILTRAGE INTELLIGENT: priorité aux items qui commencent par le terme
+        const trimmedSearch = operationsStockQuery.trim().toLowerCase();
+        console.log('🔍 [OPERATIONS-SEARCH] Recherche pour:', trimmedSearch);
+
+        // Séparer les résultats: ceux qui commencent par le terme vs ceux qui le contiennent
+        const startsWith = [];
+        const contains = [];
+
+        addedItems.forEach(item => {
+          const name = (item.name || '').toLowerCase();
+          const reference = (item.reference || '').toLowerCase();
+
+          if (name.startsWith(trimmedSearch) || reference.startsWith(trimmedSearch)) {
+            startsWith.push(item);
+          } else if (name.includes(trimmedSearch) || reference.includes(trimmedSearch)) {
+            contains.push(item);
+          }
+        });
+
+        // Priorité: items qui commencent par le terme, puis ceux qui le contiennent
+        const filtered = [...startsWith, ...contains].slice(0, 10); // Limiter à 10 résultats
+
+        console.log('🔍 [OPERATIONS-SEARCH] ✅ Items qui commencent par le terme:', startsWith.length);
+        console.log('🔍 [OPERATIONS-SEARCH] ✅ Items qui contiennent le terme:', contains.length);
+        console.log('🔍 [OPERATIONS-SEARCH] ✅ Total filtré:', filtered.length);
         console.log('✅ Résultats trouvés:', filtered.length, filtered.length > 0 ? '- Premier: ' + filtered[0].name : '');
-        
+
         if (!cancelled) {
-          setOperationsStockOptions(filtered.slice(0, 10)); // Limiter à 10 résultats
+          setOperationsStockOptions(filtered);
         }
       } catch (error) {
         console.error('Error searching stock items:', error);
@@ -10845,45 +10870,14 @@ return (
               {/* Formulaire */}
               <form onSubmit={handleSubmitInternalOperation} style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gridTemplateColumns: '1fr 1fr',
                 gap: '2rem',
                 position: 'relative',
                 zIndex: 1
               }}>
-                {/* Sélection Pôle Vendeur */}
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    color: 'var(--color-primary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    🏢 Pôle Vendeur
-                  </label>
-                  <select
-                    disabled
-                    style={{
-                      width: '100%',
-                      padding: '1rem 1.5rem',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '12px',
-                      fontSize: '1rem',
-                      fontWeight: '500',
-                      background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
-                      color: 'var(--color-text-primary)',
-                      opacity: 0.8,
-                      cursor: 'not-allowed'
-                    }}
-                  >
-                    <option>🎉 Événementiel (Fixe)</option>
-                  </select>
-                </div>
 
-                {/* Sélection Pôle Acheteur */}
-                <div>
+                {/* Pôle Acheteur */}
+                <div style={{ gridColumn: '1' }}>
                   <label style={{
                     display: 'block',
                     marginBottom: '0.5rem',
@@ -10893,7 +10887,7 @@ return (
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
-                    🎯 Pôle Acheteur *
+                    📥 Pôle Acheteur *
                   </label>
                   <select
                     required
@@ -10933,6 +10927,129 @@ return (
                     }}>📈 Upsell</option>
                   </select>
                 </div>
+
+                {/* Pôle Vendeur */}
+                <div style={{ gridColumn: '2' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-primary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    📤 Pôle Vendeur *
+                  </label>
+                  <select
+                    required
+                    value={operationSellingDepartment}
+                    onChange={(e) => setOperationSellingDepartment(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  >
+                    <option value="" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>Sélectionnez un pôle vendeur</option>
+                    <option value="creation" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🏗️ Création</option>
+                    <option value="entretien" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🔧 Entretien</option>
+                    <option value="upsell" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>📈 Upsell</option>
+                  </select>
+                </div>
+
+                {/* Chargé de projet acheteur */}
+                <div style={{ gridColumn: '1' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    👤 Chargé de projet acheteur
+                  </label>
+                  <input
+                    type="text"
+                    value={operationBuyingProjectManager}
+                    onChange={(e) => setOperationBuyingProjectManager(e.target.value)}
+                    placeholder="Nom du chargé de projet acheteur..."
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-secondary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  />
+                </div>
+
+                {/* Chargé de projet vendeur */}
+                <div style={{ gridColumn: '2' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: 'var(--color-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    👤 Chargé de projet vendeur
+                  </label>
+                  <input
+                    type="text"
+                    value={operationSellingProjectManager}
+                    onChange={(e) => setOperationSellingProjectManager(e.target.value)}
+                    placeholder="Nom du chargé de projet vendeur..."
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.5rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      fontSize: '1rem',
+                      fontWeight: '500',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-secondary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                  />
+                </div>
+
 
                 {/* Recherche d'article */}
                 <div style={{gridColumn: '1 / -1'}}>
@@ -11103,33 +11220,82 @@ return (
                                 }}>
                                   {item.name}
                                 </div>
-                                <div style={{ 
-                                  fontSize: '0.85rem', 
-                                  color: 'var(--color-text-secondary)', 
-                                  marginBottom: '0.25rem' 
+                                <div style={{
+                                  fontSize: '0.85rem',
+                                  color: 'var(--color-text-secondary)',
+                                  marginBottom: '0.25rem'
                                 }}>
                                   Réf: {item.reference}
                                 </div>
-                                {(item.dimensions?.height || item.dimensions?.diameter) && (
-                                  <div style={{ 
-                                    fontSize: '0.8rem', 
-                                    color: 'var(--color-text-secondary)', 
-                                    marginBottom: '0.5rem',
-                                    display: 'flex',
-                                    gap: '1rem'
-                                  }}>
-                                    {item.dimensions?.height > 0 && (
-                                      <span>
-                                        H: {item.dimensions.height}cm
-                                      </span>
-                                    )}
-                                    {item.dimensions?.diameter > 0 && (
-                                      <span>
-                                        Ø: {item.dimensions.diameter}cm
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
+
+                                {/* DEBUG: Afficher les données brutes */}
+                                {console.log('🌱 [OPERATIONS-DIMENSIONS]', item.name, {
+                                  height: item.height || item.dimensions?.height,
+                                  diameter: item.diameter || item.dimensions?.diameter,
+                                  width: item.width || item.dimensions?.width,
+                                  length: item.length || item.dimensions?.length,
+                                  dimensions: item.dimensions
+                                })}
+
+                                {/* Dimensions de la plante */}
+                                <div style={{
+                                  fontSize: '0.8rem',
+                                  color: 'var(--color-text-secondary)',
+                                  marginTop: '0.375rem',
+                                  marginBottom: '0.5rem',
+                                  display: 'flex',
+                                  gap: '0.625rem',
+                                  flexWrap: 'wrap'
+                                }}>
+                                  {((item.height || item.dimensions?.height) && Number(item.height || item.dimensions?.height) > 0) && (
+                                    <span style={{
+                                      background: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                                      color: '#10b981',
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '6px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      📏 H: {item.height || item.dimensions?.height}cm
+                                    </span>
+                                  )}
+                                  {((item.diameter || item.dimensions?.diameter) && Number(item.diameter || item.dimensions?.diameter) > 0) && (
+                                    <span style={{
+                                      background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                                      color: '#6366f1',
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '6px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      🔵 Ø: {item.diameter || item.dimensions?.diameter}cm
+                                    </span>
+                                  )}
+                                  {((item.width || item.dimensions?.width) !== undefined && (item.width || item.dimensions?.width) !== null) && (
+                                    <span style={{
+                                      background: isDark ? 'rgba(251, 191, 36, 0.1)' : 'rgba(251, 191, 36, 0.1)',
+                                      color: '#f59e0b',
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '6px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      ↔️ L: {item.width || item.dimensions?.width || 0}cm
+                                    </span>
+                                  )}
+                                  {((item.length || item.dimensions?.length) !== undefined && (item.length || item.dimensions?.length) !== null) && (
+                                    <span style={{
+                                      background: isDark ? 'rgba(168, 85, 247, 0.1)' : 'rgba(168, 85, 247, 0.1)',
+                                      color: '#a855f7',
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '6px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      ↕️ P: {item.length || item.dimensions?.length || 0}cm
+                                    </span>
+                                  )}
+                                </div>
                                 <div style={{ 
                                   display: 'flex', 
                                   gap: '1rem', 
@@ -11333,26 +11499,26 @@ return (
                 <div style={{gridColumn: '1 / -1', marginTop: '2rem'}}>
                   <button
                     type="submit"
-                    disabled={operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationQuantity}
+                    disabled={operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationSellingDepartment || !operationQuantity}
                     style={{
                       width: '100%',
                       padding: '1.5rem 2rem',
                       fontSize: '1.2rem',
                       fontWeight: '700',
-                      background: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationQuantity
-                        ? 'linear-gradient(135deg, #9ca3af, #6b7280)' 
+                      background: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationSellingDepartment || !operationQuantity
+                        ? 'linear-gradient(135deg, #9ca3af, #6b7280)'
                         : 'linear-gradient(135deg, var(--color-success), var(--color-success-dark))',
                       color: 'white',
                       border: 'none',
                       borderRadius: '16px',
-                      cursor: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationQuantity ? 'not-allowed' : 'pointer',
+                      cursor: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationSellingDepartment || !operationQuantity ? 'not-allowed' : 'pointer',
                       transition: 'all 0.3s ease',
                       boxShadow: 'var(--shadow-lg)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '1rem',
-                      opacity: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationQuantity ? 0.7 : 1
+                      opacity: operationSubmitting || !selectedOperationArticle || !operationBuyingDepartment || !operationSellingDepartment || !operationQuantity ? 0.7 : 1
                     }}
                   >
                     <span style={{ fontSize: '1.5rem' }}>

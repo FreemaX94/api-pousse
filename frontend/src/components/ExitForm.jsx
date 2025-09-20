@@ -633,18 +633,76 @@ export default function ExitForm({ onSaved, currentUser, variant = 'definitive' 
                       }}>
                         Disponible: {item.availableQuantity || 0}
                       </div>
+                      {/* Dimensions de la plante */}
                       <div style={{
-                        color: 'var(--color-text-secondary)', 
-                        fontSize: '0.7rem', 
-                        marginTop: '0.25rem',
+                        color: 'var(--color-text-secondary)',
+                        fontSize: '0.8rem',
+                        marginTop: '0.375rem',
                         display: 'flex',
-                        gap: '0.5rem',
+                        gap: '0.625rem',
                         flexWrap: 'wrap'
                       }}>
-                        {item.price > 0 && <span>💰 {item.price}€</span>}
-                        <span>📏 H: {item.height || 0}cm</span>
-                        <span>📐 Ø: {item.diameter || 0}cm</span>
+                        {item.height && Number(item.height) > 0 && (
+                          <span style={{
+                            background: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                            color: '#10b981',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            📏 H: {item.height}cm
+                          </span>
+                        )}
+                        {item.diameter && Number(item.diameter) > 0 && (
+                          <span style={{
+                            background: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                            color: '#6366f1',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            🔵 Ø: {item.diameter}cm
+                          </span>
+                        )}
+                        {(item.width !== undefined && item.width !== null) && (
+                          <span style={{
+                            background: isDark ? 'rgba(251, 191, 36, 0.1)' : 'rgba(251, 191, 36, 0.1)',
+                            color: '#f59e0b',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            ↔️ L: {item.width || 0}cm
+                          </span>
+                        )}
+                        {(item.length !== undefined && item.length !== null) && (
+                          <span style={{
+                            background: isDark ? 'rgba(168, 85, 247, 0.1)' : 'rgba(168, 85, 247, 0.1)',
+                            color: '#a855f7',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            ↕️ P: {item.length || 0}cm
+                          </span>
+                        )}
                       </div>
+
+                      {/* Prix en dessous des dimensions */}
+                      {item.price > 0 && (
+                        <div style={{
+                          fontSize: '0.875rem',
+                          color: '#10b981',
+                          fontWeight: '600',
+                          marginTop: '0.25rem'
+                        }}>
+                          💰 {item.price}€
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

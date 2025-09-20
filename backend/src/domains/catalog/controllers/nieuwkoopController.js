@@ -194,7 +194,76 @@ exports.getMovementImage = async (req, res) => {
 
 exports.getNieuwkoopItems = async (req, res) => {
   try {
-    const items = await NieuwkoopItem.find().sort({ createdAt: -1 });
+    const { search } = req.query;
+    console.log('🔍 [NIEUWKOOP-SEARCH] ============ DÉBUT RECHERCHE ============');
+    console.log('🔍 [NIEUWKOOP-SEARCH] req.query complet:', req.query);
+    console.log('🔍 [NIEUWKOOP-SEARCH] Paramètre search:', search);
+    console.log('🔍 [NIEUWKOOP-SEARCH] Type de search:', typeof search);
+    console.log('🔍 [NIEUWKOOP-SEARCH] Longueur search:', search ? search.length : 'undefined');
+
+    let items;
+
+    // 🎯 FORCER LA RECHERCHE: si search existe, filtrer AUTOMATIQUEMENT
+    if (search) {
+      const trimmedSearch = search.trim();
+      console.log('🔍 [NIEUWKOOP-SEARCH] ✅ FORCER RECHERCHE avec terme:', trimmedSearch);
+
+      // Recherche prioritaire: commencer par "stre" d'abord
+      const startWithRegex = new RegExp(`^${trimmedSearch}`, 'i');
+      const containsRegex = new RegExp(trimmedSearch, 'i');
+
+      console.log('🔍 [NIEUWKOOP-SEARCH] Regex start:', startWithRegex);
+      console.log('🔍 [NIEUWKOOP-SEARCH] Regex contains:', containsRegex);
+
+      // Recherche en deux étapes: d'abord ceux qui commencent par le terme
+      const itemsStartWith = await NieuwkoopItem.find({
+        $or: [
+          { name: startWithRegex },
+          { reference: startWithRegex }
+        ]
+      }).limit(5).sort({ name: 1 });
+
+      // Puis ceux qui contiennent le terme (mais ne commencent pas par)
+      const itemsContain = await NieuwkoopItem.find({
+        $and: [
+          {
+            $or: [
+              { name: containsRegex },
+              { reference: containsRegex }
+            ]
+          },
+          {
+            $nor: [
+              { name: startWithRegex },
+              { reference: startWithRegex }
+            ]
+          }
+        ]
+      }).limit(5).sort({ name: 1 });
+
+      // Combiner les résultats: priorité aux items qui commencent par le terme
+      items = [...itemsStartWith, ...itemsContain];
+
+      console.log('🔍 [NIEUWKOOP-SEARCH] ✅ Items trouvés (commencent par):', itemsStartWith.length);
+      console.log('🔍 [NIEUWKOOP-SEARCH] ✅ Items trouvés (contiennent):', itemsContain.length);
+      console.log('🔍 [NIEUWKOOP-SEARCH] ✅ Total items filtrés:', items.length);
+
+      // Debug: afficher les résultats
+      if (items.length > 0) {
+        console.log('🔍 [NIEUWKOOP-SEARCH] Résultats prioritaires:');
+        items.slice(0, 10).forEach((item, i) => {
+          console.log(`🔍 [NIEUWKOOP-SEARCH] ${i + 1}. ${item.name} (${item.reference})`);
+        });
+      } else {
+        console.log('🔍 [NIEUWKOOP-SEARCH] ⚠️ AUCUN RÉSULTAT TROUVÉ pour:', trimmedSearch);
+      }
+    } else {
+      console.log('🔍 [NIEUWKOOP-SEARCH] ❌ RECHERCHE DÉSACTIVÉE - Récupération de tous les items');
+      items = await NieuwkoopItem.find().sort({ createdAt: -1 });
+      console.log('🔍 [NIEUWKOOP-SEARCH] Tous les items:', items.length);
+    }
+
+    console.log('🔍 [NIEUWKOOP-SEARCH] ============ FIN RECHERCHE ============');
     
     // 🚀 Calculer les exitCount pour tous les articles
     const references = items.map(item => item.reference);

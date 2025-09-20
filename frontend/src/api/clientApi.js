@@ -64,15 +64,35 @@ export const getStockItems = async (search = '') => {
       isNewPlant: false
     }));
 
-    // Filtrage côté client si nécessaire
+    // 🎯 FILTRAGE CÔTÉ FRONTEND INTELLIGENT: priorité aux items qui commencent par le terme
     if (search.length >= 2) {
-      const q = search.toLowerCase();
-      return stockItems.filter(
-        i =>
-          (i.reference && i.reference.toLowerCase().includes(q)) ||
-          (i.name && i.name.toLowerCase().includes(q)) ||
-          (i.description && i.description.toLowerCase().includes(q))
-      );
+      const trimmedSearch = search.trim().toLowerCase();
+      console.log('🔍 [EXIT-FORM-SEARCH] Recherche pour:', trimmedSearch);
+
+      // Séparer les résultats: ceux qui commencent par le terme vs ceux qui le contiennent
+      const startsWith = [];
+      const contains = [];
+
+      stockItems.forEach(item => {
+        const name = (item.name || '').toLowerCase();
+        const reference = (item.reference || '').toLowerCase();
+        const description = (item.description || '').toLowerCase();
+
+        if (name.startsWith(trimmedSearch) || reference.startsWith(trimmedSearch)) {
+          startsWith.push(item);
+        } else if (name.includes(trimmedSearch) || reference.includes(trimmedSearch) || description.includes(trimmedSearch)) {
+          contains.push(item);
+        }
+      });
+
+      // Priorité: items qui commencent par le terme, puis ceux qui le contiennent
+      const filteredItems = [...startsWith, ...contains].slice(0, 10); // Limiter à 10 résultats
+
+      console.log('🔍 [EXIT-FORM-SEARCH] ✅ Items qui commencent par le terme:', startsWith.length);
+      console.log('🔍 [EXIT-FORM-SEARCH] ✅ Items qui contiennent le terme:', contains.length);
+      console.log('🔍 [EXIT-FORM-SEARCH] ✅ Total filtré:', filteredItems.length);
+
+      return filteredItems;
     }
 
     return stockItems;
