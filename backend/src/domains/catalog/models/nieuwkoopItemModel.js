@@ -47,6 +47,11 @@ const nieuwkoopItemSchema = new Schema({
       min: [0, 'La profondeur ne peut être négative'],
       max: [1000, 'La profondeur ne peut dépasser 1000 cm']
     },
+    length: {
+      type: Number,
+      min: [0, 'La longueur ne peut être négative'],
+      max: [1000, 'La longueur ne peut dépasser 1000 cm']
+    },
     unit: {
       type: String,
       enum: ['cm', 'm', 'mm'],
@@ -133,6 +138,11 @@ const nieuwkoopItemSchema = new Schema({
       type: Number,
       default: 0,
       min: [0, 'La quantité disponible ne peut être négative']
+    },
+    toOrder: {
+      type: Number,
+      default: 0,
+      min: [0, 'La quantité à commander ne peut être négative']
     },
     location: {
       warehouse: {
@@ -387,6 +397,7 @@ nieuwkoopItemSchema.virtual('dimensionsFormatted').get(function() {
   if (dims.height) parts.push(`H: ${dims.height}${dims.unit}`);
   if (dims.diameter) parts.push(`Ø: ${dims.diameter}${dims.unit}`);
   if (dims.width) parts.push(`L: ${dims.width}${dims.unit}`);
+  if (dims.length) parts.push(`Long: ${dims.length}${dims.unit}`);
   if (dims.depth) parts.push(`P: ${dims.depth}${dims.unit}`);
   
   return parts.join(' x ');

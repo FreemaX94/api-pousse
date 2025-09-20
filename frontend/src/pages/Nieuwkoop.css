@@ -1995,8 +1995,8 @@ body {
 
   /* 📋 CARTES ARTICLES STOCK - UNE SEULE COLONNE MOBILE */
   .grid,
-  [style*="display: 'grid'"],
-  div[style*="gridTemplateColumns"],
+  [style*="display: 'grid'"]:not([style*="gridTemplateColumns: 'repeat(4, 1fr)'"]),
+  div[style*="gridTemplateColumns"]:not([style*="gridTemplateColumns: 'repeat(4, 1fr)'"]),
   .grid-cols-2,
   .grid-cols-3,
   .grid-cols-4 {
@@ -2004,6 +2004,13 @@ body {
     flex-direction: column !important;
     gap: 0.5rem !important;
     grid-template-columns: none !important;
+  }
+
+  /* 📊 PRESERVATION DE LA GRILLE DE METRIQUES SUR MOBILE */
+  [style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.25rem !important;
   }
 
   /* Cartes d'articles individuelles - pleine largeur */

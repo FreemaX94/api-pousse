@@ -25,6 +25,8 @@ router.post('/stock', controller.createNieuwkoopItem);
 router.put('/stock/:id', controller.updateNieuwkoopQuantity);
 router.put('/stock/:id/note', controller.updateNieuwkoopNote);
 router.put('/stock/:id/category', controller.updateNieuwkoopCategory); // ✅ Route de MAJ catégorie
+router.put('/stock/:id/toOrder', controller.updateNieuwkoopToOrder); // ✅ Route de MAJ quantité à commander
+router.put('/stock/:id/delivery', controller.processStockDelivery); // ✅ Route de réception de stock
 router.put('/:id/update-field', controller.updateItemField); // ✅ Route de MAJ d'un champ spécifique
 router.delete('/stock/:id', controller.deleteNieuwkoopItem);
 router.delete('/stock/all', controller.deleteAllNieuwkoopItems);

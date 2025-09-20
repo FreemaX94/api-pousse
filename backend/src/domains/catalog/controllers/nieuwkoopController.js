@@ -219,7 +219,8 @@ exports.getNieuwkoopItems = async (req, res) => {
         stock: {
           quantity: item.stock?.quantity || 0,
           reservedQuantity: item.stock?.reservedQuantity || 0,
-          minimumAlert: item.stock?.minimumAlert || 0
+          minimumAlert: item.stock?.minimumAlert || 0,
+          toOrder: item.stock?.toOrder || 0
         },
         // Ajouter availableQuantity pour cohérence
         availableQuantity: Math.max(0, (item.stock?.quantity || 0) - (item.stock?.reservedQuantity || 0)),
@@ -229,6 +230,11 @@ exports.getNieuwkoopItems = async (req, res) => {
         totalExitQuantity: exitCountData[item.reference]?.totalExitQuantity || 0,
         // Conserver d'autres champs utiles
         dimensions: item.dimensions,
+        // Ajouter les champs plats pour compatibilité frontend
+        height: item.dimensions?.height || 0,
+        diameter: item.dimensions?.diameter || 0,
+        width: item.dimensions?.width || 0,
+        length: item.dimensions?.length || 0,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt
       };
@@ -402,19 +408,19 @@ exports.updateItemField = async (req, res) => {
     console.log(`🔄 [UPDATE FIELD] Article ${id}, champ: ${field}, valeur: ${value}`);
 
     // Validation des champs autorisés
-    const allowedFields = ['name', 'price', 'height', 'diameter'];
+    const allowedFields = ['name', 'price', 'height', 'diameter', 'width', 'length'];
     if (!allowedFields.includes(field)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Champ non autorisé',
         message: `Seuls ces champs peuvent être mis à jour: ${allowedFields.join(', ')}`
       });
     }
 
     // Validation des valeurs
-    if (field === 'price' || field === 'height' || field === 'diameter') {
+    if (field === 'price' || field === 'height' || field === 'diameter' || field === 'width' || field === 'length') {
       const numValue = parseFloat(value);
       if (isNaN(numValue) || numValue < 0) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: 'Valeur invalide',
           message: `${field} doit être un nombre positif`
         });
@@ -446,6 +452,14 @@ exports.updateItemField = async (req, res) => {
       // Mettre à jour à la fois dimensions.diameter et diameter (pour compatibilité)
       updateQuery['dimensions.diameter'] = parseFloat(value);
       updateQuery.diameter = parseFloat(value);
+    } else if (field === 'width') {
+      // Mettre à jour à la fois dimensions.width et width (pour compatibilité)
+      updateQuery['dimensions.width'] = parseFloat(value);
+      updateQuery.width = parseFloat(value);
+    } else if (field === 'length') {
+      // Mettre à jour à la fois dimensions.length et length (pour compatibilité)
+      updateQuery['dimensions.length'] = parseFloat(value);
+      updateQuery.length = parseFloat(value);
     }
 
     // Effectuer la mise à jour
@@ -465,9 +479,99 @@ exports.updateItemField = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Erreur mise à jour champ:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Erreur serveur',
-      message: 'Impossible de mettre à jour l\'article' 
+      message: 'Impossible de mettre à jour l\'article'
     });
+  }
+};
+
+// ✅ Contrôleur pour mettre à jour la quantité à commander
+exports.updateNieuwkoopToOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { toOrder } = req.body;
+
+    // Validation de la quantité à commander
+    if (typeof toOrder !== 'number' || toOrder < 0) {
+      return res.status(400).json({ message: 'La quantité à commander doit être un nombre positif ou zéro.' });
+    }
+
+    const updated = await NieuwkoopItem.findByIdAndUpdate(
+      id,
+      { 'stock.toOrder': toOrder },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Article introuvable.' });
+    }
+
+    console.log(`✅ Quantité à commander mise à jour: ${updated.name} -> ${toOrder}`);
+    res.json(updated);
+  } catch (err) {
+    console.error('❌ Erreur updateNieuwkoopToOrder:', err.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+// ✅ Contrôleur pour traiter la réception de stock commandé
+exports.processStockDelivery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deliveryDate, quantityReceived } = req.body;
+
+    // Validation des données
+    if (!deliveryDate || !quantityReceived || quantityReceived <= 0) {
+      return res.status(400).json({
+        message: 'Date de livraison et quantité reçue sont requises (quantité > 0).'
+      });
+    }
+
+    // Trouver l'article
+    const item = await NieuwkoopItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Article introuvable.' });
+    }
+
+    // Récupérer la quantité commandée
+    const toOrderQuantity = item.stock?.toOrder || 0;
+    if (toOrderQuantity <= 0) {
+      return res.status(400).json({
+        message: 'Aucune quantité en commande pour cet article.'
+      });
+    }
+
+    // Calculer le nouveau stock
+    const currentStock = item.stock?.quantity || 0;
+    const newStock = currentStock + quantityReceived;
+
+    // Mettre à jour l'article : ajouter au stock et remettre toOrder à 0
+    const updated = await NieuwkoopItem.findByIdAndUpdate(
+      id,
+      {
+        'stock.quantity': newStock,
+        'stock.toOrder': 0,
+        'stock.lastRestocked': new Date()
+      },
+      { new: true }
+    );
+
+    console.log(`✅ Réception de stock: ${updated.name} - Stock: ${currentStock} → ${newStock} (+${quantityReceived})`);
+
+    res.json({
+      message: 'Réception de stock traitée avec succès',
+      item: updated,
+      delivery: {
+        date: deliveryDate,
+        quantityReceived,
+        previousStock: currentStock,
+        newStock
+      }
+    });
+
+  } catch (err) {
+    console.error('❌ Erreur processStockDelivery:', err.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
   }
 };

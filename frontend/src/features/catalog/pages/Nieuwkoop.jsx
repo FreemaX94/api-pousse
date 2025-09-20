@@ -843,6 +843,16 @@ const Nieuwkoop = () => {
   const [operationsStockOptions, setOperationsStockOptions] = useState([]);
   const [selectedOperationArticle, setSelectedOperationArticle] = useState(null);
   const [operationBuyingDepartment, setOperationBuyingDepartment] = useState('');
+
+  // État pour les quantités à commander
+  const [toOrderQuantities, setToOrderQuantities] = useState({});
+
+  // État pour gérer l'édition inline des quantités à commander
+  const [editingToOrder, setEditingToOrder] = useState(null); // null ou référence du produit en cours d'édition
+  const [tempToOrderValue, setTempToOrderValue] = useState('');
+
+  // État pour les dates de rentrée dans le stock
+  const [deliveryDates, setDeliveryDates] = useState({});
   
   // État pour éviter les rechargements multiples
   const [stockLoading, setStockLoading] = useState(false);
@@ -1406,9 +1416,19 @@ const Nieuwkoop = () => {
           price: parseFloat(item.price) || 0,
           height: item.dimensions?.height || item.height || item.Height || item.HeightLxWxH || 0,
           diameter: item.dimensions?.diameter || item.diameter || item.DiameterCulturePot || item.Diameter || item.Opening || (item.PotSize ? parseInt(item.PotSize) : 0) || 0,
-          note: item.notes || item.note || ''
+          note: item.notes || item.note || '',
+          toOrder: item.stock?.toOrder || 0
         }));
-        
+
+        // Charger les quantités à commander depuis la BDD
+        const toOrderData = {};
+        cleaned.forEach(item => {
+          if (item.toOrder > 0) {
+            toOrderData[item.reference] = item.toOrder;
+          }
+        });
+        setToOrderQuantities(toOrderData);
+
         console.log('✅ Stock actualisé:', cleaned.length, 'articles');
         setAddedItems(cleaned);
         stockLoadedRef.current.add('Stock');
@@ -3146,9 +3166,19 @@ const Nieuwkoop = () => {
               image: item.images?.[0]?.url || item.image || '',
               height: item.dimensions?.height || item.height || 0,
               diameter: item.dimensions?.diameter || item.diameter || item.DiameterCulturePot || item.Diameter || item.Opening || (item.PotSize ? parseInt(item.PotSize) : 0) || 0,
-              note: item.notes || item.note || ''
+              note: item.notes || item.note || '',
+              toOrder: item.stock?.toOrder || 0
             }));
-            
+
+            // Charger les quantités à commander depuis la BDD
+            const toOrderData = {};
+            cleaned.forEach(item => {
+              if (item.toOrder > 0) {
+                toOrderData[item.reference] = item.toOrder;
+              }
+            });
+            setToOrderQuantities(toOrderData);
+
             console.log('✅ Processed', cleaned.length, 'items for', activeSection);
             setAddedItems(cleaned);
             console.log('📦 Stock items loaded with references:', cleaned.map(item => ({
@@ -3221,6 +3251,14 @@ const Nieuwkoop = () => {
             if (field === 'diameter') {
               updated.diameter = parseFloat(value) || 0;
               if (updated.dimensions) updated.dimensions.diameter = parseFloat(value) || 0;
+            }
+            if (field === 'width') {
+              updated.width = parseFloat(value) || 0;
+              if (updated.dimensions) updated.dimensions.width = parseFloat(value) || 0;
+            }
+            if (field === 'length') {
+              updated.length = parseFloat(value) || 0;
+              if (updated.dimensions) updated.dimensions.length = parseFloat(value) || 0;
             }
             return updated;
           }
@@ -3446,6 +3484,99 @@ const Nieuwkoop = () => {
         const updated = response.data;
         setAddedItems(prev => prev.map(item => item._id === id ? updated : item));
       });
+  };
+
+  // Fonction pour mettre à jour la quantité à commander
+  const updateToOrderQuantity = async (productReference, quantity) => {
+    setToOrderQuantities(prev => ({
+      ...prev,
+      [productReference]: Math.max(0, quantity)
+    }));
+
+    // Trouver l'ID de l'article par sa référence
+    const product = addedItems.find(item => item.reference === productReference);
+    if (!product) {
+      console.error('Article non trouvé pour la référence:', productReference);
+      return;
+    }
+
+    try {
+      const response = await axiosApi.put(`/catalog/nieuwkoop/stock/${product._id}/toOrder`, {
+        toOrder: Math.max(0, quantity)
+      });
+      console.log('✅ Quantité à commander sauvegardée:', response.data.name, '->', quantity);
+    } catch (err) {
+      console.error('❌ Erreur sauvegarde quantité à commander:', err);
+      // En cas d'erreur, ne pas perdre la valeur locale
+    }
+  };
+
+  // Fonctions pour gérer l'édition inline des quantités à commander
+  const startEditingToOrder = (productReference) => {
+    setEditingToOrder(productReference);
+    setTempToOrderValue((toOrderQuantities[productReference] || 0).toString());
+  };
+
+  const saveToOrderQuantity = (productReference) => {
+    const newQuantity = parseInt(tempToOrderValue) || 0;
+    updateToOrderQuantity(productReference, newQuantity);
+    setEditingToOrder(null);
+    setTempToOrderValue('');
+  };
+
+  const cancelEditingToOrder = () => {
+    setEditingToOrder(null);
+    setTempToOrderValue('');
+  };
+
+  const handleToOrderKeyPress = (e, productReference) => {
+    if (e.key === 'Enter') {
+      saveToOrderQuantity(productReference);
+    } else if (e.key === 'Escape') {
+      cancelEditingToOrder();
+    }
+  };
+
+  // Fonction pour traiter la réception de stock
+  const handleStockDelivery = async (productReference, deliveryDate) => {
+    const product = addedItems.find(item => item.reference === productReference);
+    if (!product) {
+      console.error('Article non trouvé pour la référence:', productReference);
+      return;
+    }
+
+    const toOrderQuantity = toOrderQuantities[productReference] || 0;
+    if (toOrderQuantity <= 0) {
+      console.error('Aucune quantité à commander pour cet article');
+      return;
+    }
+
+    try {
+      const response = await axiosApi.put(`/catalog/nieuwkoop/stock/${product._id}/delivery`, {
+        deliveryDate,
+        quantityReceived: toOrderQuantity
+      });
+
+      console.log('✅ Réception de stock traitée:', response.data.name, '->', toOrderQuantity, 'reçus le', deliveryDate);
+
+      // Mettre à jour les states locaux
+      setToOrderQuantities(prev => ({
+        ...prev,
+        [productReference]: 0
+      }));
+
+      setDeliveryDates(prev => {
+        const updated = { ...prev };
+        delete updated[productReference];
+        return updated;
+      });
+
+      // Recharger les données pour refléter le nouveau stock
+      await loadStockData();
+
+    } catch (err) {
+      console.error('❌ Erreur réception de stock:', err);
+    }
   };
 
   // Fonctions utilitaires pour les notifications
@@ -7186,21 +7317,81 @@ return (
                   ))}
                 </div>
 
-                <div 
-                  className="stock-grid-4"
+                <div
+                  className="stock-grid-alphabetical"
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '1.5rem',
                     marginTop: '2rem',
                     padding: '2rem',
                     borderRadius: '1rem'
                   }}
                 >
-                  {sortedItems.filter(prod =>
-                    (!activeCategory || prod.category === activeCategory)
-                    && prod.name.toLowerCase().includes(searchTerm.toLowerCase())
-                  ).map((prod, index) => {
+                  {(() => {
+                    // Filtrer les articles comme avant
+                    const filteredItems = sortedItems.filter(prod =>
+                      (!activeCategory || prod.category === activeCategory)
+                      && prod.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+
+                    // Grouper par première lettre (ordre alphabétique)
+                    const groupedByLetter = {};
+                    filteredItems.forEach(prod => {
+                      const firstLetter = prod.name.charAt(0).toUpperCase();
+                      if (!groupedByLetter[firstLetter]) {
+                        groupedByLetter[firstLetter] = [];
+                      }
+                      groupedByLetter[firstLetter].push(prod);
+                    });
+
+                    // Trier les lettres
+                    const sortedLetters = Object.keys(groupedByLetter).sort();
+
+                    return sortedLetters.map(letter => (
+                      <div key={letter} style={{ marginBottom: '3rem' }}>
+                        {/* En-tête de lettre */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginBottom: '1.5rem',
+                          gap: '1rem'
+                        }}>
+                          <div style={{
+                            fontSize: '2rem',
+                            fontWeight: 'bold',
+                            color: 'var(--color-primary)',
+                            background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '12px',
+                            border: '2px solid var(--color-primary)',
+                            minWidth: '60px',
+                            textAlign: 'center'
+                          }}>
+                            {letter}
+                          </div>
+                          <div style={{
+                            height: '2px',
+                            flex: 1,
+                            background: 'linear-gradient(90deg, var(--color-primary) 0%, transparent 100%)',
+                            borderRadius: '1px'
+                          }}></div>
+                          <span style={{
+                            fontSize: '0.9rem',
+                            color: 'var(--color-secondary)',
+                            fontWeight: '600'
+                          }}>
+                            {groupedByLetter[letter].length} article{groupedByLetter[letter].length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+
+                        {/* Grille des articles pour cette lettre */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(4, 1fr)',
+                          gap: '1.5rem'
+                        }}>
+                          {groupedByLetter[letter].map((prod, index) => {
                     // Calculer la quantité disponible en tenant compte des projections
                     const baseQuantity = prod.quantity || 0;
                     const baseReserved = prod.reservedQuantity || 0;
@@ -7715,98 +7906,346 @@ return (
                                 fontWeight: '600'
                               }}>Diamètre</div>
                             </div>
+
+                            <div style={{
+                              padding: '1rem',
+                              background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                              borderRadius: '16px',
+                              textAlign: 'center',
+                              border: '1px solid var(--color-primary)',
+                              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                            }}>
+                              <div style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>↔️</div>
+                              <div style={{
+                                fontSize: '1.125rem',
+                                fontWeight: '700',
+                                color: 'var(--color-primary)',
+                                marginBottom: '0.25rem'
+                              }}>
+                                {editingItemId === prod._id && editingField === 'width' ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <input
+                                      type="number"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={handleSaveEdit}
+                                      onKeyPress={handleKeyPress}
+                                      onClick={(e) => e.stopPropagation()}
+                                      autoFocus
+                                      style={{
+                                        background: 'var(--color-surface)',
+                                        border: '2px solid var(--color-primary)',
+                                        borderRadius: '4px',
+                                        padding: '2px 6px',
+                                        fontSize: 'inherit',
+                                        fontWeight: 'inherit',
+                                        color: 'inherit',
+                                        width: '60px',
+                                        textAlign: 'center'
+                                      }}
+                                    />
+                                    <span style={{ marginLeft: '4px' }}>cm</span>
+                                  </div>
+                                ) : (
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEdit(prod._id, 'width', prod.width || 0);
+                                    }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    title="Cliquer pour modifier la largeur"
+                                  >
+                                    {prod.width || 0} cm
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{
+                                fontSize: '0.75rem',
+                                color: 'var(--color-secondary)',
+                                fontWeight: '600'
+                              }}>Largeur</div>
+                            </div>
+
+                            <div style={{
+                              padding: '1rem',
+                              background: 'linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)',
+                              borderRadius: '16px',
+                              textAlign: 'center',
+                              border: '1px solid var(--color-primary)',
+                              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                            }}>
+                              <div style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>↕️</div>
+                              <div style={{
+                                fontSize: '1.125rem',
+                                fontWeight: '700',
+                                color: 'var(--color-primary)',
+                                marginBottom: '0.25rem'
+                              }}>
+                                {editingItemId === prod._id && editingField === 'length' ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <input
+                                      type="number"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={handleSaveEdit}
+                                      onKeyPress={handleKeyPress}
+                                      onClick={(e) => e.stopPropagation()}
+                                      autoFocus
+                                      style={{
+                                        background: 'var(--color-surface)',
+                                        border: '2px solid var(--color-primary)',
+                                        borderRadius: '4px',
+                                        padding: '2px 6px',
+                                        fontSize: 'inherit',
+                                        fontWeight: 'inherit',
+                                        color: 'inherit',
+                                        width: '60px',
+                                        textAlign: 'center'
+                                      }}
+                                    />
+                                    <span style={{ marginLeft: '4px' }}>cm</span>
+                                  </div>
+                                ) : (
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEdit(prod._id, 'length', prod.length || 0);
+                                    }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-bg-secondary)'}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    title="Cliquer pour modifier la longueur"
+                                  >
+                                    {prod.length || 0} cm
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{
+                                fontSize: '0.75rem',
+                                color: 'var(--color-secondary)',
+                                fontWeight: '600'
+                              }}>Longueur</div>
+                            </div>
                           </div>
 
                           {/* Informations condensées */}
                           <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '0.5rem',
                             marginBottom: '1rem',
-                            padding: '0.75rem 1rem',
+                            padding: '0.75rem',
                             background: 'var(--color-bg-primary)',
                             borderRadius: '12px',
                             border: '1px solid var(--color-primary)'
                           }}>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '1rem'
-                            }}>
-                              {/* Stock Total */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: 'var(--color-secondary)',
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>
-                                  Stock
-                                </div>
-                                <div style={{
-                                  fontSize: '1rem',
-                                  fontWeight: '700',
-                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : 'var(--color-primary)'
-                                }}>
-                                  {available}
-                                </div>
+                            {/* Stock Total */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--color-secondary)',
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                Stock
                               </div>
-                              
-                              {/* Réservés */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: selectedStockDate && stockProjections[prod.reference] 
-                                    ? 'var(--color-primary)' 
-                                    : 'var(--color-secondary)',
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>{selectedStockDate && stockProjections[prod.reference] ? '📅 Réservés' : 'Réservés'}</div>
-                                <div style={{
-                                  fontSize: '1rem',
-                                  fontWeight: '700',
-                                  color: 'var(--color-accent)'
-                                }}>
-                                  {(() => {
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : 'var(--color-primary)'
+                              }}>
+                                {available}
+                              </div>
+                            </div>
+
+                            {/* Réservés */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: selectedStockDate && stockProjections[prod.reference]
+                                  ? 'var(--color-primary)'
+                                  : 'var(--color-secondary)',
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>{selectedStockDate && stockProjections[prod.reference] ? '📅 Réservés' : 'Réservés'}</div>
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: 'var(--color-accent)'
+                              }}>
+                                {(() => {
+                                  const projectedQty = stockProjections[prod.reference];
+                                  if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
+                                    return Math.abs(projectedQty);
+                                  }
+                                  return prod.reservedQuantity || 0;
+                                })()}
+                              </div>
+                            </div>
+
+                            {/* Disponible */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--color-success)',
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                Disponible
+                              </div>
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: 'var(--color-success)'
+                              }}>
+                                {(() => {
+                                  const reserved = (() => {
                                     const projectedQty = stockProjections[prod.reference];
                                     if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
                                       return Math.abs(projectedQty);
                                     }
                                     return prod.reservedQuantity || 0;
-                                  })()}
-                                </div>
-                              </div>
-                              
-                              {/* Disponible */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: 'var(--color-success)',
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>
-                                  Disponible
-                                </div>
-                                <div style={{
-                                  fontSize: '1rem',
-                                  fontWeight: '700',
-                                  color: 'var(--color-success)'
-                                }}>
-                                  {(() => {
-                                    const reserved = (() => {
-                                      const projectedQty = stockProjections[prod.reference];
-                                      if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
-                                        return Math.abs(projectedQty);
-                                      }
-                                      return prod.reservedQuantity || 0;
-                                    })();
-                                    const disponible = Math.max(0, available - reserved);
-                                    return disponible;
-                                  })()}
-                                </div>
+                                  })();
+                                  const disponible = Math.max(0, available - reserved);
+                                  return disponible;
+                                })()}
                               </div>
                             </div>
+
+                            {/* À commander */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--color-warning)',
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                À commander
+                              </div>
+                              {editingToOrder === prod.reference ? (
+                                <input
+                                  type="number"
+                                  value={tempToOrderValue}
+                                  onChange={(e) => setTempToOrderValue(e.target.value)}
+                                  onKeyDown={(e) => handleToOrderKeyPress(e, prod.reference)}
+                                  onBlur={() => saveToOrderQuantity(prod.reference)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  autoFocus
+                                  style={{
+                                    fontSize: '1rem',
+                                    fontWeight: '700',
+                                    color: 'var(--color-warning)',
+                                    padding: '0.25rem',
+                                    borderRadius: '6px',
+                                    border: '2px solid var(--color-warning)',
+                                    background: 'white',
+                                    textAlign: 'center',
+                                    width: '60px',
+                                    outline: 'none'
+                                  }}
+                                />
+                              ) : (
+                                <motion.div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    startEditingToOrder(prod.reference);
+                                  }}
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  style={{
+                                    fontSize: '1rem',
+                                    fontWeight: '700',
+                                    color: 'var(--color-warning)',
+                                    cursor: 'pointer',
+                                    padding: '0.25rem',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--color-warning)',
+                                    background: 'transparent',
+                                    transition: 'all 0.2s ease',
+                                    minHeight: '2rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  {toOrderQuantities[prod.reference] || 0}
+                                </motion.div>
+                              )}
+                            </div>
                           </div>
+
+                          {/* Date de rentrée dans le stock - Affiché seulement si À commander > 0 */}
+                          {(toOrderQuantities[prod.reference] || 0) > 0 && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              marginBottom: '1rem',
+                              padding: '0.5rem',
+                              background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%)',
+                              borderRadius: '8px',
+                              border: '1px solid #ffd93d',
+                              boxShadow: '0 2px 8px rgba(255, 217, 61, 0.1)'
+                            }}>
+                              <div style={{
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                color: '#ffd93d',
+                                minWidth: 'fit-content',
+                                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                              }}>
+                                Date de rentrée:
+                              </div>
+                              <input
+                                type="date"
+                                value={deliveryDates[prod.reference] || ''}
+                                onChange={(e) => {
+                                  const date = e.target.value;
+                                  setDeliveryDates(prev => ({
+                                    ...prev,
+                                    [prod.reference]: date
+                                  }));
+
+                                  // Si une date est saisie, traiter la réception
+                                  if (date) {
+                                    handleStockDelivery(prod.reference, date);
+                                  }
+                                }}
+                                style={{
+                                  flex: 1,
+                                  padding: '0.4rem',
+                                  borderRadius: '6px',
+                                  border: '1px solid #555',
+                                  fontSize: '0.8rem',
+                                  background: '#1a1a1a',
+                                  color: '#fff',
+                                  outline: 'none',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onFocus={(e) => {
+                                  e.target.style.border = '1px solid #ffd93d';
+                                  e.target.style.boxShadow = '0 0 0 2px rgba(255, 217, 61, 0.2)';
+                                }}
+                                onBlur={(e) => {
+                                  e.target.style.border = '1px solid #555';
+                                  e.target.style.boxShadow = 'none';
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                          )}
 
                           {/* Section combinée : Catégorie + Quantité */}
                           <div style={{
@@ -7927,10 +8366,14 @@ return (
 
                           {/* Dates simplifiées */}
                         </div>
-                        
+
                       </div>
                     );
-                  })}
+                          })}
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </>
             )}

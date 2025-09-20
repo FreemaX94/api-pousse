@@ -139,6 +139,11 @@ const nieuwkoopItemSchema = new Schema({
       default: 0,
       min: [0, 'La quantité disponible ne peut être négative']
     },
+    toOrder: {
+      type: Number,
+      default: 0,
+      min: [0, 'La quantité à commander ne peut être négative']
+    },
     location: {
       warehouse: {
         type: String,
@@ -448,14 +453,25 @@ nieuwkoopItemSchema.methods.addToStock = async function(quantity) {
   if (quantity <= 0) {
     throw new Error('La quantité à ajouter doit être positive');
   }
-  
+
   this.stock.quantity += quantity;
   this.stock.availableQuantity = this.actualAvailableQuantity;
   this.stock.lastRestocked = new Date();
-  
+
   // Mettre à jour le statut de disponibilité
   this.updateAvailabilityStatus();
-  
+
+  await this.save();
+  return this;
+};
+
+nieuwkoopItemSchema.methods.updateToOrder = async function(toOrderQuantity) {
+  if (toOrderQuantity < 0) {
+    throw new Error('La quantité à commander ne peut être négative');
+  }
+
+  this.stock.toOrder = toOrderQuantity;
+
   await this.save();
   return this;
 };

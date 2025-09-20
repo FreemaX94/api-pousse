@@ -728,6 +728,9 @@ const Nieuwkoop = () => {
   const [operationsStockQuery, setOperationsStockQuery] = useState('');
   const [operationsStockOptions, setOperationsStockOptions] = useState([]);
   const [selectedOperationArticle, setSelectedOperationArticle] = useState(null);
+
+  // État pour les quantités à commander
+  const [toOrderQuantities, setToOrderQuantities] = useState({});
   
 
   const handleEntrySaved = () => setRefreshEntries(f => !f);
@@ -1157,6 +1160,21 @@ const Nieuwkoop = () => {
         const updated = response.data;
         setAddedItems(prev => prev.map(item => item._id === id ? updated : item));
       });
+  };
+
+  // Fonction pour mettre à jour la quantité à commander
+  const updateToOrderQuantity = (productReference, quantity) => {
+    setToOrderQuantities(prev => ({
+      ...prev,
+      [productReference]: Math.max(0, quantity)
+    }));
+
+    // TODO: Sauvegarder en base de données
+    // axiosApi.put(`/catalog/nieuwkoop/stock/${id}/toOrder`, { toOrder: quantity })
+    //   .then(response => {
+    //     console.log('Quantité à commander mise à jour:', response.data);
+    //   })
+    //   .catch(err => console.error('Erreur mise à jour quantité à commander:', err));
   };
 
   // Fonctions utilitaires pour les notifications
@@ -4412,92 +4430,125 @@ return (
 
                           {/* Informations condensées */}
                           <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '0.5rem',
                             marginBottom: '1rem',
-                            padding: '0.75rem 1rem',
+                            padding: '0.75rem',
                             background: themeStyles.colorBgPrimary,
                             borderRadius: '12px',
                             border: `1px solid ${themeStyles.colorPrimary}`
                           }}>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '1rem'
-                            }}>
-                              {/* Stock Total */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: themeStyles.colorSecondary,
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>
-                                  Stock
-                                </div>
-                                <div style={{
-                                  fontSize: '1rem',
-                                  fontWeight: '700',
-                                  color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : themeStyles.colorPrimary
-                                }}>
-                                  {available}
-                                </div>
+                            {/* Stock Total */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: themeStyles.colorSecondary,
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                Stock
                               </div>
-                              
-                              {/* Réservés */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: selectedStockDate && stockProjections[prod.reference] 
-                                    ? themeStyles.colorPrimary 
-                                    : themeStyles.colorSecondary,
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>{selectedStockDate && stockProjections[prod.reference] ? '📅 Réservés' : 'Réservés'}</div>
-                                <div style={{
-                                  fontSize: '1rem',
-                                  fontWeight: '700',
-                                  color: themeStyles.colorAccent
-                                }}>
-                                  {(() => {
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: isOutOfStock ? '#ef4444' : isLowStock ? '#f59e0b' : themeStyles.colorPrimary
+                              }}>
+                                {available}
+                              </div>
+                            </div>
+
+                            {/* Réservés */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: selectedStockDate && stockProjections[prod.reference]
+                                  ? themeStyles.colorPrimary
+                                  : themeStyles.colorSecondary,
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>{selectedStockDate && stockProjections[prod.reference] ? '📅 Réservés' : 'Réservés'}</div>
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: themeStyles.colorAccent
+                              }}>
+                                {(() => {
+                                  const projectedQty = stockProjections[prod.reference];
+                                  if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
+                                    return Math.abs(projectedQty);
+                                  }
+                                  return prod.reservedQuantity || 0;
+                                })()}
+                              </div>
+                            </div>
+
+                            {/* Disponible */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: themeStyles.colorSuccess,
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                Disponible
+                              </div>
+                              <div style={{
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                color: themeStyles.colorSuccess
+                              }}>
+                                {(() => {
+                                  const reserved = (() => {
                                     const projectedQty = stockProjections[prod.reference];
                                     if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
                                       return Math.abs(projectedQty);
                                     }
                                     return prod.reservedQuantity || 0;
-                                  })()}
-                                </div>
+                                  })();
+                                  const disponible = Math.max(0, available - reserved);
+                                  return disponible;
+                                })()}
                               </div>
-                              
-                              {/* Disponible */}
-                              <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                  fontSize: '0.7rem',
-                                  color: themeStyles.colorSuccess,
-                                  marginBottom: '0.25rem',
-                                  fontWeight: '600'
-                                }}>
-                                  Disponible
-                                </div>
-                                <div style={{
+                            </div>
+
+                            {/* À commander */}
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '0.7rem',
+                                color: themeStyles.colorWarning,
+                                marginBottom: '0.25rem',
+                                fontWeight: '600'
+                              }}>
+                                À commander
+                              </div>
+                              <motion.div
+                                onClick={() => {
+                                  const currentQuantity = toOrderQuantities[prod.reference] || 0;
+                                  const newQuantity = prompt(
+                                    `Quantité à commander pour ${prod.name}:`,
+                                    currentQuantity.toString()
+                                  );
+                                  if (newQuantity !== null && !isNaN(newQuantity)) {
+                                    updateToOrderQuantity(prod.reference, parseInt(newQuantity) || 0);
+                                  }
+                                }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                style={{
                                   fontSize: '1rem',
                                   fontWeight: '700',
-                                  color: themeStyles.colorSuccess
-                                }}>
-                                  {(() => {
-                                    const reserved = (() => {
-                                      const projectedQty = stockProjections[prod.reference];
-                                      if (selectedStockDate && projectedQty !== undefined && projectedQty < 0) {
-                                        return Math.abs(projectedQty);
-                                      }
-                                      return prod.reservedQuantity || 0;
-                                    })();
-                                    const disponible = Math.max(0, available - reserved);
-                                    return disponible;
-                                  })()}
-                                </div>
-                              </div>
+                                  color: themeStyles.colorWarning,
+                                  cursor: 'pointer',
+                                  padding: '0.25rem',
+                                  borderRadius: '6px',
+                                  border: `1px solid ${themeStyles.colorWarning}`,
+                                  background: 'transparent',
+                                  transition: 'all 0.2s ease'
+                                }}
+                              >
+                                {toOrderQuantities[prod.reference] || 0}
+                              </motion.div>
                             </div>
                           </div>
 

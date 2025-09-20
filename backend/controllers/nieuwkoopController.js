@@ -242,6 +242,7 @@ exports.getNieuwkoopItems = async (req, res) => {
       // Gestion des anciens articles avec champs directs (quantity, reservedQuantity)
       const stockQuantity = item.stock?.quantity || item.quantity || 0;
       const reservedQuantity = item.stock?.reservedQuantity || item.reservedQuantity || 0;
+      const toOrder = item.stock?.toOrder || 0;
       const availableQuantity = Math.max(0, stockQuantity - reservedQuantity);
 
       // Calculer les dimensions avec fallbacks multiples
@@ -264,7 +265,8 @@ exports.getNieuwkoopItems = async (req, res) => {
         stock: {
           quantity: stockQuantity,
           reservedQuantity,
-          availableQuantity
+          availableQuantity,
+          toOrder
         },
         // Prix avec fallbacks multiples (priorité aux champs directs pour anciens articles)
         price: item.price || item.pricing?.price || item.PriceNett || 0,
@@ -298,7 +300,8 @@ exports.getNieuwkoopItems = async (req, res) => {
         price: transformedItems[0].price,
         height: transformedItems[0].height,
         diameter: transformedItems[0].diameter,
-        availableQuantity: transformedItems[0].availableQuantity
+        availableQuantity: transformedItems[0].availableQuantity,
+        toOrder: transformedItems[0].stock?.toOrder
       });
     }
     
@@ -387,6 +390,34 @@ exports.updateNieuwkoopCategory = async (req, res) => {
     res.json(updated);
   } catch (err) {
     console.error('❌ Erreur updateNieuwkoopCategory:', err.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+exports.updateNieuwkoopToOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { toOrder } = req.body;
+
+    // Validation de la quantité à commander
+    if (typeof toOrder !== 'number' || toOrder < 0) {
+      return res.status(400).json({ message: 'La quantité à commander doit être un nombre positif ou zéro.' });
+    }
+
+    const updated = await NieuwkoopItem.findByIdAndUpdate(
+      id,
+      { 'stock.toOrder': toOrder },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Article introuvable.' });
+    }
+
+    console.log(`✅ Quantité à commander mise à jour: ${updated.name} -> ${toOrder}`);
+    res.json(updated);
+  } catch (err) {
+    console.error('❌ Erreur updateNieuwkoopToOrder:', err.message);
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 };
