@@ -2177,6 +2177,33 @@ const Nieuwkoop = () => {
     }
   };
 
+  // Calculer le stock futur en tenant compte des commandes programmées
+  const calculateFutureStock = (productReference, currentStock, targetDate = null) => {
+    const toOrderQty = toOrderQuantities[productReference] || 0;
+    const deliveryDate = deliveryDates[productReference];
+
+    // Si pas de commande en cours, retourner le stock actuel
+    if (toOrderQty <= 0 || !deliveryDate) {
+      return currentStock;
+    }
+
+    // Si une date cible est spécifiée, vérifier si la livraison aura eu lieu
+    if (targetDate) {
+      const deliveryTimestamp = new Date(deliveryDate).getTime();
+      const targetTimestamp = new Date(targetDate).getTime();
+
+      // Si la date cible est après ou égale à la date de livraison
+      if (targetTimestamp >= deliveryTimestamp) {
+        return currentStock + toOrderQty;
+      } else {
+        return currentStock; // La livraison n'a pas encore eu lieu
+      }
+    }
+
+    // Par défaut, calculer pour la date de livraison prévue
+    return currentStock + toOrderQty;
+  };
+
   // Gérer le changement de date
   const handleDateSelection = (day) => {
     const newDate = new Date(selectedYear, selectedMonth, day);
@@ -3562,8 +3589,15 @@ const Nieuwkoop = () => {
     }
   };
 
-  // Fonction pour traiter la réception de stock
-  const handleStockDelivery = async (productReference, deliveryDate) => {
+  // Fonction pour sauvegarder la date de rentrée prévue (sans traiter immédiatement)
+  const handleStockDelivery = (productReference, deliveryDate) => {
+    console.log('📅 Date de rentrée prévue:', productReference, 'le', deliveryDate);
+    // La date est déjà sauvegardée dans deliveryDates par le onChange
+    // Pas de traitement immédiat - juste pour le calcul du stock futur
+  };
+
+  // Fonction pour traiter réellement la réception quand la date arrive
+  const processActualStockDelivery = async (productReference) => {
     const product = addedItems.find(item => item.reference === productReference);
     if (!product) {
       console.error('Article non trouvé pour la référence:', productReference);
@@ -3573,6 +3607,12 @@ const Nieuwkoop = () => {
     const toOrderQuantity = toOrderQuantities[productReference] || 0;
     if (toOrderQuantity <= 0) {
       console.error('Aucune quantité à commander pour cet article');
+      return;
+    }
+
+    const deliveryDate = deliveryDates[productReference];
+    if (!deliveryDate) {
+      console.error('Aucune date de rentrée définie pour cet article');
       return;
     }
 
@@ -7278,7 +7318,7 @@ return (
       }}
       onMouseLeave={() => setShowSortMenu(false)}
     >
-      {["prix", "quantité", "hauteur", "diamètre"].map(option => (
+      {["prix", "quantité", "hauteur", "diamètre", "largeur", "longueur"].map(option => (
         <div
           key={option}
           onClick={() => {
@@ -8387,6 +8427,31 @@ return (
                                 {loadingStates[`quantity-${prod._id}`] ? '⏳' : '+'}
                               </button>
                             </div>
+
+                            {/* Affichage du stock futur si une commande est programmée */}
+                            {(toOrderQuantities[prod.reference] || 0) > 0 && deliveryDates[prod.reference] && (
+                              <div style={{
+                                marginTop: '0.5rem',
+                                padding: '0.4rem 0.6rem',
+                                background: 'linear-gradient(135deg, #10b981, #059669)',
+                                borderRadius: '8px',
+                                color: 'white',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                textAlign: 'center',
+                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)'
+                              }}>
+                                <div style={{ marginBottom: '0.2rem' }}>
+                                  📈 Stock futur le {new Date(deliveryDates[prod.reference]).toLocaleDateString('fr-FR')}
+                                </div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
+                                  {calculateFutureStock(prod.reference, prod.quantity || 0)} unités
+                                </div>
+                                <div style={{ fontSize: '0.65rem', opacity: 0.9 }}>
+                                  ({(prod.quantity || 0)} + {toOrderQuantities[prod.reference]} à recevoir)
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           {/* Dates simplifiées */}
@@ -11271,7 +11336,7 @@ return (
                                       🔵 Ø: {item.diameter || item.dimensions?.diameter}cm
                                     </span>
                                   )}
-                                  {((item.width || item.dimensions?.width) !== undefined && (item.width || item.dimensions?.width) !== null) && (
+                                  {true && (
                                     <span style={{
                                       background: isDark ? 'rgba(251, 191, 36, 0.1)' : 'rgba(251, 191, 36, 0.1)',
                                       color: '#f59e0b',
@@ -11283,7 +11348,7 @@ return (
                                       ↔️ L: {item.width || item.dimensions?.width || 0}cm
                                     </span>
                                   )}
-                                  {((item.length || item.dimensions?.length) !== undefined && (item.length || item.dimensions?.length) !== null) && (
+                                  {true && (
                                     <span style={{
                                       background: isDark ? 'rgba(168, 85, 247, 0.1)' : 'rgba(168, 85, 247, 0.1)',
                                       color: '#a855f7',

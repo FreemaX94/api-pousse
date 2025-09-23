@@ -95,11 +95,11 @@ export default function Login() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '1rem',
+      padding: '0.5rem',
       background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a3a 25%, #2d1b69 50%, #667eea 75%, #764ba2 100%)',
       position: 'relative',
       overflow: 'hidden'
@@ -153,9 +153,10 @@ export default function Login() {
       <div style={{
         width: '100%',
         maxWidth: '520px',
+        height: 'calc(100vh - 1rem)',
         background: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: '40px',
-        padding: '3.5rem',
+        borderRadius: '30px',
+        padding: '1.5rem',
         boxShadow: `
           0 25px 50px rgba(0, 0, 0, 0.25),
           0 0 0 1px rgba(255, 255, 255, 0.1),
@@ -164,7 +165,10 @@ export default function Login() {
         backdropFilter: 'blur(30px)',
         position: 'relative',
         overflow: 'hidden',
-        border: '1px solid rgba(255, 255, 255, 0.1)'
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
       }}>
         {/* Effet de brillance animé */}
         <div style={{
@@ -189,17 +193,18 @@ export default function Login() {
           pointerEvents: 'none'
         }} />
 
+        {/* Section du haut - En-tête */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '3.5rem',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          flex: '0 0 auto'
         }}>
           {/* Logo avec effet néon */}
           <div style={{
-            width: '100px',
-            height: '100px',
-            margin: '0 auto 2rem',
+            width: '70px',
+            height: '70px',
+            margin: '0 auto 1rem',
             background: 'linear-gradient(135deg, #667eea, #764ba2, #a855f7)',
             borderRadius: '50%',
             display: 'flex',
@@ -249,13 +254,13 @@ export default function Login() {
           </div>
 
           <h1 style={{
-            fontSize: '3.5rem',
+            fontSize: '2.2rem',
             fontWeight: '900',
             background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            marginBottom: '0.8rem',
+            marginBottom: '0.3rem',
             textShadow: '0 4px 20px rgba(255,255,255,0.1)',
             letterSpacing: '-0.03em',
             animation: 'fadeInUp 1s ease-out 0.5s both'
@@ -265,10 +270,10 @@ export default function Login() {
 
           <p style={{
             color: 'rgba(255, 255, 255, 0.8)',
-            fontSize: '1.3rem',
+            fontSize: '1rem',
             fontWeight: '400',
             margin: 0,
-            marginBottom: '1rem',
+            marginBottom: '0.3rem',
             animation: 'fadeInUp 1s ease-out 0.7s both'
           }}>
             Accédez à votre espace de gestion
@@ -280,7 +285,7 @@ export default function Login() {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '1rem',
-            margin: '1.5rem auto',
+            margin: '0.8rem auto',
             animation: 'fadeInUp 1s ease-out 0.9s both'
           }}>
             <div style={{
@@ -319,7 +324,16 @@ export default function Login() {
           </div>
         </div>
 
-        {error && (
+        {/* Section centrale - Formulaire et erreurs */}
+        <div style={{
+          flex: '1 1 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {error && (
           <div style={{
             background: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -341,18 +355,17 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{
-          display: 'grid',
-          gap: '1.5rem',
-          position: 'relative',
-          zIndex: 1
-        }}>
+          <form onSubmit={handleSubmit} style={{
+            display: 'grid',
+            gap: '1rem',
+            marginTop: '1rem'
+          }}>
           <div style={{ position: 'relative' }}>
             <label htmlFor="username" style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.75rem',
-              marginBottom: '1rem',
+              marginBottom: '0.6rem',
               fontSize: '1rem',
               fontWeight: '600',
               color: 'rgba(255, 255, 255, 0.9)',
@@ -427,7 +440,7 @@ export default function Login() {
               display: 'flex',
               alignItems: 'center',
               gap: '0.75rem',
-              marginBottom: '1rem',
+              marginBottom: '0.6rem',
               fontSize: '1rem',
               fontWeight: '600',
               color: 'rgba(255, 255, 255, 0.9)',
@@ -637,16 +650,21 @@ export default function Login() {
               )}
             </span>
           </button>
-        </form>
+          </form>
+        </div>
 
-        {/* Séparateur décoratif premium */}
+        {/* Section du bas - Séparateur, CTA et Footer */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          margin: '3rem 0 2.5rem',
+          flex: '0 0 auto',
           position: 'relative',
           zIndex: 1
         }}>
+          {/* Séparateur décoratif premium */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '1rem 0 0.8rem'
+          }}>
           <div style={{
             flex: 1,
             height: '1px',
@@ -694,20 +712,18 @@ export default function Login() {
           }} />
         </div>
 
-        {/* Call to action amélioré */}
-        <div style={{
-          textAlign: 'center',
-          padding: '2rem 0',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <p style={{
-            fontSize: '1.1rem',
-            color: 'rgba(255, 255, 255, 0.8)',
-            fontWeight: '500',
-            margin: '0 0 1rem',
-            lineHeight: 1.5
+          {/* Call to action amélioré */}
+          <div style={{
+            textAlign: 'center',
+            padding: '0.5rem 0'
           }}>
+            <p style={{
+              fontSize: '1rem',
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontWeight: '500',
+              margin: '0 0 0.8rem',
+              lineHeight: 1.5
+            }}>
             Vous n'avez pas encore de compte ?
           </p>
 
@@ -745,19 +761,17 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* Footer signature premium */}
-        <div style={{
-          textAlign: 'center',
-          marginTop: '2rem',
-          padding: '1.5rem 0',
-          color: 'rgba(255, 255, 255, 0.5)',
-          fontSize: '0.85rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          position: 'relative',
-          zIndex: 1,
-          background: 'rgba(0, 0, 0, 0.1)',
-          borderRadius: '0 0 40px 40px'
-        }}>
+          {/* Footer signature premium */}
+          <div style={{
+            textAlign: 'center',
+            marginTop: '0.8rem',
+            padding: '0.8rem 0',
+            color: 'rgba(255, 255, 255, 0.5)',
+            fontSize: '0.75rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(0, 0, 0, 0.1)',
+            borderRadius: '0 0 30px 30px'
+          }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -783,6 +797,7 @@ export default function Login() {
             <span>Version 2.0</span>
             <span>•</span>
             <span>SSL Sécurisé</span>
+          </div>
           </div>
         </div>
       </div>
