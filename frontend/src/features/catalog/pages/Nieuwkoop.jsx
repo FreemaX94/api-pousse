@@ -11072,6 +11072,10 @@ return (
                       background: 'var(--color-surface)',
                       color: 'var(--color-text-primary)'
                     }}>📈 Upsell</option>
+                    <option value="evenements" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🎉 Événements</option>
                   </select>
                 </div>
 
@@ -11124,6 +11128,10 @@ return (
                       background: 'var(--color-surface)',
                       color: 'var(--color-text-primary)'
                     }}>📈 Upsell</option>
+                    <option value="evenements" style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)'
+                    }}>🎉 Événements</option>
                   </select>
                 </div>
 
@@ -11733,6 +11741,7 @@ return (
                     const status = statusConfig[operation.status] || statusConfig.pending;
                     const departmentNames = {
                       evenementiel: '🎉 Événementiel',
+                      evenements: '🎉 Événements',
                       creation: '🏗️ Création',
                       entretien: '🔧 Entretien',
                       upsell: '📈 Upsell'

@@ -19,14 +19,14 @@ const internalOperationSchema = new mongoose.Schema({
   // Départements impliqués
   sellingDepartment: {
     type: String,
-    enum: ['evenementiel'],
-    default: 'evenementiel',
+    enum: ['evenementiel', 'evenements', 'creation', 'entretien', 'upsell'],
+    default: 'evenements',
     required: true
   },
   
   buyingDepartment: {
     type: String,
-    enum: ['creation', 'entretien', 'upsell'],
+    enum: ['creation', 'entretien', 'upsell', 'evenements'],
     required: true
   },
   

@@ -20,8 +20,8 @@ router.post('/',
   authMiddleware(),
   celebrate({
     [Segments.BODY]: Joi.object({
-      buyingDepartment: Joi.string().valid('creation', 'entretien', 'upsell').required(),
-      sellingDepartment: Joi.string().valid('evenementiel', 'creation', 'entretien', 'upsell').optional(),
+      buyingDepartment: Joi.string().valid('creation', 'entretien', 'upsell', 'evenements').required(),
+      sellingDepartment: Joi.string().valid('evenementiel', 'evenements', 'creation', 'entretien', 'upsell').optional(),
       article: Joi.object({
         reference: Joi.string().required(),
         name: Joi.string().required(),
@@ -67,7 +67,7 @@ router.post('/',
 
       // Créer l'opération
       const operation = new InternalOperation({
-        sellingDepartment: 'evenementiel', // Toujours événementiel
+        sellingDepartment: req.body.sellingDepartment || 'evenements', // Utiliser la valeur du frontend ou défaut
         buyingDepartment,
         article,
         quantity,
@@ -134,7 +134,7 @@ router.get('/',
   authMiddleware(),
   celebrate({
     [Segments.QUERY]: Joi.object({
-      department: Joi.string().valid('evenementiel', 'creation', 'entretien', 'upsell').optional(),
+      department: Joi.string().valid('evenementiel', 'evenements', 'creation', 'entretien', 'upsell').optional(),
       status: Joi.string().valid('pending', 'validated', 'cancelled', 'completed').optional(),
       role: Joi.string().valid('seller', 'buyer', 'both').default('both'),
       limit: Joi.number().integer().min(1).max(100).default(50),
