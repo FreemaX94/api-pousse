@@ -25,6 +25,8 @@ exports.createMovement = async (req, res) => {
       isNewPlant, // nouvelle plante (mode multiple)
       height,     // hauteur de la plante (mode multiple)
       diameter,   // diamètre de la plante (mode multiple)
+      width,      // largeur de la plante (mode multiple)
+      length,     // longueur de la plante (mode multiple)
       category    // catégorie de la plante (mode multiple)
     } = req.body;
 
@@ -33,6 +35,8 @@ exports.createMovement = async (req, res) => {
     const parsedCoef = coef ? parseInt(coef, 10) : 1;
     const parsedHeight = height ? parseFloat(height) : 0;
     const parsedDiameter = diameter ? parseFloat(diameter) : 0;
+    const parsedWidth = width ? parseFloat(width) : 0;
+    const parsedLength = length ? parseFloat(length) : 0;
 
     // Pour les entrées externes sans référence, générer une référence unique
     const finalReference = reference || `EXT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -100,7 +104,7 @@ exports.createMovement = async (req, res) => {
             console.log('🔍 [NEW ARTICLE] DO_SPACES_BUCKET:', process.env.DO_SPACES_BUCKET);
             console.log('🔍 [NEW ARTICLE] isSpacesConfigured():', isSpacesConfigured());
             
-            const useSpaces = process.env.NODE_ENV === 'production' && isSpacesConfigured();
+            const useSpaces = isSpacesConfigured(); // Utiliser Spaces même en local si configuré
             console.log('🔍 [NEW ARTICLE] useSpaces:', useSpaces);
             
             if (useSpaces) {
@@ -248,11 +252,19 @@ exports.createMovement = async (req, res) => {
             name: name,
             description: note || `Article externe: ${name}`,
             category: 'externe',
+            // Dimensions dans l'objet dimensions
             dimensions: {
               height: parsedHeight || 0,
               diameter: parsedDiameter || 0,
+              width: parsedWidth || 0,
+              length: parsedLength || 0,
               unit: 'cm'
             },
+            // Dimensions directes pour compatibilité
+            height: parsedHeight || 0,
+            diameter: parsedDiameter || 0,
+            width: parsedWidth || 0,
+            length: parsedLength || 0,
             pricing: {
               price: itemPrice,
               currency: 'EUR'
@@ -351,6 +363,8 @@ exports.createMovement = async (req, res) => {
       isNewPlant: isNewPlant === 'true' || isNewPlant === true,
       height: parsedHeight,
       diameter: parsedDiameter,
+      width: parsedWidth,
+      length: parsedLength,
       category: category || 'autre'
     };
 

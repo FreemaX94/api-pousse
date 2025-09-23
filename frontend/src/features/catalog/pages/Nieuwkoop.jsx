@@ -191,6 +191,8 @@ function ExternalEntryForm({ onSaved, currentUser }) {
     coef: 1,
     height: '',
     diameter: '',
+    width: '',
+    length: '',
     eventDate: new Date().toISOString().substr(0, 10),
     project: '',
     note: '',
@@ -203,8 +205,8 @@ function ExternalEntryForm({ onSaved, currentUser }) {
   const [imagePreview, setImagePreview] = useState(null);
   
   // URL de base pour les images
-  const imageBaseUrl = import.meta.env.MODE === 'development' 
-    ? 'http://localhost:3001/api' 
+  const imageBaseUrl = import.meta.env.MODE === 'development'
+    ? 'http://localhost:3001/api'
     : (import.meta.env.VITE_API_BASE_URL || '/api');
 
   // Charger projets
@@ -277,6 +279,8 @@ function ExternalEntryForm({ onSaved, currentUser }) {
         coef: 1,
         height: '',
         diameter: '',
+        width: '',
+        length: '',
         eventDate: new Date().toISOString().substr(0, 10),
         project: '',
         note: '',
@@ -528,6 +532,42 @@ function ExternalEntryForm({ onSaved, currentUser }) {
           />
         </div>
 
+        {/* Largeur */}
+        <div>
+          <label htmlFor="width" style={getLabelStyle()}>↔️ Largeur (cm)</label>
+          <input
+            id="width"
+            name="width"
+            type="number"
+            step="0.1"
+            min="0"
+            value={formData.width}
+            onChange={handleChange}
+            placeholder="Largeur en cm"
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
+        {/* Longueur */}
+        <div>
+          <label htmlFor="length" style={getLabelStyle()}>↕️ Longueur (cm)</label>
+          <input
+            id="length"
+            name="length"
+            type="number"
+            step="0.1"
+            min="0"
+            value={formData.length}
+            onChange={handleChange}
+            placeholder="Longueur en cm"
+            style={getInputStyle()}
+            onFocus={(e) => e.target.style.borderColor = themeStyles.inputFocus}
+            onBlur={(e) => e.target.style.borderColor = themeStyles.inputBorder}
+          />
+        </div>
+
         {/* Coefficient */}
         <div>
           <label htmlFor="coef" style={getLabelStyle()}>⚖️ Coefficient</label>
@@ -719,6 +759,46 @@ if (typeof document !== 'undefined' && !document.querySelector('#micro-interacti
   style.textContent = microInteractionStyles;
   document.head.appendChild(style);
 }
+
+// Fonction utilitaire pour construire les URLs d'images
+const getImageUrl = (item) => {
+  if (!item.image) return '';
+
+  // Articles Nieuwkoop (référence normale)
+  if (item.reference && !item.reference.startsWith('EXT-')) {
+    return `/api/catalog/nieuwkoop/items/${item.reference}/image`;
+  }
+
+  // Articles externes avec image Spaces (URL complète)
+  if (item.image && (item.image.includes('digitaloceanspaces.com') || item.image.startsWith('https://'))) {
+    return item.image;
+  }
+
+  // Images de mouvements - URL selon environnement
+  if (item.image && item.image.includes('movement_')) {
+    // Extraire le nom de fichier
+    const filename = item.image.replace('/movements/', '').replace('/', '').replace(/^.*movement_/, 'movement_');
+
+    // En développement local ET production, utiliser directement DigitalOcean Spaces
+    // car la route locale /api/catalog/nieuwkoop/movement-image/ redirige vers Spaces avec CORS
+    return `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
+  }
+
+  // Articles externes en local - construire l'URL locale
+  if (item.reference && item.reference.startsWith('EXT-') && import.meta.env.MODE === 'development') {
+    // Si l'image est un chemin relatif, construire l'URL locale
+    if (!item.image.startsWith('http')) {
+      // Si l'image commence déjà par /api/, l'utiliser directement
+      if (item.image.startsWith('/api/')) {
+        return `http://localhost:3001${item.image}`;
+      }
+      return `http://localhost:3001/api${item.image.startsWith('/') ? '' : '/'}${item.image}`;
+    }
+  }
+
+  // Fallback pour autres cas
+  return item.image;
+};
 
 const Nieuwkoop = () => {
   // Hook pour le thème
@@ -3218,6 +3298,8 @@ const Nieuwkoop = () => {
               image: item.images?.[0]?.url || item.image || '',
               height: item.dimensions?.height || item.height || 0,
               diameter: item.dimensions?.diameter || item.diameter || item.DiameterCulturePot || item.Diameter || item.Opening || (item.PotSize ? parseInt(item.PotSize) : 0) || 0,
+              width: item.dimensions?.width || item.width || 0,
+              length: item.dimensions?.length || item.length || 0,
               note: item.notes || item.note || '',
               toOrder: item.stock?.toOrder || 0
             }));
@@ -7786,8 +7868,8 @@ return (
                               height: '180px',
                               overflow: 'hidden'
                             }}>
-                            <motion.img 
-                              src={prod.image} 
+                            <motion.img
+                              src={getImageUrl(prod)}
                               alt={prod.name}
                               animate={{
                                 y: [0, -3, 0],
@@ -11218,36 +11300,7 @@ return (
                               }}>
 {item.image ? (
                                   <img
-                                    src={(() => {
-                                      // DEBUG: Log des images de vases
-                                      if (item.reference && item.reference.startsWith('EXT-') && item.image && item.image.includes('movement_')) {
-                                        console.log(`🖼️ VASE DEBUG: ${item.name} (${item.reference})`, {
-                                          image: item.image,
-                                          includesSpaces: item.image.includes('digitaloceanspaces.com'),
-                                          startsWithHttps: item.image.startsWith('https://')
-                                        });
-                                      }
-                                      
-                                      // Articles Nieuwkoop (référence normale)
-                                      if (item.reference && !item.reference.startsWith('EXT-')) {
-                                        return `/api/catalog/nieuwkoop/items/${item.reference}/image`;
-                                      }
-                                      
-                                      // Articles externes avec image Spaces (URL complète)
-                                      if (item.image && (item.image.includes('digitaloceanspaces.com') || item.image.startsWith('https://'))) {
-                                        return item.image;
-                                      }
-                                      
-                                      // Images de mouvements - Direct Spaces URL
-                                      if (item.image && item.image.includes('movement_')) {
-                                        const filename = item.image.replace('/movements/', '').replace('/', '');
-                                        // Direct URL vers DigitalOcean Spaces
-                                        return `https://api-pousse-uploads.ams3.digitaloceanspaces.com/movements/${filename}`;
-                                      }
-                                      
-                                      // Fallback pour autres cas
-                                      return item.image;
-                                    })()}
+                                    src={getImageUrl(item)}
                                     alt={item.name}
                                     style={{
                                       width: '100%',
