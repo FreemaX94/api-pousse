@@ -891,6 +891,7 @@ const Nieuwkoop = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [sortBy, setSortBy] = useState("prix");
+  const [selectedLetter, setSelectedLetter] = useState('');
   
   // 🌟 Mouse Trail Effect - DÉSACTIVÉ POUR PERFORMANCE
   // const [mousePos, setMousePos] = useState({x: 0, y: 0});
@@ -7433,6 +7434,148 @@ return (
                   </div>
                 </div>
 
+                {/* Filtre Alphabétique */}
+                <div style={{
+                  marginTop: '2rem',
+                  padding: '1.5rem',
+                  background: isDark
+                    ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                    : 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                  borderRadius: '20px',
+                  boxShadow: isDark
+                    ? 'inset 0 2px 8px rgba(0, 0, 0, 0.2)'
+                    : 'inset 0 2px 8px rgba(0, 0, 0, 0.04)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    marginBottom: '1rem'
+                  }}>
+                    <span style={{
+                      fontSize: '1.1rem',
+                      fontWeight: '700',
+                      color: isDark ? '#f3f4f6' : '#1f2937'
+                    }}>
+                      🔤 Filtrer par lettre
+                    </span>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem',
+                    alignItems: 'center'
+                  }}>
+                    {/* Bouton Tous */}
+                    <button
+                      onClick={() => setSelectedLetter('')}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '10px',
+                        border: selectedLetter === ''
+                          ? '2px solid #10b981'
+                          : `2px solid ${isDark ? '#4b5563' : '#d1d5db'}`,
+                        background: selectedLetter === ''
+                          ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                          : isDark ? '#374151' : 'white',
+                        color: selectedLetter === '' ? 'white' : (isDark ? '#f3f4f6' : '#374151'),
+                        fontWeight: selectedLetter === '' ? '700' : '600',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        boxShadow: selectedLetter === ''
+                          ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                          : '0 2px 4px rgba(0, 0, 0, 0.05)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedLetter !== '') {
+                          e.target.style.transform = 'translateY(-2px)';
+                          e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = selectedLetter === ''
+                          ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                          : '0 2px 4px rgba(0, 0, 0, 0.05)';
+                      }}
+                    >
+                      Tous
+                    </button>
+
+                    {/* Lettres A-Z */}
+                    {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => {
+                      const hasArticles = addedItems.some(item => {
+                        const matchesCategory = !activeCategory || item.category === activeCategory;
+                        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+                        const matchesLetter = item.name.charAt(0).toUpperCase() === letter;
+                        return matchesCategory && matchesSearch && matchesLetter;
+                      });
+
+                      const articleCount = addedItems.filter(item => {
+                        const matchesCategory = !activeCategory || item.category === activeCategory;
+                        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+                        const matchesLetter = item.name.charAt(0).toUpperCase() === letter;
+                        return matchesCategory && matchesSearch && matchesLetter;
+                      }).length;
+
+                      return (
+                        <button
+                          key={letter}
+                          onClick={() => hasArticles && setSelectedLetter(letter)}
+                          disabled={!hasArticles}
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            borderRadius: '10px',
+                            border: selectedLetter === letter
+                              ? '2px solid #10b981'
+                              : `2px solid ${isDark ? '#4b5563' : '#d1d5db'}`,
+                            background: selectedLetter === letter
+                              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                              : hasArticles
+                                ? (isDark ? '#374151' : 'white')
+                                : (isDark ? '#1e293b' : '#f3f4f6'),
+                            color: selectedLetter === letter
+                              ? 'white'
+                              : hasArticles
+                                ? (isDark ? '#f3f4f6' : '#374151')
+                                : (isDark ? '#4b5563' : '#9ca3af'),
+                            fontWeight: selectedLetter === letter ? '700' : '600',
+                            fontSize: '0.9rem',
+                            cursor: hasArticles ? 'pointer' : 'not-allowed',
+                            transition: 'all 0.2s ease',
+                            boxShadow: selectedLetter === letter
+                              ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                              : '0 2px 4px rgba(0, 0, 0, 0.05)',
+                            opacity: hasArticles ? 1 : 0.4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (hasArticles && selectedLetter !== letter) {
+                              e.target.style.transform = 'translateY(-2px)';
+                              e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = selectedLetter === letter
+                              ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                              : '0 2px 4px rgba(0, 0, 0, 0.05)';
+                          }}
+                          title={hasArticles ? `${articleCount} article${articleCount > 1 ? 's' : ''}` : 'Aucun article'}
+                        >
+                          {letter}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Système de notifications */}
                 <div style={{
                   position: 'fixed',
@@ -7492,7 +7635,12 @@ return (
                     // Trier les lettres
                     const sortedLetters = Object.keys(groupedByLetter).sort();
 
-                    return sortedLetters.map(letter => (
+                    // Filtrer par lettre sélectionnée
+                    const lettersToDisplay = selectedLetter
+                      ? sortedLetters.filter(letter => letter === selectedLetter)
+                      : sortedLetters;
+
+                    return lettersToDisplay.map(letter => (
                       <div key={letter} style={{ marginBottom: '3rem' }}>
                         {/* En-tête de lettre */}
                         <div style={{
