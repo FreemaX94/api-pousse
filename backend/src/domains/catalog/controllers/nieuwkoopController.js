@@ -375,7 +375,7 @@ exports.updateNieuwkoopCategory = async (req, res) => {
     const { id } = req.params;
     const { category } = req.body;
 
-    const allowed = ['plante', 'contenant', 'noel', 'artificiel', 'seche', 'entretien', 'autre'];
+    const allowed = ['plante', 'plantes-exterieures', 'contenant', 'decoration', 'noel', 'artificiel', 'seche', 'entretien', 'autre'];
     if (!allowed.includes(category)) {
       return res.status(400).json({ message: 'Catégorie invalide.' });
     }

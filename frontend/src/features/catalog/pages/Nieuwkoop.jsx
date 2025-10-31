@@ -8429,7 +8429,7 @@ return (
                               >
                                 <option value="">🤷‍♂️ Non classé</option>
                                 <option value="plante">🌿 Plantes</option>
-                                <option value="plantes-exterieurs">🌲 Plantes extérieurs</option>
+                                <option value="plantes-exterieures">🌲 Plantes extérieures</option>
                                 <option value="contenant">🏺 Contenants</option>
                                 <option value="decoration">🎨 Décor</option>
                                 <option value="artificiel">🧠 Artificiels</option>
